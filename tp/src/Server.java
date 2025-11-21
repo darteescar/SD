@@ -1,9 +1,10 @@
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Server {
      private Cache cache_eventos;
-     private ClientesBD clientes;
+     private HashMap<String, Cliente> clientes;
      private ThreadPool threadPool;
 
      public Server (int days, int series, int threads, int cache_size) {
