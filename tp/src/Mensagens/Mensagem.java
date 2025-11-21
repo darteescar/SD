@@ -44,6 +44,7 @@ public class Mensagem {
                Evento evento = Evento.deserialize(in);
 
                return new MsgEvento(nome_cliente, tipo_mensagem, dia, evento);
+
           } else if (tipo_mensagem == TipoMensagem.QUERY_INFORMACAO_1 ||
                               tipo_mensagem == TipoMensagem.QUERY_INFORMACAO_2 ||
                               tipo_mensagem == TipoMensagem.QUERY_INFORMACAO_3 ||
@@ -53,27 +54,39 @@ public class Mensagem {
                int diasAnteriores = in.readInt();
 
                return new MsgInformacao(nome_cliente, tipo_mensagem, dia, nome_produto, diasAnteriores);
+
           } else if (tipo_mensagem == TipoMensagem.QUERY_FILTRO) {
 
                int size = in.readInt();
                ArrayList<String> produtos = new ArrayList<>();
+
                for (int i = 0; i < size; i++) {
                     produtos.add(in.readUTF());
                }
+               
                int diaFiltro = in.readInt();
 
                return new MsgFiltro(nome_cliente, tipo_mensagem, dia, produtos, diaFiltro);
+
           } else if (tipo_mensagem == TipoMensagem.QUERY_OCORRENCIAS_SIMULTANEAS) {
 
                String p1 = in.readUTF();
                String p2 = in.readUTF();
 
                return new MsgOcorrSimultanea(nome_cliente, tipo_mensagem, dia, p1, p2);
+
           } else if (tipo_mensagem == TipoMensagem.QUERY_OCORRENCIAS_CONSECUTIVAS) {
                
                int n = in.readInt();
 
                return new MsgOcorrConsecutiva(nome_cliente, tipo_mensagem, dia, n);
+
+          } else if (tipo_mensagem == TipoMensagem.LOGIN) {
+               
+               String password = in.readUTF();
+
+               return new MsgLogin(nome_cliente, tipo_mensagem, dia, password);
+          
           } else {
                return null;// Tipo de mensagem desconhecido
           }

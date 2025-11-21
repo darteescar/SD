@@ -3,11 +3,12 @@ import java.util.HashMap;
 import java.util.Map;
 import Data.Serie;
 import Data.Evento;
+import Data.Login;
 
 public class Server {
      //private Cache cache_eventos;
-     private HashMap<String, Cliente> clientes;
      //private ThreadPool threadPool;
+     private HashMap<String, Login> logins;
      private Serie serieDiaAtual = new Serie();
 
      public Server (int days, int series, int threads, int cache_size) {
