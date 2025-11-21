@@ -8,6 +8,7 @@ public class Server {
      //private Cache cache_eventos;
      private HashMap<String, Cliente> clientes;
      //private ThreadPool threadPool;
+     private Serie serieDiaAtual = new Serie();
 
      public Server (int days, int series, int threads, int cache_size) {
      }

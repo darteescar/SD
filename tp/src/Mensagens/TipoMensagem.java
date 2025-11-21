@@ -1,13 +1,14 @@
 package Mensagens;
 
 public enum TipoMensagem {
+     REGISTO_EVENTO,
+     QUERY_INFORMACAO_1,
+     QUERY_INFORMACAO_2,
+     QUERY_INFORMACAO_3,
+     QUERY_INFORMACAO_4,
+     QUERY_FILTRO,
+     QUERY_OCORRENCIAS_SIMULTANEAS,
+     QUERY_OCORRENCIAS_CONSECUTIVAS,
      LOGIN,
-     LOGOUT,
-     COMPRA,
-     QUERY_1,
-     QUERY_2,
-     QUERY_3,
-     QUERY_4,
-     QUERY_5,
-     QUERY_6
+     LOGOUT
 }
