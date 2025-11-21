@@ -1,3 +1,5 @@
+package Mensagens;
+
 public enum TipoMensagem {
      LOGIN,
      LOGOUT,

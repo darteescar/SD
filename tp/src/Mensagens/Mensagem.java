@@ -1,6 +1,5 @@
 package Mensagens;
 
-import TipoMensagem;
 import java.time.LocalDate;
 
 public class Mensagem {
