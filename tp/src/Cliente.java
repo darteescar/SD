@@ -5,8 +5,6 @@ import java.time.LocalDate;
 //import Data.Login;
 import Mensagens.*;
 
-import Mensagens.Mensagem;
-
 public class Cliente {
 
      public void main(String[] args) throws Exception {
@@ -17,7 +15,7 @@ public class Cliente {
                
           String username = args[0];
           String password = args[1];
-          Mensagem msgInicial = new MsgLogin(username, TipoMensagem.LOGIN, LocalDate.now(), password);
+          Mensagem msgInicial = new MsgCliente(username, TipoMensagem.LOGIN, LocalDate.now(), password);
 
           Socket s = new Socket("localhost", 12345);
          
