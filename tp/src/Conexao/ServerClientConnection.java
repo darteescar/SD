@@ -52,7 +52,7 @@ public class ServerClientConnection implements AutoCloseable {
         }
     }
 
-    public Frame receiveMsg() throws IOException {
+    public Frame receive() throws IOException {
         this.lockReceive.lock();
         try {
             int tag = this.in.readInt();
