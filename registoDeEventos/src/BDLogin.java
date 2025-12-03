@@ -19,6 +19,7 @@ public class BDLogin {
 
      public boolean containsUser(String username){
           // procura pelo user no ficheiro
+          return true;
      }
 
      public void add(String username, String password){
@@ -27,9 +28,11 @@ public class BDLogin {
 
      public boolean remove(String username, String password){
           // remove user e password do ficheiro
+          return true;
      }
 
      public String get(String username){
           // devolve password do username passado
+          return null;
      }
 }

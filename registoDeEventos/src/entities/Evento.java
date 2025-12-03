@@ -4,7 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class Evento {
+public class Evento{
     private String produto;
     private int quantidade;
     private double preco;
@@ -57,25 +57,18 @@ public class Evento {
         return new Evento(this);
     }
     
-    public void serialize(DataOutputStream dos) throws IOException{
+    public void serialize(DataOutputStream dos) throws IOException{   
         dos.writeUTF(this.produto);
         dos.writeInt(this.quantidade);
         dos.writeDouble(this.preco);
         dos.writeUTF(this.data);
-        // o flush fica noutro sítio
     }
 
-    public static Evento deserialize(DataInputStream dis){
-        try{
-            String produto = dis.readUTF();
-            int quantidade = dis.readInt();
-            double preco = dis.readDouble();
-            String data = dis.readUTF();
-            return new Evento(produto, quantidade, preco, data);
-        }catch(IOException e){
-            System.out.println("[PROBLEMA AO DESERIALIZAR EVENTO] " + e.getMessage());
-            e.printStackTrace();
-            return null;
-        }
+    public static Evento deserialize(DataInputStream dis) throws IOException{
+        String produto = dis.readUTF();
+        int quantidade = dis.readInt();
+        double preco = dis.readDouble();
+        String data = dis.readUTF();
+        return new Evento(produto, quantidade, preco, data);
     }
 }

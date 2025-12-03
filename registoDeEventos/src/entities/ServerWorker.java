@@ -1,5 +1,8 @@
 package entities;
 
+import java.net.Socket;
+
+import structs.Par;
 import structs.ServerBuffer;
 
 public class ServerWorker implements Runnable {
@@ -16,10 +19,10 @@ public class ServerWorker implements Runnable {
         try {
             while (true) {
                 // Bloqueia à espera que a queue tenha uma mensagem para processar
-                Mensagem mensagem = buffer.poll();
+                Par<Socket, Mensagem> par = buffer.poll();
                 
                 // Processamento da mensagem
-                processEvent(mensagem);
+                processEvent(par.snd());
             }
         } catch (InterruptedException e) {
             System.out.println("Worker " + id + " interrompido.");
@@ -27,7 +30,7 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private void processEvent(Object mensagem) {
+    private void processEvent(Mensagem mensagem) {
         
     }
 }

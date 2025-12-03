@@ -1,5 +1,4 @@
-
-
+import structs.Cache;
 
 public class GestorLogins {
      Cache<String,String> cache; //<USER,PASSWORD>
