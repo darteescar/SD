@@ -1,6 +1,5 @@
 package client;
 
-import java.io.IOException;
 import java.net.Socket;
 import structs.ClientBuffer;
 
@@ -22,8 +21,6 @@ public class Client {
                // Lançar thread reader
                new Thread(new ClientReader(socket, bufferIn)).start();
 
-          } catch (IOException e) {
-               e.printStackTrace();
           } catch(Exception e) {
                e.printStackTrace();
           }
