@@ -1,4 +1,5 @@
-import structs.Cache;
+package structs;
+import data.BDUsers;
 
 public class GestorLogins {
      Cache<String,String> cache; //<USER,PASSWORD>

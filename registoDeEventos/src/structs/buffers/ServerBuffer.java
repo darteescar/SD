@@ -1,43 +1,43 @@
-package structs;
+package structs.buffers;
 
-import entities.Mensagem;
+import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ClientBuffer {
-    private Queue<Mensagem> queue;
+import entities.Mensagem;
+import structs.Par;
+
+public class ServerBuffer {
+    private Queue<Par<Socket, Mensagem>> queue;
     private ReentrantLock lock;
     private Condition condition;
 
-    public ClientBuffer(){
+    public ServerBuffer(){
         this.queue = new ArrayDeque<>();
         this.lock = new ReentrantLock();
         this.condition = this.lock.newCondition();
     }
 
-    public void add(Mensagem mensagem){
+    public void add(Par<Socket, Mensagem> par){
         this.lock.lock();
         try{
-            this.queue.add(mensagem);
+            this.queue.add(par);
             condition.signal(); // Acorda uma thread que esteja a espera de consumir
         }finally{
             this.lock.unlock();
         } 
     }
 
-    public Mensagem poll(){
+    public Par<Socket, Mensagem> poll() throws InterruptedException{
         this.lock.lock();
         try{
             while(queue.isEmpty()){
                 condition.await(); // Bloqueia até haver uma mensagem para processar
             }
             return this.queue.poll();
-        } catch(InterruptedException e) {
-            Thread.currentThread().interrupt();
-            return null;
-        } finally{
+        }finally{
             this.lock.unlock();
         }
     }

@@ -1,11 +1,12 @@
-package client;
+package structs.threads;
 
 import entities.Mensagem;
+import structs.buffers.ClientBuffer;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.Socket;
-import structs.ClientBuffer;
 
 public class ClientReader implements Runnable  {
     private final Socket socket;

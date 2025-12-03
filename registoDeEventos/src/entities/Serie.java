@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import entities.requests.Evento;
+import entities.payloads.Evento;
 
 public class Serie {
     private List<Evento> eventos;

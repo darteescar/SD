@@ -1,4 +1,4 @@
-package entities.requests;
+package entities.payloads;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

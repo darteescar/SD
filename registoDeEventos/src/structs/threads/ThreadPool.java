@@ -1,6 +1,7 @@
-package structs;
+package structs.threads;
 
 import entities.ServerWorker;
+import structs.buffers.ServerBuffer;
 
 public class ThreadPool {
     private Thread[] threads;

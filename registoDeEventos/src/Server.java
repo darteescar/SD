@@ -5,8 +5,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import entities.Mensagem;
-import structs.ServerBuffer;
-import structs.ThreadPool;
+import structs.buffers.ServerBuffer;
+import structs.threads.ThreadPool;
 import structs.Par;
 
 

@@ -3,7 +3,7 @@ package entities;
 import java.net.Socket;
 
 import structs.Par;
-import structs.ServerBuffer;
+import structs.buffers.ServerBuffer;
 
 public class ServerWorker implements Runnable {
     private int id;
