@@ -1,5 +1,6 @@
 package structs;
 
+import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;
@@ -8,7 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import entities.Mensagem;
 
 public class ServerBuffer {
-    private Queue<Mensagem> queue;
+    private Queue<Par<Socket, Mensagem>> queue;
     private ReentrantLock lock;
     private Condition condition;
 
@@ -18,17 +19,17 @@ public class ServerBuffer {
         this.condition = this.lock.newCondition();
     }
 
-    public void add(Mensagem mensagem){
+    public void add(Par<Socket, Mensagem> par){
         this.lock.lock();
         try{
-            this.queue.add(mensagem);
+            this.queue.add(par);
             condition.signal(); // Acorda uma thread que esteja a espera de consumir
         }finally{
             this.lock.unlock();
         } 
     }
 
-    public Mensagem poll() throws InterruptedException{
+    public Par<Socket, Mensagem> poll() throws InterruptedException{
         this.lock.lock();
         try{
             while(queue.isEmpty()){
