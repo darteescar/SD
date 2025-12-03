@@ -7,12 +7,18 @@ import java.io.IOException;
 import enums.TipoMsg;
 
 public class Mensagem {
+    private int id;
     private TipoMsg tipo;
     private byte[] data;
 
-    public Mensagem(TipoMsg tipo, byte[] data){
+    public Mensagem(int id, TipoMsg tipo, byte[] data){
+        this.id = id;
         this.tipo = tipo;
         this.data = data;
+    }
+    
+    public int getID(){
+        return this.id;
     }
 
     public TipoMsg getTipo(){
@@ -24,17 +30,19 @@ public class Mensagem {
     }
 
     public void serialize(DataOutputStream dos) throws IOException{
+        dos.writeInt(id);
         dos.writeInt(this.tipo.ordinal());
         dos.writeInt(this.data.length);
         dos.write(this.data);
     }
 
     public static Mensagem deserialize(DataInputStream dis) throws IOException{
+        int id = dis.readInt();
         int tipoOrdinal = dis.readInt();
         TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
         int length = dis.readInt();
         byte[] data = new byte[length];
         dis.readFully(data);
-        return new Mensagem(tipo, data);
+        return new Mensagem(id, tipo, data);
     }
 }

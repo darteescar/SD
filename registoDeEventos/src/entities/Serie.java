@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import entities.requests.Evento;
+
 public class Serie {
     private List<Evento> eventos;
     private ReentrantLock lock;
@@ -51,9 +53,11 @@ public class Serie {
     public void serialize(DataOutputStream dos) throws IOException{
         this.lock.lock();
         try{
-            dos.writeInt(this.size());
+            dos.writeInt(this.eventos.size());
             for(Evento e : this.eventos){
-                e.serialize(dos);
+                byte[] eventoBytes = e.serialize();
+                dos.writeInt(eventoBytes.length);
+                dos.write(eventoBytes);
             }
         }finally{
             this.lock.unlock();
@@ -62,10 +66,12 @@ public class Serie {
 
     public static Serie deserialize(DataInputStream dis) throws IOException{
         Serie serie = new Serie();
-
         int size = dis.readInt();
         for(int i = 0; i < size; i++){
-            Evento evento = Evento.deserialize(dis);
+            int eventoSize = dis.readInt();
+            byte[] eventoBytes = new byte[eventoSize];
+            dis.readFully(eventoBytes);
+            Evento evento = Evento.deserialize(eventoBytes);
             serie.add(evento);
         }
         return serie;
