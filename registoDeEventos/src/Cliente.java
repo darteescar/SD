@@ -1,8 +1,11 @@
-public class Cliente {
+import java.io.IOException;
+import java.net.Socket;
 
+public class Cliente {
+    private Socket socket;
     private boolean conectado = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Cliente cliente = new Cliente();
         ClienteView view = new ClienteView(cliente);
         view.iniciar();
@@ -17,18 +20,30 @@ public class Cliente {
     // ------------------------ AÇÕES ------------------------
 
     public void conectar() {
-        
+        try {
+            this.socket = new Socket("localhost",12345);
+            if (socket.isConnected()){
+                conectado = true;
+            }
 
-        // código real de ligação ao servidor
-        // socket = new Socket(...)
-
-        conectado = true; // trocar para o real
+        } catch (IOException e) {
+            System.out.println("Cliente não conseguiu estabelecer conexão. "+e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void desconectar() {
-        
-        conectado = false;
-        // Fechar socket, parar threads, etc.
+        try {
+            // Esperar por todas as mensagens das Threads ?
+            this.socket.close();
+            if (socket.isClosed()){
+                conectado = false;
+            }
+
+        } catch (IOException e) {
+            System.out.println("Cliente não conseguiu estabelecer conexão. "+e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void enviarEvento() {

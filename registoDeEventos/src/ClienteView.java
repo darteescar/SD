@@ -1,6 +1,6 @@
-import menu.*;
 import java.util.Arrays;
 import java.util.List;
+import menu.*;
 
 public class ClienteView {
 
