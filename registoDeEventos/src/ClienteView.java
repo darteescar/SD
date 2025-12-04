@@ -22,13 +22,8 @@ public class ClienteView {
 
         List<MenuOpcao> opcoes = Arrays.asList(
             new MenuOpcao("Conectar ao Servidor", () -> {
-                if (cliente.conectar()) {
-                    System.out.println("Ligação estabelecida!");
+                
                     mostrarMenuLogin();
-                } else {
-                    System.out.println("Ligação falhada!");
-                    mostrarMenuConexao();
-                }
             })
         );
 
@@ -41,6 +36,11 @@ public class ClienteView {
         List<MenuOpcao> opcoes = Arrays.asList(
 
             new MenuOpcao("Registar", () -> {
+
+
+                // ler dados de registo
+
+
                 if (cliente.registar()) {
                     System.out.println("Registo realizado com sucesso!");
                     mostrarMenuPrincipal();
@@ -51,6 +51,11 @@ public class ClienteView {
             }),
 
             new MenuOpcao("Login", () -> {
+
+
+                // ler dados de login
+
+
                 if (cliente.login()) {
                     System.out.println("Login realizado com sucesso!");
                     mostrarMenuPrincipal();
@@ -102,6 +107,7 @@ public class ClienteView {
         List<MenuOpcao> opcoes = Arrays.asList(
 
             new MenuOpcao("Enviar Mensagem", () -> {
+
                 // Mostrar opções de TipoMsg
                 System.out.println("Escolha o tipo de mensagem:");
                 for (TipoMsg tipo : TipoMsg.values()) {
