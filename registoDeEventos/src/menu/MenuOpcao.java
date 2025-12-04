@@ -30,7 +30,7 @@ public class MenuOpcao {
         this.preCondicao = preCondicao;
         this.metodo = metodo;
     }
-
+    
     /**
      * Construtor parameterizado
      * 
