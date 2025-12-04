@@ -23,7 +23,7 @@ public class GestorLogins {
      }
      
      public boolean autenticar(String username,String password) {
-          if (cache.containsKey(username)){ // se está na cache
+          if (cache.containsKey(username)){ // MISS - se está na cache
                if (cache.get(username).equals(password)){ // se a password guardada é igual à passada
                     return true; // autenticação correta
                }
@@ -33,7 +33,7 @@ public class GestorLogins {
                     return true; // autenticação correta
                }
           } 
-          return false;
+          return false; // user nao existe ou password incorreta
      }
 
      public boolean apagar(String username, String password) {
