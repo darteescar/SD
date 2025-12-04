@@ -2,22 +2,24 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import structs.GestorLogins;
 import structs.ServerWorker;
 
 public class Server implements AutoCloseable{
     private final ServerSocket ss;
-    // Cache
-    // Base de Dados
+    private final GestorLogins logins;
 
     public Server() throws IOException{
         this.ss = new ServerSocket(12345);
+        this.logins = new GestorLogins(10);
     }
 
     public void start() throws IOException{
         while(true){
-            // Começar a aceitar conexões dos clientes
+            // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
-            Thread worker  = new Thread(new ServerWorker(socket));
+            // Cada cliente tem um thread dedicada a processar e executar mensagens
+            Thread worker  = new Thread(new ServerWorker(socket, logins));
             worker.start();
         }
     }

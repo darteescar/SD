@@ -2,6 +2,7 @@ package enums;
 
 public enum TipoMsg {
     LOGIN,
+    REGISTA_LOGIN,
     REGISTO,
     QUANTIDADE_VENDAS,
     VOLUME_VENDAS,
