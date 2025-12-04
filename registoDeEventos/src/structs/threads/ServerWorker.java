@@ -1,7 +1,7 @@
-package entities;
+package structs.threads;
 
 import java.net.Socket;
-
+import entities.Mensagem;
 import structs.Par;
 import structs.buffers.ServerBuffer;
 

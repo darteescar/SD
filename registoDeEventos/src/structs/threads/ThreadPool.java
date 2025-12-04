@@ -1,6 +1,5 @@
 package structs.threads;
 
-import entities.ServerWorker;
 import structs.buffers.ServerBuffer;
 
 public class ThreadPool {
