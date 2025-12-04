@@ -15,7 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import entities.Mensagem;
 
-public class Demultiplexer {
+public class Demultiplexer implements AutoCloseable{
     class Entry{
         public Queue<String> queue;
         public Condition cond;
@@ -92,7 +92,7 @@ public class Demultiplexer {
     public String receive(int id) throws InterruptedException{
         this.lock.lock();
         try{
-            Entry entry = this.mapEntries.get(id);
+            Entry entry = this.getEntry(id);
             while(entry.queue.isEmpty()){
                 entry.cond.await();
                 if(this.ex != null){

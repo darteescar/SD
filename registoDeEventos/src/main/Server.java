@@ -1,3 +1,4 @@
+package main;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -24,6 +25,7 @@ public class Server implements AutoCloseable{
         }
     }
 
+    @Override
     public void close() throws IOException{
         this.ss.close();
     }
