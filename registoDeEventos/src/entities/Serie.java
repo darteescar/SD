@@ -1,21 +1,25 @@
 package entities;
 
-import java.io.DataInputStream;
+import entities.payloads.Evento;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import entities.payloads.Evento;
-
 public class Serie {
+    private String data;
     private List<Evento> eventos;
     private ReentrantLock lock;
 
-    public Serie(){
+    public Serie(String data){
         this.eventos = new ArrayList<>();
         this.lock = new ReentrantLock();
+        this.data = data;
+    }
+
+    public String getData() {
+        return this.data;
     }
 
     public void add(Evento evento){
@@ -41,6 +45,7 @@ public class Serie {
         this.lock.lock();
         try{
             StringBuilder sb = new StringBuilder();
+            sb.append(this.data).append(":\n");
             for(Evento e : this.eventos){
                 sb.append(e.toString()).append("\n");
             }
@@ -64,7 +69,7 @@ public class Serie {
         }
     }
 
-    public static Serie deserialize(DataInputStream dis) throws IOException{
+    /*public static Serie deserialize(DataInputStream dis) throws IOException{
         Serie serie = new Serie();
         int size = dis.readInt();
         for(int i = 0; i < size; i++){
@@ -75,5 +80,14 @@ public class Serie {
             serie.add(evento);
         }
         return serie;
+    }*/
+
+    public List<Evento> getEventos() {
+        this.lock.lock();
+        try {
+            return new ArrayList<>(this.eventos);
+        } finally {
+            this.lock.unlock();
+        }
     }
 }
