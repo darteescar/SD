@@ -3,15 +3,18 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import structs.GestorLogins;
+import structs.GestorSeries;
 import structs.ServerWorker;
 
 public class Server implements AutoCloseable{
     private final ServerSocket ss;
     private final GestorLogins logins;
+    private final GestorSeries eventos;
 
-    public Server() throws IOException{
+    public Server(int d, int s) throws IOException{
         this.ss = new ServerSocket(12345);
-        this.logins = new GestorLogins(10);
+        this.logins = new GestorLogins(s+1);
+        this.eventos = new GestorSeries(d, s);
     }
 
     public void start() throws IOException{
@@ -30,8 +33,16 @@ public class Server implements AutoCloseable{
     }
 
     public static void main(String[] args){
-        try (Server server = new Server();){
+        if (args.length != 2){
+            System.out.println("Uso: make server <D> <S>");
+            return;
+        }
+        int d = Integer.parseInt(args[0]);
+        int s = Integer.parseInt(args[1]);
+
+        try (Server server = new Server(d,s);){
             server.start();
+
         }catch(Exception e){
             System.out.println("[ERRO SERVER] " + e.getMessage());
             e.printStackTrace();
