@@ -9,17 +9,17 @@ public class BDUsers {
             BDUsers.singleton = new BDUsers();
         }
         return BDUsers.singleton;
-    }
+     }
 
      // Construtor: cria a tabela se não existir
      private BDUsers() {
           try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
-             Statement stm = conn.createStatement()){
-          String sql = "CREATE TABLE IF NOT EXISTS users (" +
-                       "username VARCHAR(50) PRIMARY KEY," +
-                       "password VARCHAR(50) NOT NULL" +
-                       ");";
-          stm.executeUpdate(sql);
+               Statement stm = conn.createStatement()){
+               String sql = "CREATE TABLE IF NOT EXISTS users (" +
+                         "username VARCHAR(50) PRIMARY KEY," +
+                         "password VARCHAR(50) NOT NULL" +
+                         ");";
+               stm.executeUpdate(sql);
           } catch (SQLException e) {
                System.out.println("Erro ao criar tabela de utilizadores: " + e.getMessage());
                e.printStackTrace();
