@@ -17,20 +17,20 @@ import java.net.Socket;
 public class ServerWorker implements Runnable {
     private final Socket socket;
     private final GestorLogins logins;
+    private final GestorSeries gestorSeries;
     private final DataOutputStream out;
     private final DataInputStream in;
     private final int cliente;
     private Data data;
-    private GestorSeries gestorSeries;
 
     public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data, GestorSeries gestorSeries) throws IOException{
         this.socket = socket;
         this.logins = logins;
+        this.gestorSeries = gestorSeries;
         this.out = new DataOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
         this.data = data;
-        this.gestorSeries = gestorSeries;
     }
 
     @Override
