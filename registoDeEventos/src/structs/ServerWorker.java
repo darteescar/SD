@@ -1,19 +1,17 @@
 package structs;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.List;
-
 import entities.Mensagem;
 import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
 import entities.payloads.Login;
 import enums.TipoMsg;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.Socket;
 
 public class ServerWorker implements Runnable {
     private final Socket socket;
@@ -84,11 +82,11 @@ public class ServerWorker implements Runnable {
             case LOGIN -> result = processLOGIN(mensagem.getData());
             case REGISTA_LOGIN -> result = processREGISTA_LOGIN(mensagem.getData());
             case REGISTO -> result = processREGISTO(mensagem.getData());
-            case QUANTIDADE_VENDAS -> processQUANTIDADE_VENDAS(mensagem.getData());
-            case VOLUME_VENDAS -> processVOLUME_VENDAS(mensagem.getData());
-            case PRECO_MEDIO -> processPRECO_MEDIO(mensagem.getData());
-            case PRECO_MAXIMO -> processPRECO_MAXIMO(mensagem.getData());
-            case LISTA -> processLISTA(mensagem.getData());
+            case QUANTIDADE_VENDAS -> result = processQUANTIDADE_VENDAS(mensagem.getData());
+            case VOLUME_VENDAS -> result = processVOLUME_VENDAS(mensagem.getData());
+            case PRECO_MEDIO -> result =processPRECO_MEDIO(mensagem.getData());
+            case PRECO_MAXIMO -> result = processPRECO_MAXIMO(mensagem.getData());
+            case LISTA -> result = processLISTA(mensagem.getData());
             default -> throw new IllegalArgumentException("[TIPO DE MENSAGEM INVALIDO");
         }
 
