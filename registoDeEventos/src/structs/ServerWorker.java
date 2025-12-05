@@ -56,7 +56,7 @@ public class ServerWorker implements Runnable {
                     Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
                     reply.serialize(out);
                     out.flush();
-                    System.out.println("Servidor enviou resposta da mensagem > " + id + " (" + tipo + ")");
+                    //System.out.println("Servidor enviou resposta da mensagem > " + id + " (" + tipo + ")");
                 } catch (IOException e) {
                     System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
                     e.printStackTrace();
@@ -87,7 +87,7 @@ public class ServerWorker implements Runnable {
             case PRECO_MEDIO -> result =processPRECO_MEDIO(mensagem.getData());
             case PRECO_MAXIMO -> result = processPRECO_MAXIMO(mensagem.getData());
             case LISTA -> result = processLISTA(mensagem.getData());
-            default -> throw new IllegalArgumentException("[TIPO DE MENSAGEM INVALIDO");
+            default -> throw new IllegalArgumentException("[TIPO DE MENSAGEM INVALIDO]");
         }
 
         return result;

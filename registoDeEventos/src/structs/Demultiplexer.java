@@ -1,5 +1,6 @@
 package structs;
 
+import entities.Mensagem;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -12,8 +13,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-
-import entities.Mensagem;
 
 public class Demultiplexer implements AutoCloseable{
     class Entry{
@@ -58,7 +57,7 @@ public class Demultiplexer implements AutoCloseable{
                     Mensagem m = Mensagem.deserialize(in);
                     int id = m.getID();
                     String result = new String(m.getData());
-                    System.out.println("BG: " + result);
+                    //System.out.println("BG: " + result);
                     //System.out.println("Demultiplexer recebeu resposta da mensagem (background) > " + id );
 
                     this.lock.lock();
@@ -104,7 +103,7 @@ public class Demultiplexer implements AutoCloseable{
                 }
             }
             String reply = entry.queue.poll();
-            System.out.println("Demu: " + reply);
+            //System.out.println("Demu: " + reply);
             //System.out.println("Demultiplexer recebeu resposta da mensagem (receive) > " + id );
             return reply;
         }finally{

@@ -2,7 +2,6 @@ package main;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-
 import structs.GestorLogins;
 import structs.ServerWorker;
 
