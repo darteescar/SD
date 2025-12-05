@@ -1,18 +1,17 @@
 package main;
-import java.io.IOException;
-import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-
 import entities.Mensagem;
 import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
 import entities.payloads.Login;
 import enums.TipoMsg;
-import structs.Sender;
+import java.io.IOException;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import structs.ClienteView;
 import structs.Demultiplexer;
+import structs.Sender;
 
 public class Cliente implements AutoCloseable{
     private final Socket socket;
@@ -42,12 +41,31 @@ public class Cliente implements AutoCloseable{
         sender.start();
     }
 
-    public void sendLOGIN(TipoMsg tipo, String username, String password) throws IOException{
+    public boolean sendAndWait(Mensagem mensagem) {
+        boolean result = false;
+
+        try {
+            int id = mensagem.getID();
+
+            this.demu.send(mensagem);
+            String resposta = this.demu.receive(id);
+
+            result = resposta.equals("true");
+
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            result = false;
+        }
+
+        return result;
+}
+
+    public boolean sendLOGIN(TipoMsg tipo, String username, String password) throws IOException{
         Login login = new Login(username, password);
         byte[] bytes = login.serialize();
         Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
         
-        this.send(mensagem);
+        return this.sendAndWait(mensagem);
     }
 
     public void sendEVENTO(TipoMsg tipo, String produto, int quantidade, double preco, String data) throws IOException{

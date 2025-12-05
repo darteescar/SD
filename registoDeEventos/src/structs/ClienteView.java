@@ -1,12 +1,11 @@
 package structs;
+import enums.TipoMsg;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.locks.ReentrantLock;
-
-import enums.TipoMsg;
 import main.Cliente;
 import menu.Menu;
 import menu.MenuOpcao;
@@ -45,7 +44,7 @@ public class ClienteView {
     public Menu criaMenuPrincipal(){
         List<MenuOpcao> menuPrincipal = new ArrayList<>();
         menuPrincipal.add(new MenuOpcao("Fazer login", () -> fazerLogin()));
-        menuPrincipal.add(new MenuOpcao("Registar", () -> registar()));
+        menuPrincipal.add(new MenuOpcao("Registar", () -> fazerRegisto()));
         menuPrincipal.add(new MenuOpcao("Enviar mensagem", () -> this.isAutenticado() ,() -> irParaMenuMensagens()));
         menuPrincipal.add(new MenuOpcao("Ver Respostas", () -> this.isAutenticado(),() -> verRespostas()));
         return new Menu(menuPrincipal);
@@ -70,24 +69,36 @@ public class ClienteView {
             System.out.print("Introduza a password > ");
             String password = scanner.nextLine();
 
-            this.cliente.sendLOGIN(TipoMsg.LOGIN, username, password);
+            boolean result = this.cliente.sendLOGIN(TipoMsg.LOGIN, username, password);
+            if (result) {
+                System.out.println("Login efetuado com sucesso!");
+                this.criaMenuMensagens();
+            } else {
+                System.out.println("Falha no login. Verifique as credenciais.");
+                fazerLogin();
+            }
             Thread.sleep(1000);
-
         }catch(Exception e){
             System.out.println("[ERRO AO ENVIAR LOGIN] " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    public void registar(){
+    public void fazerRegisto(){
         try{
             System.out.print("Introduza o username > ");
             String username = scanner.nextLine();
             System.out.print("Introduza a password > ");
             String password = scanner.nextLine();
 
-            this.cliente.sendLOGIN(TipoMsg.REGISTA_LOGIN, username, password);
-            Thread.sleep(1000);
+            boolean result = this.cliente.sendLOGIN(TipoMsg.LOGIN, username, password);
+            if (result) {
+                System.out.println("Registo efetuado com sucesso!");
+                this.criaMenuMensagens();
+            } else {
+                System.out.println("Falha no login. Verifique as credenciais.");
+                fazerRegisto();
+            }
 
         }catch(Exception e){
             System.out.println("[ERRO AO ENVIAR REGISTO DE LOGIN] " + e.getMessage());
