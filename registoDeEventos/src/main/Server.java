@@ -2,6 +2,7 @@ package main;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import entities.Data;
 import structs.GestorLogins;
 import structs.GestorSeries;
 import structs.ServerWorker;
@@ -11,11 +12,12 @@ public class Server implements AutoCloseable{
     private final GestorLogins logins;
     private final GestorSeries eventos;
     private int cliente;
+    private Data data;
 
     public Server(int d, int s) throws IOException{
         this.ss = new ServerSocket(12345);
         this.logins = new GestorLogins(s+1);
-        this.eventos = new GestorSeries(d, s);
+        this.eventos = new GestorSeries(d, s, data);
     }
 
     public void start() throws IOException{
@@ -23,7 +25,7 @@ public class Server implements AutoCloseable{
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
             // Cada cliente tem um thread dedicada a processar e executar mensagens
-            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++));
+            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++, data, eventos));
             worker.start();
         }
     }

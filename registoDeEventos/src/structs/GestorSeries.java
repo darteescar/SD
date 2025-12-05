@@ -1,15 +1,22 @@
 package structs;
 
 import data.BDSeries;
+import entities.Data;
 import entities.Serie;
 
 public class GestorSeries {
-     Cache<String,Serie> cache; //<Dia,Serie>
-     BDSeries bd;
+     private Cache<String,Serie> cache; //<Dia,Serie>
+     private BDSeries bd;
+     private int d;
+     private int s;
+     private Data data;
 
-     public GestorSeries(int d, int s){
-          this.cache = new Cache<>(d);
+     public GestorSeries(int d, int s, Data data){
+          this.cache = new Cache<>(s);
           this.bd = BDSeries.getInstance();
+          this.d = d;
+          this.s = s;
+          this.data = data;
      }
 
      public boolean add(Serie serie) {
