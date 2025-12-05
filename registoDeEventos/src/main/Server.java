@@ -25,7 +25,7 @@ public class Server implements AutoCloseable{
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
             // Cada cliente tem um thread dedicada a processar e executar mensagens
-            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++, data));
+            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++, data, eventos));
             worker.start();
         }
     }

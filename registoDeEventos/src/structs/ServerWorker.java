@@ -1,11 +1,11 @@
 package structs;
 
+import entities.Data;
 import entities.Mensagem;
 import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
 import entities.payloads.Login;
-import entities.Data;
 import enums.TipoMsg;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -21,14 +21,16 @@ public class ServerWorker implements Runnable {
     private final DataInputStream in;
     private final int cliente;
     private Data data;
+    private GestorSeries gestorSeries;
 
-    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data) throws IOException{
+    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data, GestorSeries gestorSeries) throws IOException{
         this.socket = socket;
         this.logins = logins;
         this.out = new DataOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
         this.data = data;
+        this.gestorSeries = gestorSeries;
     }
 
     @Override
