@@ -1,5 +1,4 @@
 import entities.Mensagem;
-import entities.payloads.Login;
 import enums.TipoMsg;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
@@ -10,7 +9,6 @@ public class Cliente {
     private Socket socket;
     private int num_pedidos = 0;
     // Lista/Queue de respostas prontas a serem 'poped' pelo metodo consultarRespostas()
-    // Demultiplexer de mensagens recebidas
 
     public static void main(String[] args) throws IOException {
         Cliente cliente = new Cliente();
@@ -48,46 +46,27 @@ public class Cliente {
 
     }
 
-    public boolean login(String username, String password) {
-        Login login = new Login(username, password);
-        byte[] payload;
-        try {
-            payload = login.serialize();
-            enviarMensagem(TipoMsg.LOGIN, payload);
-            // consoante valores retornados pelo Server retornamos true ou false
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public boolean login() {
+        // consoante valores retornados pelo Server
+        return true;
     }
 
-    public boolean registar(String username, String password) {
-        Login login = new Login(username, password);
-        byte[] payload;
-        try {
-            payload = login.serialize();
-            enviarMensagem(TipoMsg.LOGIN, payload);
-            // consoante valores retornados pelo Server retornamos true ou false
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public boolean registar() {
+        // consoante valores retornados pelo Server
+        return true;
     }
 
-    public void enviarMensagem(TipoMsg tipo, byte[] data) {
+    public void enviarMensagem(TipoMsg tipo, String data) {
         Thread thread = new Thread(() -> {
             try {
-                Mensagem msg = new Mensagem(this.num_pedidos, tipo, data);
+                Mensagem msg = new Mensagem(this.num_pedidos, tipo, data.getBytes());
 
                 this.num_pedidos += 1;
 
                 DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+
                 msg.serialize(dos);
                 dos.flush();
-
-                // esperaMensagem
 
             } catch (IOException e) {
                 System.out.println("Erro ao enviar mensagem: " + e.getMessage());
