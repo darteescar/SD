@@ -10,6 +10,10 @@ CLASSPATH = $(BIN_DIR):$(LIB_DIR)/*
 SERVER_MAIN = main.Server
 SERVER_CLIENTE = main.Cliente
 
+# Argumentos para o servidor (passados com make server D=.. S=..)
+D ?= 0
+S ?= 0
+
 # .java
 SOURCES := $(shell find $(SRC_DIR) -name "*.java")
 
@@ -22,13 +26,16 @@ compile:
 	javac -cp "$(LIB_DIR)/*" -d $(BIN_DIR) $(SOURCES)
 	@echo ">> Compilação concluída!"
 
-# Executar aplicação
-# Lado servidor
+# Executar servidor
 server:
-	@echo ">> Iniciando o servidor..."
-	java -cp "$(CLASSPATH)" $(SERVER_MAIN)
+	@if [ "$(D)" = "0" ] || [ "$(S)" = "0" ]; then \
+		echo "Uso: make server D=<valor> S=<valor>"; \
+		exit 1; \
+	fi
+	@echo ">> Iniciando o servidor com D=$(D) S=$(S)..."
+	java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S)
 
-# Lado cliente
+# Executar cliente
 cliente:
 	@echo ">> Iniciando o cliente..."
 	java -cp "$(CLASSPATH)" $(SERVER_CLIENTE)
@@ -42,4 +49,4 @@ clean:
 rebuild: clean compile
 	@echo ">> Rebuild concluído!"
 
-.PHONY: all compile sever cliente clean rebuild
+.PHONY: all compile server cliente clean rebuild
