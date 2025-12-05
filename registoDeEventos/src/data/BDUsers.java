@@ -6,7 +6,7 @@ public class BDUsers {
 
      public static BDUsers getInstance() {
         if (BDUsers.singleton == null) {
-            BDUsers.singleton = new BDUsers();
+          BDUsers.singleton = new BDUsers();
         }
         return BDUsers.singleton;
     }
