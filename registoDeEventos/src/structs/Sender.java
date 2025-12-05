@@ -48,7 +48,7 @@ public class Sender implements Runnable{
                 System.out.println("[PROBLEMA AO REGISTAR, POR FAVOR TENTE NOVAMENTE]");
 
             }else{
-                String paraLista = "Resposta da mensagem " + id + ": " + reply;
+                String paraLista = "Resposta da mensagem " + id + "> " + reply;
                 this.lock.lock();
                 try{
                     this.replies.add(paraLista);

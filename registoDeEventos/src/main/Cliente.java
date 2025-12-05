@@ -74,6 +74,15 @@ public class Cliente implements AutoCloseable{
         this.send(mensagem);
     }
 
+    public void listReplies(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("---- Respostas do Servidor ----\n");
+        for(String reply : replies){
+            sb.append(reply).append("\n");
+        }
+        System.out.println(sb.toString());
+    }
+
     public static void main(String[] args){
         try(Cliente cliente = new Cliente()){
             cliente.start();
