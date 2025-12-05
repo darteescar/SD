@@ -78,7 +78,7 @@ public class ClienteView {
 
             } else {
                 System.out.println("[CLIENTE NAO REGISTADO, POR FAVOR REGISTE-SE]");
-                fazerLogin();
+                fazerRegisto();
             }
         }catch(Exception e){
             System.out.println("[ERRO AO ENVIAR LOGIN] " + e.getMessage());

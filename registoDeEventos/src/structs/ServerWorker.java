@@ -29,27 +29,50 @@ public class ServerWorker implements Runnable {
     }
 
     @Override
-    public void run(){
-        try{
-            // Deserialize da mensagem
-            Mensagem mensagem = Mensagem.deserialize(in);
-            int id = mensagem.getID();
-            TipoMsg tipo = mensagem.getTipo();
-            System.out.println("Servidor recebeu mensagem > " + id + " (" + tipo + ")" );
+    public void run() {
+        try {
+            while (true) {
+                Mensagem mensagem = null;
+                try {
+                    mensagem = Mensagem.deserialize(in);
+                } catch (IOException e) {
+                    // Quando o cliente fecha o socket
+                    System.out.println("[CLIENTE DESCONECTOU-SE]");
+                    break; // Sai do loop, termina a thread
+                }
 
-            // Execução da mensagem
-            String result = execute(mensagem);
-            System.out.println("Servidor executou mensagem > " + id + " (" + tipo + ")" );
+                int id = mensagem.getID();
+                TipoMsg tipo = mensagem.getTipo();
+                System.out.println("Servidor recebeu mensagem > " + id + " (" + tipo + ")");
 
-            // Envio de resposta
-            Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result.getBytes());
-            reply.serialize(out);
-            out.flush();
-            System.out.println("Servidor enviou resposta da mensagem > " + id + " (" + tipo + ")" );
+                String result = "";
+                try {
+                    result = execute(mensagem);
+                    System.out.println("Result: " + result);
+                } catch (Exception e) {
+                    System.out.println("[ERRO AO EXECUTAR MENSAGEM] " + e.getMessage());
+                    e.printStackTrace();
+                }
 
-        }catch(Exception e){
-            System.out.println("[ERRO SERVER-WORKER] " + e.getMessage());
-            e.printStackTrace();
+                try {
+                    Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
+                    reply.serialize(out);
+                    out.flush();
+                    System.out.println("Servidor enviou resposta da mensagem > " + id + " (" + tipo + ")");
+                } catch (IOException e) {
+                    System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
+                    e.printStackTrace();
+                }
+            }
+        } finally {
+            try {
+                this.in.close();
+                this.out.close();
+                this.socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("[THREAD DO CLIENTE TERMINOU]");
         }
     }
 
@@ -100,56 +123,57 @@ public class ServerWorker implements Runnable {
 
         // Lógica de resgistar um evento na série do dia
 
-        return null;
+        return evento.toString();
     }
 
     private String processQUANTIDADE_VENDAS(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
+        //String produto = agregacao.getProduto();
+        //int dias = agregacao.getDias();
 
         // Lógica de realizar a query da quantidade de vendas
+        System.out.println(agregacao.toString());
 
-        return null;
+        return agregacao.toString();
     }
 
     private String processVOLUME_VENDAS(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
+        //String produto = agregacao.getProduto();
+        //int dias = agregacao.getDias();
 
         // Lógica de realizar a query do volume de vendas
 
-        return null;
+        return agregacao.toString();
     }
 
     private String processPRECO_MEDIO(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
+        //String produto = agregacao.getProduto();
+        //int dias = agregacao.getDias();
 
         // Lógica de realizar a query do preço médio
 
-        return null;
+        return agregacao.toString();
     }
 
     private String processPRECO_MAXIMO(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
+        //String produto = agregacao.getProduto();
+        //int dias = agregacao.getDias();
 
         // Lógica de realizar a query do preço máximo
 
-        return null;
+        return agregacao.toString();
     }
 
     private String processLISTA(byte[] bytes) throws IOException{
         Filtrar filtrar = Filtrar.deserialize(bytes);
-        List<String> produto = filtrar.getProdutos();
-        int dias = filtrar.getDias();
+        //List<String> produto = filtrar.getProdutos();
+        //int dias = filtrar.getDias();
 
         // Lógica de realizar a query da lista
 
-        return null;
+        return filtrar.toString();
     }
 }

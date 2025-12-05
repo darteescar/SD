@@ -30,7 +30,7 @@ public class Login {
 
     @Override
     public String toString(){
-        return "Username: " + this.username + "Password: " + this.getPassword();
+        return "Username: " + this.username + " , Password: " + this.getPassword();
     }
 
     @Override

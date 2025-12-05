@@ -27,11 +27,12 @@ public class Sender implements Runnable{
 
             // Enviar a mensagem
             this.demu.send(this.mToSend);
-            System.out.println("Cliente enviou mensagem > " + id + " (" + tipo + ")" );
+            //System.out.println("Cliente enviou mensagem > " + id + " (" + tipo + ")" );
 
             // Esperar pela resposta (especificamente com o ID passado)
             String reply = demu.receive(id);
-            System.out.println("Cliente recebeu resposta da mensagem > " + id + " (" + tipo + ")" );
+            System.out.println("Reply:" + reply);
+            //System.out.println("Cliente recebeu resposta da mensagem > " + id + " (" + tipo + ")" );
 
             if(tipo != TipoMsg.REGISTA_LOGIN && tipo != TipoMsg.LOGIN){
                 String paraLista = "Resposta da mensagem " + id + "> " + reply;

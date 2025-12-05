@@ -30,7 +30,7 @@ public class Agregacao {
 
     @Override
     public String toString(){
-        return "Produto: " + this.produto + "Dias: " + this.dias;
+        return "Produto: " + this.produto + " ,Dias: " + this.dias;
     }
 
     @Override

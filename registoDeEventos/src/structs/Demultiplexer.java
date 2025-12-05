@@ -58,14 +58,15 @@ public class Demultiplexer implements AutoCloseable{
                     Mensagem m = Mensagem.deserialize(in);
                     int id = m.getID();
                     String result = new String(m.getData());
-                    System.out.println("Demultiplexer recebeu resposta da mensagem (background) > " + id );
+                    System.out.println("BG: " + result);
+                    //System.out.println("Demultiplexer recebeu resposta da mensagem (background) > " + id );
 
                     this.lock.lock();
                     try{
                         Entry entry = this.getEntry(id);
                         entry.queue.add(result);
                         entry.cond.signalAll();
-                        System.out.println("Demultiplexer adicionou resposta da mensagem à queue > " + id );
+                        //System.out.println("Demultiplexer adicionou resposta da mensagem à queue > " + id );
 
                     }finally{
                         this.lock.unlock();
@@ -103,7 +104,8 @@ public class Demultiplexer implements AutoCloseable{
                 }
             }
             String reply = entry.queue.poll();
-            System.out.println("Demultiplexer recebeu resposta da mensagem (receive) > " + id );
+            System.out.println("Demu: " + reply);
+            //System.out.println("Demultiplexer recebeu resposta da mensagem (receive) > " + id );
             return reply;
         }finally{
             this.lock.unlock();
@@ -111,6 +113,8 @@ public class Demultiplexer implements AutoCloseable{
     }
 
     public void close() throws IOException{
+        this.in.close();
+        this.out.close();
         this.socket.close();
     }
 }
