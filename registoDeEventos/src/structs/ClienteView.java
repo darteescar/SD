@@ -127,10 +127,8 @@ public class ClienteView {
             String quantidade = scanner.nextLine();
             System.out.print("Introduza o preço> ");
             String preco = scanner.nextLine();
-            System.out.print("Introduza a data> ");
-            String data = scanner.nextLine();
 
-            this.cliente.sendEVENTO(TipoMsg.REGISTO, produto, Integer.parseInt(quantidade), Double.parseDouble(preco), data);
+            this.cliente.sendEVENTO(TipoMsg.REGISTO, produto, Integer.parseInt(quantidade), Double.parseDouble(preco));
 
         }catch(IOException e){
             System.out.println("[ERRO AO ENVIAR REGISTO DE LOGIN] " + e.getMessage());

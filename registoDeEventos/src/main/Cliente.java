@@ -67,8 +67,8 @@ public class Cliente implements AutoCloseable{
         return this.sendAndWait(mensagem);
     }
 
-    public void sendEVENTO(TipoMsg tipo, String produto, int quantidade, double preco, String data) throws IOException{
-        Evento evento = new Evento(produto, quantidade, preco, data);
+    public void sendEVENTO(TipoMsg tipo, String produto, int quantidade, double preco) throws IOException{
+        Evento evento = new Evento(produto, quantidade, preco);
         byte[] bytes = evento.serialize();
         Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
 

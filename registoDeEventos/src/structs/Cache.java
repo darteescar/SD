@@ -64,6 +64,16 @@ public class Cache<K,V>{
           }
      }
 
+     public boolean remove(K key){
+          lock.lock();
+          try {
+               map.remove(key);
+               return true;
+          } finally {
+               lock.unlock();
+          }
+     }
+
      // Para depuração: mostra o estado da cache
      @Override
      public String toString() {
