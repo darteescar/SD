@@ -8,6 +8,7 @@ import structs.ServerWorker;
 public class Server implements AutoCloseable{
     private final ServerSocket ss;
     private final GestorLogins logins;
+    private int cliente;
 
     public Server() throws IOException{
         this.ss = new ServerSocket(12345);
@@ -19,7 +20,7 @@ public class Server implements AutoCloseable{
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
             // Cada cliente tem um thread dedicada a processar e executar mensagens
-            Thread worker  = new Thread(new ServerWorker(socket, logins));
+            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++));
             worker.start();
         }
     }

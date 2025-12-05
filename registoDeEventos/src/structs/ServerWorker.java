@@ -18,12 +18,14 @@ public class ServerWorker implements Runnable {
     private final GestorLogins logins;
     private final DataOutputStream out;
     private final DataInputStream in;
+    private final int cliente;
 
-    public ServerWorker(Socket socket, GestorLogins logins) throws IOException{
+    public ServerWorker(Socket socket, GestorLogins logins, int cliente) throws IOException{
         this.socket = socket;
         this.logins = logins;
         this.out = new DataOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
+        this.cliente = cliente;
     }
 
     @Override
@@ -36,17 +38,16 @@ public class ServerWorker implements Runnable {
                 } catch (IOException e) {
                     // Quando o cliente fecha o socket
                     System.out.println("[CLIENTE DESCONECTOU-SE]");
-                    break; // Sai do loop, termina a thread
+                    break; // Sai do loop, e termina a thread
                 }
 
                 int id = mensagem.getID();
                 TipoMsg tipo = mensagem.getTipo();
-                System.out.println("Servidor recebeu mensagem > " + id + " (" + tipo + ")");
+                System.out.println("Servidor recebeu mensagem numero -> " + id + " (" + tipo + ") do cliente -> " + cliente);
 
                 String result = "";
                 try {
                     result = execute(mensagem);
-                    System.out.println("Result: " + result);
                 } catch (Exception e) {
                     System.out.println("[ERRO AO EXECUTAR MENSAGEM] " + e.getMessage());
                     e.printStackTrace();
@@ -56,7 +57,7 @@ public class ServerWorker implements Runnable {
                     Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
                     reply.serialize(out);
                     out.flush();
-                    //System.out.println("Servidor enviou resposta da mensagem > " + id + " (" + tipo + ")");
+                    System.out.println("Servidor enviou resposta da mensagem -> " + id + " (" + tipo + ") do cliente -> " + cliente);
                 } catch (IOException e) {
                     System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
                     e.printStackTrace();
@@ -130,7 +131,6 @@ public class ServerWorker implements Runnable {
         //int dias = agregacao.getDias();
 
         // Lógica de realizar a query da quantidade de vendas
-        System.out.println(agregacao.toString());
 
         return agregacao.toString();
     }

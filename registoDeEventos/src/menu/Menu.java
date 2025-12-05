@@ -47,7 +47,7 @@ public class Menu {
      */
     public int getEscolha(){
         int escolha;
-        System.out.print("Escolha uma das opções > \n");
+        System.out.print("Escolha uma das opções > ");
         try{
             String line = scanner.nextLine();
             escolha = Integer.parseInt(line);
