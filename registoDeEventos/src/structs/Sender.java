@@ -22,16 +22,18 @@ public class Sender implements Runnable{
     @Override
     public void run(){
         try{
+            int id = this.mToSend.getID();
+            TipoMsg tipo = this.mToSend.getTipo();
+
             // Enviar a mensagem
             this.demu.send(this.mToSend);
+            System.out.println("Cliente enviou mensagem > " + id + " (" + tipo + ")" );
 
             // Esperar pela resposta (especificamente com o ID passado)
-            int id = this.mToSend.getID();
             String reply = demu.receive(id);
+            System.out.println("Cliente recebeu resposta da mensagem > " + id + " (" + tipo + ")" );
 
-            TipoMsg tipo = mToSend.getTipo();
-
-            if(tipo != TipoMsg.REGISTA_LOGIN || tipo != TipoMsg.LOGIN){
+            if(tipo != TipoMsg.REGISTA_LOGIN && tipo != TipoMsg.LOGIN){
                 String paraLista = "Resposta da mensagem " + id + "> " + reply;
                 this.lock.lock();
                 try{

@@ -72,7 +72,10 @@ public class ClienteView {
             boolean result = this.cliente.sendLOGIN(TipoMsg.LOGIN, username, password);
             if (result) {
                 System.out.println("[LOGIN EFETUADO COM SUCESSO]");
-                this.criaMenuMensagens();
+                this.switchAutenticacao();
+                Menu menuMensagens = this.criaMenuMensagens();
+                menuMensagens .run();
+
             } else {
                 System.out.println("[CLIENTE NAO REGISTADO, POR FAVOR REGISTE-SE]");
                 fazerLogin();
@@ -93,7 +96,9 @@ public class ClienteView {
             boolean result = this.cliente.sendLOGIN(TipoMsg.REGISTA_LOGIN, username, password);
             if (result) {
                 System.out.println("[REGISTO EFETUADO COM SUCESSO]");
-                this.criaMenuMensagens();
+                this.switchAutenticacao();
+                Menu menuMensagens = this.criaMenuMensagens();
+                menuMensagens .run();
             } else {
                 System.out.println("[PROBLEMA AO REGISTAR, POR FAVOR TENTE NOVAMENTE]");
                 fazerRegisto();

@@ -28,6 +28,7 @@ public class Cliente implements AutoCloseable{
     }
 
     public void start(){
+        this.demu.start();
         this.view.init();
     }
     

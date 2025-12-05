@@ -34,14 +34,18 @@ public class ServerWorker implements Runnable {
             // Deserialize da mensagem
             Mensagem mensagem = Mensagem.deserialize(in);
             int id = mensagem.getID();
+            TipoMsg tipo = mensagem.getTipo();
+            System.out.println("Servidor recebeu mensagem > " + id + " (" + tipo + ")" );
 
             // Execução da mensagem
             String result = execute(mensagem);
+            System.out.println("Servidor executou mensagem > " + id + " (" + tipo + ")" );
 
             // Envio de resposta
             Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result.getBytes());
             reply.serialize(out);
             out.flush();
+            System.out.println("Servidor enviou resposta da mensagem > " + id + " (" + tipo + ")" );
 
         }catch(Exception e){
             System.out.println("[ERRO SERVER-WORKER] " + e.getMessage());
