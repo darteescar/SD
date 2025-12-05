@@ -37,13 +37,12 @@ public class Cliente implements AutoCloseable{
     }
 
     public void send(Mensagem mensagem){
-        Thread sender = new Thread(new Sender(this.demu, mensagem, replies, view));
+        Thread sender = new Thread(new Sender(this.demu, mensagem, replies));
         sender.start();
     }
 
     public boolean sendAndWait(Mensagem mensagem) {
         boolean result = false;
-
         try {
             int id = mensagem.getID();
 
@@ -56,9 +55,8 @@ public class Cliente implements AutoCloseable{
             e.printStackTrace();
             result = false;
         }
-
         return result;
-}
+    }
 
     public boolean sendLOGIN(TipoMsg tipo, String username, String password) throws IOException{
         Login login = new Login(username, password);

@@ -1,1 +1,5 @@
+# Ignorar os .class
 *.class
+
+# Ignorar a pasta bin/
+bin/

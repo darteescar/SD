@@ -34,7 +34,7 @@ public class Menu {
         System.out.println();
         for(int i = 0; i < this.opcoes.size(); i++){
             MenuOpcao opcao = this.opcoes.get(i);
-            System.out.println((i+1) + " -> " + (opcao.isPreCondicaoValida() ? opcao.getNomeOpcao() : "---------------"));
+            System.out.println((i+1) + " -> " + (opcao.isPreCondicaoValida() ? opcao.getNomeOpcao() : "-----------"));
         }
         System.out.println("0 -> Sair");
         System.out.println();

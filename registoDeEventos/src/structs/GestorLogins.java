@@ -7,7 +7,7 @@ public class GestorLogins {
 
      public GestorLogins(int capacidade){
           this.cache = new Cache<>(capacidade);
-          this.users = new BDUsers();
+          this.users = BDUsers.getInstance();
      }
 
      public boolean registar(String username,String password) {

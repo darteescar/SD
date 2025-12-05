@@ -1,0 +1,24 @@
+package data;
+
+public class BDConfig {
+    static final String USERNAME = "me";
+    static final String PASSWORD = "mypass";
+    private static final String DATABASE = "base_dados_sd";
+    private static final String DRIVER = "jdbc:mariadb";
+    static final String URL = DRIVER + "://localhost:3306/" + DATABASE;
+}
+
+/*
+Para a Base de Dados funcionar é necessário ter a Mariadb instalada.
+Feito isso, é preciso correr os seguintes comandos, dentro da Mariadb:
+
+CREATE DATABASE base_dados_sd;
+
+CREATE USER IF NOT EXISTS 'me'@'localhost' IDENTIFIED BY 'mypass';
+
+GRANT ALL PRIVILEGES ON base_dados_sd.* TO 'me'@'localhost';
+
+FLUSH PRIVILEGES;
+
+Agora é só compilar e correr o Server e o Cliente.
+*/

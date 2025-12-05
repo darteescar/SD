@@ -11,14 +11,12 @@ public class Sender implements Runnable{
     private final ReentrantLock lock;
     private Mensagem mToSend;
     private List<String> replies;
-    private final ClienteView view;
 
-    public Sender(Demultiplexer demu, Mensagem mToSend, List<String> replies, ClienteView view){
+    public Sender(Demultiplexer demu, Mensagem mToSend, List<String> replies){
         this.demu = demu;
         this.lock =  new ReentrantLock();
         this.mToSend = mToSend;
         this.replies = replies;
-        this.view = view;
     }
 
     @Override
@@ -33,21 +31,7 @@ public class Sender implements Runnable{
 
             TipoMsg tipo = mToSend.getTipo();
 
-            if(tipo.equals(TipoMsg.LOGIN) && reply.equals("true")){
-                this.view.switchAutenticacao();
-                System.out.println("[LOGIN EFETUADO COM SUCESSO]");
-
-            }else if(tipo.equals(TipoMsg.LOGIN) && reply.equals("false")){
-                System.out.println("[CLIENTE NAO REGISTADO, POR FAVOR REGISTE-SE]");
-
-            }else if(tipo.equals(TipoMsg.REGISTA_LOGIN) && reply.equals("true")){
-                this.view.switchAutenticacao();
-                System.out.println("[REGISTO EFETUADO COM SUCESSO]");
-
-            }else if (tipo.equals(TipoMsg.REGISTA_LOGIN) && reply.equals("true")){
-                System.out.println("[PROBLEMA AO REGISTAR, POR FAVOR TENTE NOVAMENTE]");
-
-            }else{
+            if(tipo != TipoMsg.REGISTA_LOGIN || tipo != TipoMsg.LOGIN){
                 String paraLista = "Resposta da mensagem " + id + "> " + reply;
                 this.lock.lock();
                 try{

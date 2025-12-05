@@ -71,13 +71,12 @@ public class ClienteView {
 
             boolean result = this.cliente.sendLOGIN(TipoMsg.LOGIN, username, password);
             if (result) {
-                System.out.println("Login efetuado com sucesso!");
+                System.out.println("[LOGIN EFETUADO COM SUCESSO]");
                 this.criaMenuMensagens();
             } else {
-                System.out.println("Falha no login. Verifique as credenciais.");
+                System.out.println("[CLIENTE NAO REGISTADO, POR FAVOR REGISTE-SE]");
                 fazerLogin();
             }
-            Thread.sleep(1000);
         }catch(Exception e){
             System.out.println("[ERRO AO ENVIAR LOGIN] " + e.getMessage());
             e.printStackTrace();
@@ -91,12 +90,12 @@ public class ClienteView {
             System.out.print("Introduza a password > ");
             String password = scanner.nextLine();
 
-            boolean result = this.cliente.sendLOGIN(TipoMsg.LOGIN, username, password);
+            boolean result = this.cliente.sendLOGIN(TipoMsg.REGISTA_LOGIN, username, password);
             if (result) {
-                System.out.println("Registo efetuado com sucesso!");
+                System.out.println("[REGISTO EFETUADO COM SUCESSO]");
                 this.criaMenuMensagens();
             } else {
-                System.out.println("Falha no login. Verifique as credenciais.");
+                System.out.println("[PROBLEMA AO REGISTAR, POR FAVOR TENTE NOVAMENTE]");
                 fazerRegisto();
             }
 
