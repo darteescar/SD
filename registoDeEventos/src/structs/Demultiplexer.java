@@ -51,21 +51,18 @@ public class Demultiplexer implements AutoCloseable{
     // Começar Thread de background que vai orientar as replies para a thread correta
     public void start(){
         Thread background = new Thread(() -> {
-            System.out.println("Demultiplexer iniciado");
+            System.out.println("[DEMULTIPLEXER INICIADO]");
             try{
                 while(true){
                     Mensagem m = Mensagem.deserialize(in);
                     int id = m.getID();
                     String result = new String(m.getData());
-                    //System.out.println("BG: " + result);
-                    //System.out.println("Demultiplexer recebeu resposta da mensagem (background) > " + id );
 
                     this.lock.lock();
                     try{
                         Entry entry = this.getEntry(id);
                         entry.queue.add(result);
                         entry.cond.signalAll();
-                        //System.out.println("Demultiplexer adicionou resposta da mensagem à queue > " + id );
 
                     }finally{
                         this.lock.unlock();
@@ -103,8 +100,6 @@ public class Demultiplexer implements AutoCloseable{
                 }
             }
             String reply = entry.queue.poll();
-            //System.out.println("Demu: " + reply);
-            //System.out.println("Demultiplexer recebeu resposta da mensagem (receive) > " + id );
             return reply;
         }finally{
             this.lock.unlock();
