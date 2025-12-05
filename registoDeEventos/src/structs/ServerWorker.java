@@ -5,6 +5,7 @@ import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
 import entities.payloads.Login;
+import entities.Data;
 import enums.TipoMsg;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -19,13 +20,15 @@ public class ServerWorker implements Runnable {
     private final DataOutputStream out;
     private final DataInputStream in;
     private final int cliente;
+    private Data data;
 
-    public ServerWorker(Socket socket, GestorLogins logins, int cliente) throws IOException{
+    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data) throws IOException{
         this.socket = socket;
         this.logins = logins;
         this.out = new DataOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
+        this.data = data;
     }
 
     @Override
@@ -120,6 +123,7 @@ public class ServerWorker implements Runnable {
     private String processREGISTO(byte[] bytes) throws IOException{
         Evento evento = Evento.deserialize(bytes);
 
+        // usa a data da variável de instância data
         // Lógica de resgistar um evento na série do dia
 
         return evento.toString();
