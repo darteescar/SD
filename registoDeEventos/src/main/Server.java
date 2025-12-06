@@ -13,7 +13,7 @@ public class Server implements AutoCloseable{
     private final GestorLogins logins;
     private final GestorSeries series;
     private int cliente;
-    private Data data;
+    private final Data data;
     private Serie serie_atual;
     private final int d;
 
@@ -21,9 +21,9 @@ public class Server implements AutoCloseable{
         this.ss = new ServerSocket(12345);
         this.logins = new GestorLogins(s+1);
         this.data = new Data(01, 01, 2026);
-        this.series = new GestorSeries(d, s, data);
         this.serie_atual = new Serie(data.getData());
-        this.cliente = 0; // nao sei se te tinhas esquecido disto Tiago
+        this.series = new GestorSeries(s, data, serie_atual);
+        this.cliente = 0;
         this.d = d;
     }
 
@@ -32,7 +32,7 @@ public class Server implements AutoCloseable{
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
             // Cada cliente tem um thread dedicada a processar e executar mensagens
-            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++, data, series, serie_atual, d));
+            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++, data, series, d));
             worker.start();
         }
     }

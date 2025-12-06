@@ -3,23 +3,23 @@ package structs;
 import data.BDSeries;
 import entities.Data;
 import entities.Serie;
-import java.util.List;
 import entities.payloads.Evento;
+import java.util.List;
 
 public class GestorSeries {
      private final Cache<String,Serie> cache; //<Dia,Serie>
      private final BDSeries bd;
-     private final int d;
-     private final int s;
-     private final Data data;
+     private Data data_atual;
+     private Serie serie_atual;
 
-     public GestorSeries(int d, int s, Data data){
+     public GestorSeries(int s, Data data, Serie serie_atual){
           this.cache = new Cache<>(s);
           this.bd = BDSeries.getInstance();
-          this.d = d;
-          this.s = s;
-          this.data = data;
+          this.data_atual = data;
+          this.serie_atual = serie_atual;
      }
+
+     // Métodos de gestão de séries
 
      public boolean add(Serie serie) {
           if (serie == null || serie.getData() == null) {
@@ -60,10 +60,22 @@ public class GestorSeries {
           return null; // série não existe
      }
 
+     // Métodos sobre a série atual do dia atual
+
+     public Serie getSerieAtual(){
+          return this.serie_atual;
+     }
+
+     public Data getDataAtual(){
+          return this.data_atual;
+     }
+
+     // Métodos das Queries de Agregação
+
      public int calcQuantidadeVendas(String produto, int dias){ 
           // talvez devessemos lancar uma Thread por dia para paralelizar isto ???
           int total = 0;
-          Data currentDate = this.data.clone();
+          Data currentDate = this.data_atual.clone();
 
           for (int i = 0; i < dias; i++) {
                String diaStr = currentDate.getData();
@@ -79,7 +91,7 @@ public class GestorSeries {
      public double calcVolumeVendas(String produto, int dias){ 
           // talvez devessemos lancar uma Thread por dia para paralelizar isto ???
           double total = 0.0;
-          Data currentDate = this.data.clone();
+          Data currentDate = this.data_atual.clone();
 
           for (int i = 0; i < dias; i++) {
                String diaStr = currentDate.getData();
@@ -102,7 +114,7 @@ public class GestorSeries {
 
      public double calcPrecoMaximo(String produto, int dias){
           double maxPreco = 0.0;
-          Data currentDate = this.data.clone();
+          Data currentDate = this.data_atual.clone();
 
           for (int i = 0; i < dias; i++) {
                String diaStr = currentDate.getData();
@@ -119,7 +131,7 @@ public class GestorSeries {
      }
 
      public List<Evento> filtrarEventos(List<String> produtos, int dia){
-          Data targetDate = this.data.clone();
+          Data targetDate = this.data_atual.clone();
           for(int i = 0 ; i < dia ; i++){
                targetDate.decrementData();
           }

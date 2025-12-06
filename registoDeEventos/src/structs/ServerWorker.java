@@ -2,7 +2,6 @@ package structs;
 
 import entities.Data;
 import entities.Mensagem;
-import entities.Serie;
 import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
@@ -24,10 +23,9 @@ public class ServerWorker implements Runnable {
     private final DataInputStream in;
     private final int cliente;
     private final Data data;
-    private final Serie serie;
     private final int d;
 
-    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data, GestorSeries gestorSeries, Serie serie, int d) throws IOException{
+    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data, GestorSeries gestorSeries, int d) throws IOException{
         this.socket = socket;
         this.logins = logins;
         this.gestorSeries = gestorSeries;
@@ -35,7 +33,6 @@ public class ServerWorker implements Runnable {
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
         this.data = data;
-        this.serie = serie;
         this.d = d;
     }
 
@@ -131,9 +128,9 @@ public class ServerWorker implements Runnable {
     private String processREGISTO(byte[] bytes) throws IOException{
         Evento evento = Evento.deserialize(bytes);
 
-        this.serie.add(evento);
+        this.gestorSeries.getSerieAtual().add(evento);
 
-        String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.data.getData() + ".";
+        String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.gestorSeries.getDataAtual().getData() + ".";
 
         return resposta;
     }
