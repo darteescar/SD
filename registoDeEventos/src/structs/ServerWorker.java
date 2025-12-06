@@ -54,7 +54,7 @@ public class ServerWorker implements Runnable {
 
                 int id = mensagem.getID();
                 TipoMsg tipo = mensagem.getTipo();
-                System.out.println("Servidor recebeu mensagem numero -> " + id + " (" + tipo + ") do cliente -> " + cliente);
+                System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
 
                 String result = "";
                 try {
@@ -68,7 +68,7 @@ public class ServerWorker implements Runnable {
                     Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
                     reply.serialize(out);
                     out.flush();
-                    System.out.println("Servidor enviou resposta da mensagem -> " + id + " (" + tipo + ") do cliente -> " + cliente);
+                    System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
                 } catch (IOException e) {
                     System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
                     e.printStackTrace();
