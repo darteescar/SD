@@ -14,15 +14,14 @@ public class Server implements AutoCloseable{
     private final GestorSeries series;
     private int cliente;
     private final Data data;
-    private Serie serie_atual;
     private final int d;
 
     public Server(int d, int s) throws IOException{
         this.ss = new ServerSocket(12345);
         this.logins = new GestorLogins(s+1);
-        this.data = new Data(01, 01, 2026);
-        this.serie_atual = new Serie(data.getData());
-        this.series = new GestorSeries(s, data, serie_atual);
+        this.data = new Data(01, 01, 2025);
+        Serie serie_inicial = new Serie(data.getData());
+        this.series = new GestorSeries(s, data, serie_inicial);
         this.cliente = 0;
         this.d = d;
     }
@@ -40,10 +39,7 @@ public class Server implements AutoCloseable{
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Este método ainda não está a ser usado
     public void passarDia(){
-        // eu acho que temos de esperar que toda a gente acabe de mexer na serie do dia atual antes de a guardarmos no GestorSeries
-        this.series.add(this.serie_atual); // guarda a série do dia atual na BD e na Cache
-        this.data.incrementData();
-        this.serie_atual = new Serie(data.getData()); // cria uma nova série para o novo dia
+        this.series.passarDia();
     }
 
     @Override

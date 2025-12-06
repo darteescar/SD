@@ -5,12 +5,14 @@ import entities.Data;
 import entities.Serie;
 import entities.payloads.Evento;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GestorSeries {
      private final Cache<String,Serie> cache; //<Dia,Serie>
      private final BDSeries bd;
      private Data data_atual;
      private Serie serie_atual;
+     private ReentrantLock lock = new ReentrantLock();
 
      public GestorSeries(int s, Data data, Serie serie_atual){
           this.cache = new Cache<>(s);
@@ -62,12 +64,36 @@ public class GestorSeries {
 
      // Métodos sobre a série atual do dia atual
 
-     public Serie getSerieAtual(){
-          return this.serie_atual;
+     public void passarDia() {
+          lock.lock();
+          try {
+               add(this.serie_atual);  // guarda a série antiga
+               this.data_atual.incrementData();
+               this.serie_atual = new Serie(data_atual.getData());
+          } finally {
+               lock.unlock();
+          }
+     }
+
+     // é de notar que como o lock é o mesmo passarDia e getSerieAtual são mutuamente exclusivos
+     // logo não há hipótese de se obter uma série incompleta quando se está a passar o dia
+
+     public Serie getSerieAtual() {
+          lock.lock();
+          try {
+               return this.serie_atual;
+          } finally {
+               lock.unlock();
+          }
      }
 
      public Data getDataAtual(){
-          return this.data_atual;
+          lock.lock();
+          try {
+               return this.data_atual;
+          } finally {
+               lock.unlock();
+          }
      }
 
      // Métodos das Queries de Agregação
