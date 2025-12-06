@@ -138,4 +138,19 @@ public class Serie {
             this.lock.unlock();
         }
     }
+
+    public List<Evento> filtrarEventos(List<String> produtos) {
+        this.lock.lock();
+        try {
+            List<Evento> filtrados = new ArrayList<>();
+            for (Evento evento : this.eventos) {
+                if (produtos.contains(evento.getProduto())) {
+                    filtrados.add(evento);
+                }
+            }
+            return filtrados;
+        } finally {
+            this.lock.unlock();
+        }
+    }
 }

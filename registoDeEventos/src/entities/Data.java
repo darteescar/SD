@@ -70,24 +70,20 @@ public class Data {
     }
 
     private boolean mes31(){
-        if(this.mes == 1
-        || this.mes == 3
-        || this.mes == 5
-        || this.mes == 7
-        || this.mes == 8
-        || this.mes == 10
-        || this.mes == 12
-        ) return true;
-        else return false;
+        return this.mes == 1
+                || this.mes == 3
+                || this.mes == 5
+                || this.mes == 7
+                || this.mes == 8
+                || this.mes == 10
+                || this.mes == 12;
     }
 
     private boolean mes30(){
-        if(this.mes == 4
-        || this.mes == 6
-        || this.mes == 9
-        || this.mes == 11
-        ) return true;
-        else return false;
+        return this.mes == 4
+                || this.mes == 6
+                || this.mes == 9
+                || this.mes == 11;
     }
 
     private boolean fevereiro(){
@@ -102,8 +98,7 @@ public class Data {
         if(anoBi() && fevereiro() && dia == 29) return true;
         else if (!anoBi() && fevereiro() && dia == 28) return true;
         else if(mes31() && dia == 31) return true;
-        else if(mes30() && dia == 30) return true;
-        else return false;
+        else return mes30() && dia == 30;
     }
 
     @Override

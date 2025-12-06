@@ -3,13 +3,15 @@ package structs;
 import data.BDSeries;
 import entities.Data;
 import entities.Serie;
+import java.util.List;
+import entities.payloads.Evento;
 
 public class GestorSeries {
-     private Cache<String,Serie> cache; //<Dia,Serie>
-     private BDSeries bd;
-     private int d;
-     private int s;
-     private Data data;
+     private final Cache<String,Serie> cache; //<Dia,Serie>
+     private final BDSeries bd;
+     private final int d;
+     private final int s;
+     private final Data data;
 
      public GestorSeries(int d, int s, Data data){
           this.cache = new Cache<>(s);
@@ -114,6 +116,20 @@ public class GestorSeries {
                currentDate.decrementData();
           }
           return maxPreco;
+     }
+
+     public List<Evento> filtrarEventos(List<String> produtos, int dia){
+          Data targetDate = this.data.clone();
+          for(int i = 0 ; i < dia ; i++){
+               targetDate.decrementData();
+          }
+          String diaStr = targetDate.getData();
+          Serie serie = this.get(diaStr);
+          if (serie != null) {
+               return serie.filtrarEventos(produtos);
+          } else {
+               return List.of(); // Retorna uma lista vazia se a série não existir
+          }
      }
 
 }

@@ -14,6 +14,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.List;
 
 public class ServerWorker implements Runnable {
     private final Socket socket;
@@ -132,7 +133,7 @@ public class ServerWorker implements Runnable {
 
         this.serie.add(evento);
 
-        String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.data.getData();
+        String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.data.getData() + ".";
 
         return resposta;
     }
@@ -158,10 +159,10 @@ public class ServerWorker implements Runnable {
         int dias = agregacao.getDias();
 
         if (this.d <= 0 || dias > this.d) {
-            return "Insira num valor entre 1 e ." + this.d;
+            return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcVolumeVendas(produto, dias);
-            String resposta = "Volume de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x;
+            String resposta = "Volume de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
             return resposta;
         }
     }
@@ -172,10 +173,10 @@ public class ServerWorker implements Runnable {
         int dias = agregacao.getDias();
 
         if (this.d <= 0 || dias > this.d) {
-            return "Insira num valor entre 1 e ." + this.d;
+            return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcPrecoMedio(produto, dias);
-            String resposta = "Preço médio de venda do produto " + produto + " nos últimos " + dias + " dias: " + x;
+            String resposta = "Preço médio de venda do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
             return resposta;
         }
     }
@@ -186,10 +187,10 @@ public class ServerWorker implements Runnable {
         int dias = agregacao.getDias();
 
         if (this.d <= 0 || dias > this.d) {
-            return "Insira num valor entre 1 e ." + this.d;
+            return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcPrecoMaximo(produto, dias);
-            String resposta = "Preço máximo de venda do produto " + produto + " nos últimos " + dias + " dias: " + x;
+            String resposta = "Preço máximo de venda do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
             return resposta;
         }
 
@@ -197,11 +198,15 @@ public class ServerWorker implements Runnable {
 
     private String processLISTA(byte[] bytes) throws IOException{
         Filtrar filtrar = Filtrar.deserialize(bytes);
-        //List<String> produto = filtrar.getProdutos();
-        //int dias = filtrar.getDias();
+        List<String> produto = filtrar.getProdutos();
+        int dia = filtrar.getDias();
 
         // Lógica de realizar a query da lista
-
-        return filtrar.toString();
+        if (this.d <= 0 || dia > this.d) {
+            return "Insira num valor entre 1 e " + this.d + ".";
+        } else {
+            List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
+            return eventos.toString();
+        }
     }
 }
