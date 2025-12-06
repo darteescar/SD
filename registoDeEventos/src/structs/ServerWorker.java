@@ -2,6 +2,7 @@ package structs;
 
 import entities.Data;
 import entities.Mensagem;
+import entities.Serie;
 import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
@@ -21,9 +22,11 @@ public class ServerWorker implements Runnable {
     private final DataOutputStream out;
     private final DataInputStream in;
     private final int cliente;
-    private Data data;
+    private final Data data;
+    private final Serie serie;
+    private final int d;
 
-    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data, GestorSeries gestorSeries) throws IOException{
+    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data, GestorSeries gestorSeries, Serie serie, int d) throws IOException{
         this.socket = socket;
         this.logins = logins;
         this.gestorSeries = gestorSeries;
@@ -31,6 +34,8 @@ public class ServerWorker implements Runnable {
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
         this.data = data;
+        this.serie = serie;
+        this.d = d;
     }
 
     @Override
@@ -125,20 +130,26 @@ public class ServerWorker implements Runnable {
     private String processREGISTO(byte[] bytes) throws IOException{
         Evento evento = Evento.deserialize(bytes);
 
-        // usa a data da variável de instância data
-        // Lógica de resgistar um evento na série do dia
+        this.serie.add(evento);
 
-        return evento.toString();
+        String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.data.getData();
+
+        return resposta;
     }
 
     private String processQUANTIDADE_VENDAS(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        //String produto = agregacao.getProduto();
-        //int dias = agregacao.getDias();
+        String produto = agregacao.getProduto();
+        int dias = agregacao.getDias();
 
-        // Lógica de realizar a query da quantidade de vendas
+        if (this.d <= 0 || dias > this.d) {
+            return "Insira num valor entre 1 e ."+this.d;
+        } else {
+            int x = this.gestorSeries.calcQuantidadeVendas(produto, dias);
+            String resposta = "Quantidade de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x;
 
-        return agregacao.toString();
+            return resposta;
+        }
     }
 
     private String processVOLUME_VENDAS(byte[] bytes) throws IOException{

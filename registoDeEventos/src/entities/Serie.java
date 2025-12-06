@@ -90,4 +90,19 @@ public class Serie {
             this.lock.unlock();
         }
     }
+
+    public int calcQuantidadeVendas(String produto) { // precisa de lock ???
+        this.lock.lock();
+        try {
+            int total = 0;
+            for (Evento evento : this.eventos) {
+                if (evento.getProduto().equals(produto)) {
+                    total += evento.getQuantidade();
+                }
+            }
+            return total;
+        } finally {
+            this.lock.unlock();
+        }
+    }
 }

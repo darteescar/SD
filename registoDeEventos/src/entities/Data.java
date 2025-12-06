@@ -28,6 +28,24 @@ public class Data {
         else this.dia++;
     }
 
+    public void decrementData(){
+        if(this.dia == 1 && this.mes == 1){
+            this.dia = 31;
+            this.mes = 12;
+            this.ano--;
+        }
+        else if(this.dia == 1){
+            this.mes--;
+            if(mes31()) this.dia = 31;
+            else if(mes30()) this.dia = 30;
+            else if(fevereiro()){
+                if(anoBi()) this.dia = 29;
+                else this.dia = 28;
+            }
+        }
+        else this.dia--;
+    }
+
     public int compareData(String data){
         Data d = stringToData(data); 
         if(this.ano < d.ano) return -1;
@@ -86,5 +104,10 @@ public class Data {
         else if(mes31() && dia == 31) return true;
         else if(mes30() && dia == 30) return true;
         else return false;
+    }
+
+    @Override
+    public Data clone(){
+        return new Data(this.dia, this.mes, this.ano);
     }
 }

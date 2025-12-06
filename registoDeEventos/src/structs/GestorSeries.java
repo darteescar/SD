@@ -58,4 +58,22 @@ public class GestorSeries {
           return null; // série não existe
      }
 
+     public int calcQuantidadeVendas(String produto, int dias){ 
+          // talvez devessemos lancar uma Thread por dia para paralelizar isto ???
+          int total = 0;
+          Data currentDate = this.data.clone();
+
+          for (int i = 0; i < dias; i++) {
+               String diaStr = currentDate.getData();
+               Serie serie = this.get(diaStr);
+               if (serie != null) {
+                    total += serie.calcQuantidadeVendas(produto);
+               }
+               currentDate.decrementData();
+          }
+
+          return total;
+          
+     }
+
 }
