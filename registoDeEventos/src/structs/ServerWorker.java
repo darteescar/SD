@@ -1,6 +1,5 @@
 package structs;
 
-import entities.Data;
 import entities.Mensagem;
 import entities.payloads.Agregacao;
 import entities.payloads.Evento;
@@ -22,17 +21,15 @@ public class ServerWorker implements Runnable {
     private final DataOutputStream out;
     private final DataInputStream in;
     private final int cliente;
-    private final Data data;
     private final int d;
 
-    public ServerWorker(Socket socket, GestorLogins logins, int cliente, Data data, GestorSeries gestorSeries, int d) throws IOException{
+    public ServerWorker(Socket socket, GestorLogins logins, int cliente, GestorSeries gestorSeries, int d) throws IOException{
         this.socket = socket;
         this.logins = logins;
         this.gestorSeries = gestorSeries;
         this.out = new DataOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
-        this.data = data;
         this.d = d;
     }
 
