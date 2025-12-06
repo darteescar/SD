@@ -154,32 +154,45 @@ public class ServerWorker implements Runnable {
 
     private String processVOLUME_VENDAS(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        //String produto = agregacao.getProduto();
-        //int dias = agregacao.getDias();
+        String produto = agregacao.getProduto();
+        int dias = agregacao.getDias();
 
-        // Lógica de realizar a query do volume de vendas
-
-        return agregacao.toString();
+        if (this.d <= 0 || dias > this.d) {
+            return "Insira num valor entre 1 e ." + this.d;
+        } else {
+            double x = this.gestorSeries.calcVolumeVendas(produto, dias);
+            String resposta = "Volume de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x;
+            return resposta;
+        }
     }
 
     private String processPRECO_MEDIO(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        //String produto = agregacao.getProduto();
-        //int dias = agregacao.getDias();
+        String produto = agregacao.getProduto();
+        int dias = agregacao.getDias();
 
-        // Lógica de realizar a query do preço médio
-
-        return agregacao.toString();
+        if (this.d <= 0 || dias > this.d) {
+            return "Insira num valor entre 1 e ." + this.d;
+        } else {
+            double x = this.gestorSeries.calcPrecoMedio(produto, dias);
+            String resposta = "Preço médio de venda do produto " + produto + " nos últimos " + dias + " dias: " + x;
+            return resposta;
+        }
     }
 
     private String processPRECO_MAXIMO(byte[] bytes) throws IOException{
         Agregacao agregacao = Agregacao.deserialize(bytes);
-        //String produto = agregacao.getProduto();
-        //int dias = agregacao.getDias();
+        String produto = agregacao.getProduto();
+        int dias = agregacao.getDias();
 
-        // Lógica de realizar a query do preço máximo
+        if (this.d <= 0 || dias > this.d) {
+            return "Insira num valor entre 1 e ." + this.d;
+        } else {
+            double x = this.gestorSeries.calcPrecoMaximo(produto, dias);
+            String resposta = "Preço máximo de venda do produto " + produto + " nos últimos " + dias + " dias: " + x;
+            return resposta;
+        }
 
-        return agregacao.toString();
     }
 
     private String processLISTA(byte[] bytes) throws IOException{

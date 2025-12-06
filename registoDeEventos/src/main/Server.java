@@ -40,6 +40,7 @@ public class Server implements AutoCloseable{
     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // Este método ainda não está a ser usado
     public void passarDia(){
+        // eu acho que temos de esperar que toda a gente acabe de mexer na serie do dia atual antes de a guardarmos no GestorSeries
         this.series.add(this.serie_atual); // guarda a série do dia atual na BD e na Cache
         this.data.incrementData();
         this.serie_atual = new Serie(data.getData()); // cria uma nova série para o novo dia

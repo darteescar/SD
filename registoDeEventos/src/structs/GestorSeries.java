@@ -71,9 +71,49 @@ public class GestorSeries {
                }
                currentDate.decrementData();
           }
-
           return total;
-          
+     }
+
+     public double calcVolumeVendas(String produto, int dias){ 
+          // talvez devessemos lancar uma Thread por dia para paralelizar isto ???
+          double total = 0.0;
+          Data currentDate = this.data.clone();
+
+          for (int i = 0; i < dias; i++) {
+               String diaStr = currentDate.getData();
+               Serie serie = this.get(diaStr);
+               if (serie != null) {
+                    total += serie.calcVolumeVendas(produto);
+               }
+               currentDate.decrementData();
+          }
+          return total;
+     }
+
+     public double calcPrecoMedio(String produto, int dias){
+
+          double totalPreco = calcVolumeVendas(produto, dias);
+          int totalQuantidade = calcQuantidadeVendas(produto, dias);
+
+          return (totalQuantidade == 0) ? 0.0 : (totalPreco / totalQuantidade);
+     }
+
+     public double calcPrecoMaximo(String produto, int dias){
+          double maxPreco = 0.0;
+          Data currentDate = this.data.clone();
+
+          for (int i = 0; i < dias; i++) {
+               String diaStr = currentDate.getData();
+               Serie serie = this.get(diaStr);
+               if (serie != null) {
+                    double precoMaxDia = serie.calcPrecoMaximo(produto);
+                    if (precoMaxDia > maxPreco) {
+                         maxPreco = precoMaxDia;
+                    }
+               }
+               currentDate.decrementData();
+          }
+          return maxPreco;
      }
 
 }

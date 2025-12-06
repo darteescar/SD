@@ -105,4 +105,37 @@ public class Serie {
             this.lock.unlock();
         }
     }
+
+    public double calcVolumeVendas(String produto) { // precisa de lock ???
+        this.lock.lock();
+        try {
+            double total = 0.0;
+            for (Evento evento : this.eventos) {
+                if (evento.getProduto().equals(produto)) {
+                    total += evento.getQuantidade() * evento.getPreco();
+                }
+            }
+            return total;
+        } finally {
+            this.lock.unlock();
+        }
+    }
+
+    public double calcPrecoMaximo(String produto) { // precisa de lock ???
+        this.lock.lock();
+        try {
+            double maxPreco = 0.0;
+            for (Evento evento : this.eventos) {
+                if (evento.getProduto().equals(produto)) {
+                    double preco = evento.getPreco();
+                    if (preco > maxPreco) {
+                        maxPreco = preco;
+                    }
+                }
+            }
+            return maxPreco;
+        } finally {
+            this.lock.unlock();
+        }
+    }
 }
