@@ -138,7 +138,7 @@ public class ServerWorker implements Runnable {
         int dias = agregacao.getDias();
 
         if (this.d <= 0 || dias > this.d) {
-            return "Insira num valor entre 1 e ."+this.d;
+            return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             int x = this.gestorSeries.calcQuantidadeVendas(produto, dias);
             String resposta = "Quantidade de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x;
