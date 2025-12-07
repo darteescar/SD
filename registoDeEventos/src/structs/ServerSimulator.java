@@ -15,7 +15,7 @@ public class ServerSimulator implements Runnable{
             while (true) {
                 Thread.sleep(30000); // Simula a passagem de um dia a cada 30 segundos
                 server.passarDia();
-                server.printGS();
+                //server.printGS();
                 System.out.println("Dia passado no servidor.");
             }
         } catch (Exception e){
