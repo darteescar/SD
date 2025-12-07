@@ -17,6 +17,7 @@ public class BDSeries implements Map<String, Serie> {
     }
 
     private BDSeries() {
+        
         try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
              Statement stm = conn.createStatement()) {
 
@@ -36,7 +37,8 @@ public class BDSeries implements Map<String, Serie> {
                     " data VARCHAR(50) NOT NULL," +
                     " FOREIGN KEY (id_serie) REFERENCES serie(id_serie) ON DELETE CASCADE" +
                     ");";
-
+            stm.executeUpdate("DELETE FROM evento");
+            stm.executeUpdate("DELETE FROM serie");
             stm.executeUpdate(sqlSerie);
             stm.executeUpdate(sqlEvento);
 
@@ -92,13 +94,17 @@ public class BDSeries implements Map<String, Serie> {
     public Serie get(Object key) {
         String data = (String) key;
         Serie serie = new Serie(data);
+
         try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
-             PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT produto, quantidade, preco, data FROM evento e " +
-                     "JOIN serie s ON s.id_serie = e.id_serie " +
-                     "WHERE s.data = ? ORDER BY e.id_evento")) {
+            PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT e.produto, e.quantidade, e.preco " +
+                    "FROM evento e " +
+                    "JOIN serie s ON s.id_serie = e.id_serie " +
+                    "WHERE s.data = ? " +
+                    "ORDER BY e.id_evento")) {
 
             stmt.setString(1, data);
+
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Evento e = new Evento(
@@ -108,14 +114,18 @@ public class BDSeries implements Map<String, Serie> {
                 );
                 serie.add(e);
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return serie;
     }
 
     @Override
     public Serie put(String key, Serie value) {
+        System.out.println("Adicionando série do dia " + key + " à base de dados.");
+        System.out.println("Eventos na série: " + value.getEventos().size());
         // cria nova série com data=key e adiciona eventos
         try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
              PreparedStatement stmtSerie = conn.prepareStatement(
@@ -135,6 +145,7 @@ public class BDSeries implements Map<String, Serie> {
                     stmtEvento.setString(2, e.getProduto());
                     stmtEvento.setInt(3, e.getQuantidade());
                     stmtEvento.setDouble(4, e.getPreco());
+                    stmtEvento.setString(5, key);
                     stmtEvento.executeUpdate();
                 }
             }
@@ -208,4 +219,70 @@ public class BDSeries implements Map<String, Serie> {
         }
         return entries;
     }
+
+    public void print() {
+        System.out.println("======== CONTEÚDO DA BASE DE DADOS ========");
+
+        try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD)) {
+
+            // 1) Imprimir séries
+            System.out.println("\n--- TABELA SERIE ---");
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT id_serie, data FROM serie ORDER BY id_serie")) {
+
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    System.out.println(
+                            "Serie { id_serie=" + rs.getInt("id_serie") +
+                            ", data=" + rs.getString("data") +
+                            " }"
+                    );
+                }
+            }
+
+            // 2) Imprimir eventos
+            System.out.println("\n--- TABELA EVENTO ---");
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT id_evento, id_serie, produto, quantidade, preco " +
+                    "FROM evento ORDER BY id_evento")) {
+
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    System.out.println(
+                            "Evento { id_evento=" + rs.getInt("id_evento") +
+                            ", id_serie=" + rs.getInt("id_serie") +
+                            ", produto=" + rs.getString("produto") +
+                            ", quantidade=" + rs.getInt("quantidade") +
+                            ", preco=" + rs.getDouble("preco") +
+                            " }"
+                    );
+                }
+            }
+
+            // 3) Eventos agrupados por série (extra útil)
+            System.out.println("\n--- EVENTOS POR SERIE ---");
+            try (PreparedStatement stmt = conn.prepareStatement(
+                    "SELECT s.data, s.id_serie, e.id_evento, e.produto, e.quantidade, e.preco " +
+                    "FROM serie s LEFT JOIN evento e ON s.id_serie = e.id_serie " +
+                    "ORDER BY s.id_serie, e.id_evento")) {
+
+                ResultSet rs = stmt.executeQuery();
+                while (rs.next()) {
+                    System.out.println(
+                            "[Dia " + rs.getString("data") + "] " +
+                            "Serie " + rs.getInt("id_serie") +
+                            " -> Evento " + rs.getInt("id_evento") +
+                            " (" + rs.getString("produto") + ", Q=" + rs.getInt("quantidade") +
+                            ", P=" + rs.getDouble("preco") + ")"
+                    );
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("============================================");
+    }
+
 }

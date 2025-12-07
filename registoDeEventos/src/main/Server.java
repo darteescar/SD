@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import structs.GestorLogins;
 import structs.GestorSeries;
+import structs.ServerSimulator;
 import structs.ServerWorker;
 
 public class Server implements AutoCloseable{
@@ -14,6 +15,7 @@ public class Server implements AutoCloseable{
     private final GestorSeries series;
     private int cliente;
     private final int d;
+    private ServerSimulator simulator;
 
     public Server(int d, int s) throws IOException{
         this.ss = new ServerSocket(12345);
@@ -23,9 +25,14 @@ public class Server implements AutoCloseable{
         this.series = new GestorSeries(s, data_inicial, serie_inicial);
         this.cliente = 0;
         this.d = d;
+        this.simulator = new ServerSimulator(this);
     }
 
     public void start() throws IOException{
+
+        Thread simulator = new Thread(this.simulator); // Inicia a thread que simula a passagem dos dias
+        simulator.start();
+
         while(true){
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
@@ -39,6 +46,10 @@ public class Server implements AutoCloseable{
     // Este método ainda não está a ser usado
     public void passarDia(){
         this.series.passarDia();
+    }
+
+    public void printGS(){
+        this.series.print();
     }
 
     @Override

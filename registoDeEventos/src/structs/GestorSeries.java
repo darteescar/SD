@@ -67,6 +67,7 @@ public class GestorSeries {
      public void passarDia() {
           lock.lock();
           try {
+               System.out.println("Passando do dia");
                add(this.serie_atual);  // guarda a série antiga
                this.data_atual.incrementData();
                this.serie_atual = new Serie(data_atual.getData());
@@ -168,6 +169,10 @@ public class GestorSeries {
           } else {
                return List.of(); // Retorna uma lista vazia se a série não existir
           }
+     }
+
+     public void print(){
+          this.bd.print();
      }
 
 }

@@ -9,5 +9,7 @@ public enum TipoMsg {
     PRECO_MEDIO,
     PRECO_MAXIMO,
     LISTA,
+    NOTIFICACAO_1,
+    NOTIFICACAO_2,
     RESPOSTA;
 }
