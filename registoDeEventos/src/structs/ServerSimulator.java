@@ -13,7 +13,7 @@ public class ServerSimulator implements Runnable{
     public void run(){
         try{
             while (true) {
-                Thread.sleep(10000); // Simula a passagem de um dia a cada 5 segundos
+                Thread.sleep(30000); // Simula a passagem de um dia a cada 30 segundos
                 server.passarDia();
                 server.printGS();
                 System.out.println("Dia passado no servidor.");
