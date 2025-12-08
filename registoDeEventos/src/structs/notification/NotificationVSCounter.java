@@ -1,24 +1,26 @@
-package structs.server;
+package structs.notification;
 
-import java.net.Socket;
+import structs.server.ClientContext;
 
 public class NotificationVSCounter {
-     private final Socket socket;
+     private final ClientContext context;
      private final String prod1;
      private final String prod2;
      private boolean prod_1_sold;
      private boolean prod_2_sold;
+     private int id;
 
-     public NotificationVSCounter(Socket socket, String prod1, String prod2) {
-          this.socket = socket;
+     public NotificationVSCounter(int id, ClientContext context, String prod1, String prod2) {
+          this.context = context;
           this.prod1 = prod1;
           this.prod2 = prod2;
           this.prod_1_sold = false;
           this.prod_2_sold = false;
+          this.id = id;
      }
 
-     public Socket getSocket() {
-          return socket;
+     public ClientContext getContext() {
+          return context;
      }
 
      public String getProd1() {
@@ -33,12 +35,16 @@ public class NotificationVSCounter {
           return prod_1_sold;
      }
 
-     public void setProd_1_sold(boolean prod_1_sold) {
-          this.prod_1_sold = prod_1_sold;
+     public int getId() {
+          return id;
      }
 
      public boolean isProd_2_sold() {
           return prod_2_sold;
+     }
+
+     public void setProd_1_sold(boolean prod_1_sold) {
+          this.prod_1_sold = prod_1_sold;
      }
 
      public void setProd_2_sold(boolean prod_2_sold) {

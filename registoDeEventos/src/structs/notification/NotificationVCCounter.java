@@ -1,17 +1,19 @@
-package structs.server;
+package structs.notification;
 
-import java.net.Socket;
+import structs.server.ClientContext;
 
 public class NotificationVCCounter {
      private static String produto = "";
-     private Socket socket;
+     private ClientContext context;
      private int counter;
      private int number;
+     private int id;
 
-     public NotificationVCCounter(Socket socket, int number) {
-          this.socket = socket;
+     public NotificationVCCounter(int id ,ClientContext context, int number) {
+          this.context = context;
           this.counter = 0;
           this.number = number;
+          this.id = id;
      }
 
      // GETTERS
@@ -19,8 +21,8 @@ public class NotificationVCCounter {
           return produto;
      }
 
-     public Socket getSocket() {
-          return socket;
+     public ClientContext getContext() {
+          return context;
      }
 
      public int getCounter() {
@@ -29,6 +31,10 @@ public class NotificationVCCounter {
 
      public int getN() {
           return number;
+     }
+
+     public int getId() {
+          return id;
      }
 
      // SETTERS

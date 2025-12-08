@@ -8,9 +8,9 @@ import entities.payloads.Login;
 import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
-
 import java.io.IOException;
 import java.util.List;
+import structs.notification.ServerNotifier;
 
 public class ServerWorker implements Runnable {
     private final GestorLogins logins;
@@ -47,11 +47,11 @@ public class ServerWorker implements Runnable {
 
                 if (TipoMsg.NOTIFICACAO_VC == tipo) {
                     
-                    processNOTIFICACAOVC(mensagem.getData());
+                    processNOTIFICACAOVC(id,mensagem.getData());
 
                 } else if (TipoMsg.NOTIFICACAO_VS == tipo)
                 {   
-                    processNOTIFICACAOVS(mensagem.getData());
+                    processNOTIFICACAOVS(id,mensagem.getData());
 
                 } else {
                     String result = "";
@@ -116,7 +116,7 @@ public class ServerWorker implements Runnable {
         Evento evento = Evento.deserialize(bytes);
 
         this.gestorSeries.getSerieAtual().add(evento);
-        this.notifier.notificar(evento.getProduto());
+        this.notifier.signall(evento.getProduto());
         String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.gestorSeries.getDataAtual().getData() + ".";
 
         return resposta;
@@ -194,19 +194,19 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private void processNOTIFICACAOVC(byte[] bytes) {
+    private void processNOTIFICACAOVC(int id, byte[] bytes) {
         NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
 
-        this.notifier.add(noti,this.contexto);
+        this.notifier.add(id,noti,this.contexto);
     }
 
-    private void processNOTIFICACAOVS(byte[] bytes) {
+    private void processNOTIFICACAOVS(int id, byte[] bytes) {
         NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
 
-        this.notifier.add(noti,this.contexto);
+        this.notifier.add(id,noti,this.contexto);
     }
 
     private boolean dIsValid(int dias) {
-        return !(this.d <= 0 || dias > this.d);
+       return !(this.d <= 0 || dias > this.d);
     }
 }

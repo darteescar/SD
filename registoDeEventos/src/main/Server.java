@@ -4,10 +4,11 @@ import entities.Serie;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import structs.notification.NotificationDispatcher;
+import structs.notification.ServerNotifier;
 import structs.server.ClientContext;
 import structs.server.GestorLogins;
 import structs.server.GestorSeries;
-import structs.server.ServerNotifier;
 import structs.server.ServerSimulator;
 import structs.server.ServerWorker;
 
@@ -19,8 +20,7 @@ public class Server implements AutoCloseable{
     private final int d;
     private final ServerSimulator simulator;
     private final ServerNotifier notifier;
-
-
+    private final NotificationDispatcher dispatcher;
 
     public Server(int d, int s) throws IOException{
         this.ss = new ServerSocket(12345);
@@ -31,7 +31,8 @@ public class Server implements AutoCloseable{
         this.cliente = 0;
         this.d = d;
         this.simulator = new ServerSimulator(this);
-        this.notifier = new ServerNotifier();
+        this.dispatcher = new NotificationDispatcher();
+        this.notifier = new ServerNotifier(dispatcher);
     }
 
     public void start() throws IOException{
@@ -39,7 +40,8 @@ public class Server implements AutoCloseable{
         Thread simulator = new Thread(this.simulator); // Inicia a thread que simula a passagem dos dias
         simulator.start();
 
-
+        Thread notifierThread = new Thread(this.notifier); // Inicia a thread que gere as notificações
+        notifierThread.start();
 
         while(true){
             // Aceita a conexão de um cliente
@@ -47,7 +49,7 @@ public class Server implements AutoCloseable{
             // Cria o contexto do cliente
             ClientContext context = new ClientContext(socket);
             // Cada cliente tem um thread dedicada a processar e executar mensagens
-            Thread worker  = new Thread(new ServerWorker(context ,logins, cliente++, series, d, this.notifier));
+            Thread worker  = new Thread(new ServerWorker(context,logins, cliente++, series, d, notifier));
             worker.start();
         }
     }
