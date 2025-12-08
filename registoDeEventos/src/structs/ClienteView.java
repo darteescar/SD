@@ -200,10 +200,12 @@ public class ClienteView {
         try{
             System.out.print("Introduza os nomes dos produtos (separados por ; ) > ");
             String produto = scanner.nextLine();
+            System.out.print("Introduza o número de dias > ");
+            String dias = scanner.nextLine();
 
             List<String> produtos = new ArrayList<>(Arrays.asList(produto.split(";")));
 
-            this.cliente.sendFILTRAR(TipoMsg.LISTA, produtos);
+            this.cliente.sendFILTRAR(TipoMsg.LISTA, produtos, Integer.parseInt(dias));
 
         }catch(Exception e){
             System.out.println("[ERRO AO ENVIAR LISTA DE EVENTOS] " + e.getMessage());

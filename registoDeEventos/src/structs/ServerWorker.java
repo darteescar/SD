@@ -193,7 +193,14 @@ public class ServerWorker implements Runnable {
     private String processLISTA(byte[] bytes) throws IOException{
         Filtrar filtrar = Filtrar.deserialize(bytes);
         List<String> produto = filtrar.getProdutos();
-        List<Evento> eventos = this.gestorSeries.filtrarEventos(produto);
-        return eventos.toString();
+        int dia = filtrar.getDias();
+
+        // Lógica de realizar a query da lista
+        if (this.d <= 0 || dia > this.d) {
+            return "Insira num valor entre 1 e " + this.d + ".";
+        } else {
+            List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
+            return eventos.toString();
+        }
     }
 }
