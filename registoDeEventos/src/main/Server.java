@@ -43,6 +43,9 @@ public class Server implements AutoCloseable{
         Thread notifierThread = new Thread(this.notifier); // Inicia a thread que gere as notificações
         notifierThread.start();
 
+        Thread dispatcherThread = new Thread(this.dispatcher); // Inicia a thread que despacha as notificações
+        dispatcherThread.start();
+
         while(true){
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();

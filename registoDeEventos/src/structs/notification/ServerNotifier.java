@@ -1,5 +1,6 @@
 package structs.notification;
 
+import entities.Mensagem;
 import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
@@ -7,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import structs.server.ClientContext;
-import entities.Mensagem;
 
 public class ServerNotifier implements Runnable {
      private List<NotificationVSCounter> listavs;
@@ -61,7 +61,10 @@ public class ServerNotifier implements Runnable {
                if (nvs.isProd_1_sold() && nvs.isProd_2_sold()){
                     Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "true".getBytes());
 
-                    this.dispatcher.send(mensagem);
+                    ClientContext context = nvs.getContext();
+                    NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+
+                    this.dispatcher.add(mensagemNot);
                }
           }
      }
@@ -74,7 +77,10 @@ public class ServerNotifier implements Runnable {
                     if (nvc.getCounter() == nvc.getN()){
                          Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, produto.getBytes());
 
-                         this.dispatcher.send(mensagem);
+                         ClientContext context = nvc.getContext();
+                         NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+
+                         this.dispatcher.add(mensagemNot);
                     }
                }
           } else {
@@ -129,15 +135,19 @@ public class ServerNotifier implements Runnable {
 
      private void sendFalseToAllVCCounters() {
           for (NotificationVCCounter nvc : listavc) {
-               Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, "false".getBytes());
-               this.dispatcher.send(mensagem);
+               Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, "null".getBytes());
+               ClientContext context = nvc.getContext();
+               NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+               this.dispatcher.add(mensagemNot);
           }
      }
 
      private void sendFalseToAllVSCounters() {
           for (NotificationVSCounter nvs : listavs) {
                Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "false".getBytes());
-               this.dispatcher.send(mensagem);
+               ClientContext context = nvs.getContext();
+               NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+               this.dispatcher.add(mensagemNot);
           }
      }
 
