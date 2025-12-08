@@ -35,8 +35,19 @@ public class ServerNotifier implements Runnable {
      }
 
      public void processar(String produto){
-          processarNotificacoesVC(produto);
-          processarNotificacoesVS(produto);
+          this.lock1.lock();
+          try {
+              processarNotificacoesVC(produto);
+          } finally {
+               this.lock1.unlock();
+          }
+          
+          this.lock2.lock();
+          try {
+               processarNotificacoesVS(produto);
+          } finally {
+               this.lock2.unlock();
+          }
      }
 
      private void processarNotificacoesVS(String produto){
@@ -99,9 +110,35 @@ public class ServerNotifier implements Runnable {
      }
 
      public void clear() {
-          // envia todas as notificações pendentes antes de limpar
-          this.listavs.clear();
-          this.listavc.clear();
+          this.lock1.lock();
+          try {
+              sendFalseToAllVCCounters();
+              this.listavc.clear();
+          } finally {
+               this.lock1.unlock();
+          }
+
+          this.lock2.lock();
+          try {
+               sendFalseToAllVSCounters();
+               this.listavs.clear();
+          } finally {
+               this.lock2.unlock();
+          }
+     }
+
+     private void sendFalseToAllVCCounters() {
+          for (NotificationVCCounter nvc : listavc) {
+               Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, "false".getBytes());
+               this.dispatcher.send(mensagem);
+          }
+     }
+
+     private void sendFalseToAllVSCounters() {
+          for (NotificationVSCounter nvs : listavs) {
+               Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "false".getBytes());
+               this.dispatcher.send(mensagem);
+          }
      }
 
 }
