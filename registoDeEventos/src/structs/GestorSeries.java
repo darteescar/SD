@@ -52,7 +52,7 @@ public class GestorSeries {
      }
 
      public Serie get(String dia) {
-          if (cache.containsKey(dia)){ // MISS - se está na cache
+          if (cache.containsKey(dia)){ // HIT - se está na cache
                return cache.get(dia);
           } else if (bd.containsKey(dia)){ // MISS - se está na BD
                Serie s = bd.get(dia);
