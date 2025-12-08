@@ -40,7 +40,7 @@ public class Cliente implements AutoCloseable{
     }
 
     public void send(Mensagem mensagem){
-        Thread sender = new Thread(new Sender(this.demu, mensagem, replies));
+        Thread sender = new Thread(new Sender(this.demu, mensagem, replies, view));
         sender.start();
     }
 
@@ -108,6 +108,7 @@ public class Cliente implements AutoCloseable{
         Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
 
         this.send(mensagem);
+        this.view.switchNotificacao2();
     }
 
     public void sendNotificacaoVS(TipoMsg tipo, String prod1, String prod2) throws IOException{
@@ -116,6 +117,7 @@ public class Cliente implements AutoCloseable{
         Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
 
         this.send(mensagem);
+        this.view.switchNotificacao1();
     }
 
     public static void main(String[] args){
