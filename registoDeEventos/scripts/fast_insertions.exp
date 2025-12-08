@@ -11,9 +11,9 @@ set pid $spawn_id
 expect "Escolha uma das opções >"
 send "1\r"
 expect "Introduza o username >"
-send "duarte\r"
+send "tiago\r"
 expect "Introduza a password >"
-send "1234\r"
+send "tiago\r"
 
 # Inserir 10 produtos
 for {set i 1} {$i <= 10} {incr i} {
