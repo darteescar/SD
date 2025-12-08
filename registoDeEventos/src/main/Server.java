@@ -59,6 +59,7 @@ public class Server implements AutoCloseable{
 
     public void passarDia(){
         this.series.passarDia();
+        this.notifier.clear();
     }
 
     public void printGS(){

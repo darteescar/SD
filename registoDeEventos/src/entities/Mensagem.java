@@ -54,7 +54,6 @@ public class Mensagem {
             return new Mensagem(id, tipo, data);
             
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }

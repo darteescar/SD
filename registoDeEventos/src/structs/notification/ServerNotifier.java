@@ -5,6 +5,7 @@ import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import structs.server.ClientContext;
@@ -50,46 +51,60 @@ public class ServerNotifier implements Runnable {
           }
      }
 
-     private void processarNotificacoesVS(String produto){
-          for (NotificationVSCounter nvs : listavs){
-               if (nvs.getProd1().equals(produto)){
+     private void processarNotificacoesVS(String produto) {
+          Iterator<NotificationVSCounter> it = listavs.iterator();
+          while (it.hasNext()) {
+               NotificationVSCounter nvs = it.next();
+
+               if (nvs.getProd1().equals(produto)) {
                     nvs.setProd_1_sold(true);
                }
-               if (nvs.getProd2().equals(produto)){
+               if (nvs.getProd2().equals(produto)) {
                     nvs.setProd_2_sold(true);
                }
-               if (nvs.isProd_1_sold() && nvs.isProd_2_sold()){
-                    Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "true".getBytes());
 
+               if (nvs.isProd_1_sold() && nvs.isProd_2_sold()) {
+                    Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "true".getBytes());
                     ClientContext context = nvs.getContext();
                     NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
 
                     this.dispatcher.add(mensagemNot);
+
+                    it.remove(); // Remove da lista após enviar a notificação
+               }
+          }
+          }
+
+
+     private void processarNotificacoesVC(String produto) {
+          String produtoAtual = NotificationVCCounter.getProduto(); // Produto da sequência atual
+          if (produtoAtual.equals(produto)) {
+               // Produto igual ao anterior, incrementa contadores de todos
+               Iterator<NotificationVCCounter> it = listavc.iterator();
+               while (it.hasNext()) {
+                    NotificationVCCounter nvc = it.next();
+                    nvc.incrementCounter();
+
+                    if (nvc.getCounter() >= nvc.getN()) {
+                         // Sequência atingida → envia notificação e remove
+                         Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, produto.getBytes());
+                         ClientContext context = nvc.getContext();
+                         NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+                         this.dispatcher.add(mensagemNot);
+
+                         it.remove();
+                    }
+               }
+          } else {
+               // Produto diferente → reseta todos os contadores e atualiza o produto atual
+               NotificationVCCounter.setProduto(produto);
+               for (NotificationVCCounter nvc : listavc) {
+                    nvc.resetCounter();
                }
           }
      }
 
-     private void processarNotificacoesVC(String produto){
-          String produto_atual = NotificationVCCounter.getProduto();
-          if (produto_atual.equals(produto)){
-               for (NotificationVCCounter nvc : listavc){
-                    nvc.incrementCounter();
-                    if (nvc.getCounter() == nvc.getN()){
-                         Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, produto.getBytes());
 
-                         ClientContext context = nvc.getContext();
-                         NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
-
-                         this.dispatcher.add(mensagemNot);
-                    }
-               }
-          } else {
-               NotificationVCCounter.setProduto(produto);
-               for (NotificationVCCounter nvc : listavc){
-                    nvc.resetCounter();
-               }
-          }
-     } 
 
      public void add(int id, NotificacaoVC noti, ClientContext context){
           this.lock1.lock();
