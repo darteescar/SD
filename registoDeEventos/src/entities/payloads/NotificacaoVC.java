@@ -6,40 +6,40 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-    public class NotificacaoVC {
-        private int n;
+public class NotificacaoVC {
+    private int n;
 
-        public NotificacaoVC(int n){
-            this.n = n;
-        }
+    public NotificacaoVC(int n){
+        this.n = n;
+    }
 
-        public NotificacaoVC(NotificacaoVC notificacaoVC){
-            this.n = notificacaoVC.getN();
-        }
+    public NotificacaoVC(NotificacaoVC notificacaoVC){
+        this.n = notificacaoVC.getN();
+    }
 
-        public int getN(){
-            return this.n;
-        }
+    public int getN(){
+        return this.n;
+    }
 
     @Override
-        public String toString(){
+    public String toString(){
         return "N: " + this.n;
     }
 
     @Override
-        public NotificacaoVC clone(){
-            return new NotificacaoVC(this);
-        }
+    public NotificacaoVC clone(){
+        return new NotificacaoVC(this);
+    }
 
     public byte[] serialize() throws IOException {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
 
-            dos.writeInt(this.n);
-            dos.flush();
+        dos.writeInt(this.n);
+        dos.flush();
 
-            return baos.toByteArray();
-        }
+        return baos.toByteArray();
+    }
 
     public static NotificacaoVC deserialize(byte[] bytes) throws IOException{
         DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));

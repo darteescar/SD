@@ -4,6 +4,8 @@ import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
 import entities.payloads.Login;
+import entities.payloads.NotificacaoVC;
+import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
 import java.io.IOException;
 import java.net.Socket;
@@ -98,6 +100,22 @@ public class Cliente implements AutoCloseable{
             sb.append(reply).append("\n");
         }
         System.out.println(sb.toString());
+    }
+
+    public void sendNotificacaoVC(TipoMsg tipo, int n) throws IOException{
+        NotificacaoVC notificacao = new NotificacaoVC(n);
+        byte[] bytes = notificacao.serialize();
+        Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
+
+        this.send(mensagem);
+    }
+
+    public void sendNotificacaoVS(TipoMsg tipo, String prod1, String prod2) throws IOException{
+        NotificacaoVS notificacao = new NotificacaoVS(prod1,prod2);
+        byte[] bytes = notificacao.serialize();
+        Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
+
+        this.send(mensagem);
     }
 
     public static void main(String[] args){

@@ -15,6 +15,8 @@ public class ClienteView {
     private final ReentrantLock lock;
     private final Scanner scanner;
     private boolean autenticado = false;
+    private boolean notificacao1 = true;
+    private boolean notificacao2 = true;
 
     public ClienteView(Cliente cliente){
         this.cliente = cliente;
@@ -29,6 +31,32 @@ public class ClienteView {
         }finally{
             this.lock.unlock();
         }
+    }
+
+    public void switchNotificacao1() {
+        this.lock.lock();
+        try{
+            this.notificacao1 = !this.notificacao1;
+        }finally{
+            this.lock.unlock();
+        }
+    }
+
+    public void switchNotificacao2() {
+        this.lock.lock();
+        try{
+            this.notificacao2 = !this.notificacao2;
+        }finally{
+            this.lock.unlock();
+        }
+    }
+
+    public boolean noti1IsAvailable() {
+        return this.notificacao1;
+    }
+
+    public boolean noti2IsAvailable() {
+        return this.notificacao2;
     }
 
     public boolean isAutenticado(){
@@ -58,6 +86,8 @@ public class ClienteView {
         menuMenuMensagens.add(new MenuOpcao("Preço médio de vendas", () -> enviarPrecoMedio()));
         menuMenuMensagens.add(new MenuOpcao("Preço máximo de vendas", () -> enviarPrecoMaximo()));
         menuMenuMensagens.add(new MenuOpcao("Lista de eventos", () -> enviarLista()));
+        menuMenuMensagens.add(new MenuOpcao("Notificação de Vendas Simultâneas", () -> this.noti1IsAvailable() ,() -> enviarNotificacaoVS()));
+        menuMenuMensagens.add(new MenuOpcao("Notificação de Vendas Consecutivas", () -> this.noti2IsAvailable() ,() -> enviarNotificacaoVC()));
         return new Menu(menuMenuMensagens);
     }
 
@@ -74,7 +104,7 @@ public class ClienteView {
                 System.out.println("[LOGIN EFETUADO COM SUCESSO]");
                 this.switchAutenticacao();
                 Menu menuMensagens = this.criaMenuMensagens();
-                menuMensagens .run();
+                menuMensagens.run();
 
             } else {
                 System.out.println("[CLIENTE NAO REGISTADO, POR FAVOR REGISTE-SE]");
@@ -210,6 +240,34 @@ public class ClienteView {
         }catch(Exception e){
             System.out.println("[ERRO AO ENVIAR LISTA DE EVENTOS] " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public void enviarNotificacaoVC() {
+        try{
+            System.out.print("Introduza o número de vendas consecutivas > ");
+            String n = scanner.nextLine();
+
+            this.cliente.sendNotificacaoVC(TipoMsg.NOTIFICACAO_VC, Integer.parseInt(n));
+
+        }catch(Exception e){
+                    System.out.println("[ERRO AO ENVIAR NOTIFICAÇÃO VENDAS CONSECUTIVAS] " + e.getMessage());
+                    e.printStackTrace();
+        }
+    }
+
+    public void enviarNotificacaoVS() {
+        try{
+            System.out.print("Introduza o primeiro produto > ");
+            String prod1 = scanner.nextLine();
+            System.out.print("Introduza o segundo produto > ");
+            String prod2 = scanner.nextLine();
+
+            this.cliente.sendNotificacaoVS(TipoMsg.NOTIFICACAO_VS, prod1, prod2);
+
+        }catch(Exception e){
+                    System.out.println("[ERRO AO ENVIAR NOTIFICAÇÃO VENDAS SIMULTÂNEAS] " + e.getMessage());
+                    e.printStackTrace();
         }
     }
 }
