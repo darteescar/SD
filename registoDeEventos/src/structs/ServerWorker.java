@@ -48,7 +48,7 @@ public class ServerWorker implements Runnable {
 
                 int id = mensagem.getID();
                 TipoMsg tipo = mensagem.getTipo();
-                System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
+                //System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
 
                 String result = "";
                 try {
@@ -62,7 +62,7 @@ public class ServerWorker implements Runnable {
                     Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
                     reply.serialize(out);
                     out.flush();
-                    System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
+                    //System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
                 } catch (IOException e) {
                     System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
                     e.printStackTrace();
@@ -193,14 +193,7 @@ public class ServerWorker implements Runnable {
     private String processLISTA(byte[] bytes) throws IOException{
         Filtrar filtrar = Filtrar.deserialize(bytes);
         List<String> produto = filtrar.getProdutos();
-        int dia = filtrar.getDias();
-
-        // Lógica de realizar a query da lista
-        if (this.d <= 0 || dia > this.d) {
-            return "Insira num valor entre 1 e " + this.d + ".";
-        } else {
-            List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
-            return eventos.toString();
-        }
+        List<Evento> eventos = this.gestorSeries.filtrarEventos(produto);
+        return eventos.toString();
     }
 }

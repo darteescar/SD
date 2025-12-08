@@ -157,11 +157,9 @@ public class GestorSeries {
           return maxPreco;
      }
 
-     public List<Evento> filtrarEventos(List<String> produtos, int dia){
+     public List<Evento> filtrarEventos(List<String> produtos){
           Data targetDate = this.data_atual.clone();
-          for(int i = 0 ; i < dia ; i++){
-               targetDate.decrementData();
-          }
+          targetDate.decrementData();
           String diaStr = targetDate.getData();
           Serie serie = this.get(diaStr);
           if (serie != null) {

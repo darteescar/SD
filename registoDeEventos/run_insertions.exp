@@ -1,7 +1,0 @@
-#!/bin/bash
-
-NUM_CLIENTES=5   # alterar para quantos quiseres
-
-for i in $(seq 1 $NUM_CLIENTES); do
-    gnome-terminal -- bash -c "./insertions.exp; exec bash"
-done

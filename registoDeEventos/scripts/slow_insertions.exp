@@ -1,0 +1,75 @@
+#!/usr/bin/expect -f
+set timeout -1
+
+cd ..
+
+spawn java -cp bin:lib/* main.Cliente
+
+# Login
+expect {
+    "Escolha uma das opções >" {}
+    eof { exit }
+}
+send "1\r"
+
+expect {
+    "Introduza o username >" {}
+    eof { exit }
+}
+send "tiago\r"
+
+expect {
+    "Introduza a password >" {}
+    eof { exit }
+}
+send "tiago\r"
+
+
+# Inserir 50 produtos
+for {set i 1} {$i <= 50} {incr i} {
+
+    expect {
+        "Escolha uma das opções >" {}
+        eof { exit }
+    }
+    send "1\r"
+    after 100
+
+    expect {
+        "Introduza o nome do produto >" {}
+        eof { exit }
+    }
+    send "produto_$i\r"
+    after 100
+
+    expect {
+        "Introduza a quantidade>" {}
+        eof { exit }
+    }
+    send "$i\r"
+    after 100
+
+    expect {
+        "Introduza o preço>" {}
+        eof { exit }
+    }
+    send "$i\r"
+    after 100
+}
+
+# Sair
+expect {
+    "Escolha uma das opções >" {}
+    eof { exit }
+}
+send "0\r"
+
+# Enviar CTRL+C para terminar o cliente
+send "\003"
+
+# Espera um instante para garantir que o processo termina
+sleep 1
+
+# Fechar a janela do terminal
+exit
+

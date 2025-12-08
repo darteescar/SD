@@ -10,24 +10,17 @@ import java.util.List;
 
 public class Filtrar {
     private List<String> produtos;
-    private int dias;
 
-    public Filtrar(List<String> produtos, int dias){
+    public Filtrar(List<String> produtos){
         this.produtos = new ArrayList<>(produtos);
-        this.dias = dias;
     }
 
     public Filtrar(Filtrar filtrar){
         this.produtos = filtrar.getProdutos();
-        this.dias = filtrar.getDias();
     }
 
     public List<String> getProdutos(){
         return new ArrayList<>(this.produtos);
-    }
-
-    public int getDias(){
-        return this.dias;
     }
 
     @Override
@@ -37,7 +30,6 @@ public class Filtrar {
         for(String produto : this.produtos){
             sb.append(produto).append(", ");
         }
-        sb.append("Dias: ").append(this.dias);
         return sb.toString();
     }
 
@@ -53,7 +45,6 @@ public class Filtrar {
         for(String produto : produtos){
             dos.writeUTF(produto);
         }
-        dos.writeInt(dias);
         dos.flush();
 
         return baos.toByteArray();
@@ -67,8 +58,7 @@ public class Filtrar {
         for(int i = 0; i < size; i++){
             produtos.add(dis.readUTF());
         }
-        int dias = dis.readInt();
 
-        return new Filtrar(produtos, dias);
+        return new Filtrar(produtos);
     }
 }

@@ -83,8 +83,8 @@ public class Cliente implements AutoCloseable{
         this.send(mensagem);
     }
 
-    public void sendFILTRAR(TipoMsg tipo, List<String> produtos, int dias) throws IOException{
-        Filtrar filtrar = new Filtrar(produtos, dias);
+    public void sendFILTRAR(TipoMsg tipo, List<String> produtos) throws IOException{
+        Filtrar filtrar = new Filtrar(produtos);
         byte[] bytes = filtrar.serialize();
         Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
         
