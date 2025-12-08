@@ -6,6 +6,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import structs.GestorLogins;
 import structs.GestorSeries;
+import structs.ServerNotifier;
 import structs.ServerSimulator;
 import structs.ServerWorker;
 
@@ -15,7 +16,9 @@ public class Server implements AutoCloseable{
     private final GestorSeries series;
     private int cliente;
     private final int d;
-    private ServerSimulator simulator;
+    private final ServerSimulator simulator;
+    private final ServerNotifier notifier;
+
 
     public Server(int d, int s) throws IOException{
         this.ss = new ServerSocket(12345);
@@ -26,6 +29,7 @@ public class Server implements AutoCloseable{
         this.cliente = 0;
         this.d = d;
         this.simulator = new ServerSimulator(this);
+        this.notifier = new ServerNotifier(series);
     }
 
     public void start() throws IOException{
@@ -37,13 +41,11 @@ public class Server implements AutoCloseable{
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
             // Cada cliente tem um thread dedicada a processar e executar mensagens
-            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++, series, d));
+            Thread worker  = new Thread(new ServerWorker(socket, logins, cliente++, series, d, this.notifier));
             worker.start();
         }
     }
 
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // Este método ainda não está a ser usado
     public void passarDia(){
         this.series.passarDia();
     }

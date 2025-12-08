@@ -5,6 +5,8 @@ import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
 import entities.payloads.Login;
+import entities.payloads.NotificacaoVC;
+import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -22,8 +24,9 @@ public class ServerWorker implements Runnable {
     private final DataInputStream in;
     private final int cliente;
     private final int d;
+    private final ServerNotifier notifier;
 
-    public ServerWorker(Socket socket, GestorLogins logins, int cliente, GestorSeries gestorSeries, int d) throws IOException{
+    public ServerWorker(Socket socket, GestorLogins logins, int cliente, GestorSeries gestorSeries, int d, ServerNotifier notifier) throws IOException{
         this.socket = socket;
         this.logins = logins;
         this.gestorSeries = gestorSeries;
@@ -31,6 +34,7 @@ public class ServerWorker implements Runnable {
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
         this.d = d;
+        this.notifier = notifier;
     }
 
     @Override
@@ -50,22 +54,41 @@ public class ServerWorker implements Runnable {
                 TipoMsg tipo = mensagem.getTipo();
                 //System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
 
-                String result = "";
-                try {
-                    result = execute(mensagem);
-                } catch (Exception e) {
-                    System.out.println("[ERRO AO EXECUTAR MENSAGEM] " + e.getMessage());
-                    e.printStackTrace();
-                }
+                if (TipoMsg.NOTIFICACAO_VC == tipo) {
+                    try {
+                        processNOTIFICACAOVC(mensagem.getData());
+                    }
+                    catch (IOException e) {
+                        System.out.println("[ERRO AO EXECUTAR NOTIFICACAO DE VENDAS CONSECUTIVAS] " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                } else if (TipoMsg.NOTIFICACAO_VS == tipo)
+                {   
+                    try {
+                        processNOTIFICACAOVS(mensagem.getData());
+                    }
+                    catch (IOException e) {
+                        System.out.println("[ERRO AO EXECUTAR NOTIFICACAO DE VENDAS SIMULTÂNEAS] " + e.getMessage());
+                        e.printStackTrace();
+                    }
+                } else {
+                    String result = "";
+                    try {
+                        result = execute(mensagem);
+                    } catch (Exception e) {
+                        System.out.println("[ERRO AO EXECUTAR MENSAGEM] " + e.getMessage());
+                        e.printStackTrace();
+                    }
 
-                try {
-                    Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
-                    reply.serialize(out);
-                    out.flush();
-                    //System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
-                } catch (IOException e) {
-                    System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
-                    e.printStackTrace();
+                    try {
+                        Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
+                        reply.serialize(out);
+                        out.flush();
+                        //System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
+                    } catch (IOException e) {
+                        System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
+                        e.printStackTrace();
+                    }
                 }
             }
         } finally {
@@ -126,7 +149,7 @@ public class ServerWorker implements Runnable {
         Evento evento = Evento.deserialize(bytes);
 
         this.gestorSeries.getSerieAtual().add(evento);
-
+        this.notifier.notificar(evento.getProduto());
         String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.gestorSeries.getDataAtual().getData() + ".";
 
         return resposta;
@@ -202,5 +225,17 @@ public class ServerWorker implements Runnable {
             List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
             return eventos.toString();
         }
+    }
+
+    private void processNOTIFICACAOVC(byte[] bytes) throws IOException{
+        NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
+
+        this.notifier.add(noti,this.socket);
+    }
+
+    private void processNOTIFICACAOVS(byte[] bytes) throws IOException{
+        NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
+
+        this.notifier.add(noti,this.socket);
     }
 }
