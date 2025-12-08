@@ -38,24 +38,35 @@ public class NotificacaoVS {
           return new NotificacaoVS(this);
      }
 
-     public byte[] serialize() throws IOException{
-          ByteArrayOutputStream baos = new ByteArrayOutputStream();
-          DataOutputStream dos = new DataOutputStream(baos);
+     public byte[] serialize(){
+          try {
 
-          dos.writeUTF(produto_1);
-          dos.writeUTF(produto_2);
-          dos.flush();
-          
-          return baos.toByteArray();
+               ByteArrayOutputStream baos = new ByteArrayOutputStream();
+               DataOutputStream dos = new DataOutputStream(baos);
+
+               dos.writeUTF(produto_1);
+               dos.writeUTF(produto_2);
+               dos.flush();
+               
+               return baos.toByteArray();
+               
+          } catch (IOException e) {
+               e.printStackTrace();
+               return null;
+          }
      }
 
-     public static NotificacaoVS deserialize(byte[] bytes) throws IOException{
-          DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+     public static NotificacaoVS deserialize(byte[] bytes){
+          try {
 
-          String prod1 = dis.readUTF();
-          String prod2 = dis.readUTF();
+               DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+               String prod1 = dis.readUTF();
+               String prod2 = dis.readUTF();
+               return new NotificacaoVS(prod1, prod2);
 
-          return new NotificacaoVS(prod1, prod2);
+          } catch (IOException e) {
+               e.printStackTrace();
+               return null;
+          }
      }
-
 }

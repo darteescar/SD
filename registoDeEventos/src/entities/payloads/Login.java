@@ -38,23 +38,37 @@ public class Login {
         return new Login(this);
     }
 
-    public byte[] serialize() throws IOException{
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
+    public byte[] serialize(){
+        try {
 
-        dos.writeUTF(username);
-        dos.writeUTF(password);
-        dos.flush();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
 
-        return baos.toByteArray();
+            dos.writeUTF(username);
+            dos.writeUTF(password);
+            dos.flush();
+
+            return baos.toByteArray();  
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static Login deserialize(byte[] bytes) throws IOException{
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+    public static Login deserialize(byte[] bytes){
+        try {
+            
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
 
-        String username = dis.readUTF();
-        String password = dis.readUTF();
+            String username = dis.readUTF();
+            String password = dis.readUTF();
 
-        return new Login(username, password);
+            return new Login(username, password);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

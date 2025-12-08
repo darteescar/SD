@@ -31,22 +31,35 @@ public class NotificacaoVC {
         return new NotificacaoVC(this);
     }
 
-    public byte[] serialize() throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
+    public byte[] serialize(){
+        try {
 
-        dos.writeInt(this.n);
-        dos.flush();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
 
-        return baos.toByteArray();
+            dos.writeInt(this.n);
+            dos.flush();
+
+            return baos.toByteArray(); 
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static NotificacaoVC deserialize(byte[] bytes) throws IOException{
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+    public static NotificacaoVC deserialize(byte[] bytes){
+        try {
             
-        int n = dis.readInt();
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+            
+            int n = dis.readInt();
 
-        return new NotificacaoVC(n);
+            return new NotificacaoVC(n);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
-
 }

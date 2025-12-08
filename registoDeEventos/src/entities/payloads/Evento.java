@@ -45,24 +45,38 @@ public class Evento{
         return new Evento(this);
     }
     
-    public byte[] serialize() throws IOException{   
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
+    public byte[] serialize() {
+        try {
 
-        dos.writeUTF(this.produto);
-        dos.writeInt(this.quantidade);
-        dos.writeDouble(this.preco);
-        dos.flush();
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
 
-        return baos.toByteArray();
+            dos.writeUTF(this.produto);
+            dos.writeInt(this.quantidade);
+            dos.writeDouble(this.preco);
+            dos.flush();
+
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static Evento deserialize(byte[] bytes) throws IOException{
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+    public static Evento deserialize(byte[] bytes){
+        try {
 
-        String produto = dis.readUTF();
-        int quantidade = dis.readInt();
-        double preco = dis.readDouble();
-        return new Evento(produto, quantidade, preco);
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+
+            String produto = dis.readUTF();
+            int quantidade = dis.readInt();
+            double preco = dis.readDouble();
+            return new Evento(produto, quantidade, preco);   
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

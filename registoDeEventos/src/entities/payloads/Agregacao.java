@@ -38,23 +38,38 @@ public class Agregacao {
         return new Agregacao(this);
     }
 
-    public byte[] serialize() throws IOException{
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream dos = new DataOutputStream(baos);
+    public byte[] serialize() {
+        try {
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(baos);
 
-        dos.writeUTF(produto);
-        dos.writeInt(dias);
-        dos.flush();
+            dos.writeUTF(produto);
+            dos.writeInt(dias);
+            dos.flush();
 
-        return baos.toByteArray();
+            return baos.toByteArray();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    public static Agregacao deserialize(byte[] bytes) throws IOException{
-        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+    public static Agregacao deserialize(byte[] bytes){
+        try {
 
-        String produto = dis.readUTF();
-        int dias = dis.readInt();
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+            DataInputStream dis = new DataInputStream(bais);
 
-        return new Agregacao(produto, dias);
+            String produto = dis.readUTF();
+            int dias = dis.readInt();
+
+            return new Agregacao(produto, dias);   
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

@@ -1,10 +1,9 @@
 package entities;
 
+import enums.TipoMsg;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-
-import enums.TipoMsg;
 
 public class Mensagem {
     private int id;
@@ -29,20 +28,34 @@ public class Mensagem {
         return this.data;
     }
 
-    public void serialize(DataOutputStream dos) throws IOException{
-        dos.writeInt(id);
-        dos.writeInt(this.tipo.ordinal());
-        dos.writeInt(this.data.length);
-        dos.write(this.data);
+    public void serialize(DataOutputStream dos) {
+        try {
+
+            dos.writeInt(id);
+            dos.writeInt(this.tipo.ordinal());
+            dos.writeInt(this.data.length);
+            dos.write(this.data);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public static Mensagem deserialize(DataInputStream dis) throws IOException{
-        int id = dis.readInt();
-        int tipoOrdinal = dis.readInt();
-        TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
-        int length = dis.readInt();
-        byte[] data = new byte[length];
-        dis.readFully(data);
-        return new Mensagem(id, tipo, data);
+    public static Mensagem deserialize(DataInputStream dis) {
+        try {
+
+            int id = dis.readInt();
+            int tipoOrdinal = dis.readInt();
+            TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
+            int length = dis.readInt();
+            byte[] data = new byte[length];
+            dis.readFully(data);
+            
+            return new Mensagem(id, tipo, data);
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

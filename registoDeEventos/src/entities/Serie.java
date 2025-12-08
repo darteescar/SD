@@ -55,15 +55,19 @@ public class Serie {
         }
     }
 
-    public void serialize(DataOutputStream dos) throws IOException{
+    public void serialize(DataOutputStream dos) {
         this.lock.lock();
         try{
+
             dos.writeInt(this.eventos.size());
             for(Evento e : this.eventos){
                 byte[] eventoBytes = e.serialize();
                 dos.writeInt(eventoBytes.length);
                 dos.write(eventoBytes);
             }
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }finally{
             this.lock.unlock();
         }
