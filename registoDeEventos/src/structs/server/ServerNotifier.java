@@ -1,7 +1,8 @@
-package structs;
+package structs.server;
 
 import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
+
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +10,10 @@ import java.util.List;
 public class ServerNotifier {
      private List<NotificationVSCounter> listavs;
      private List<NotificationVCCounter> listavc;
-     private GestorSeries gestorSeries;
 
-
-     public ServerNotifier(GestorSeries gestorSeries) {
+     public ServerNotifier() {
           this.listavc = new ArrayList<>();
           this.listavs = new ArrayList<>();
-          this.gestorSeries = gestorSeries;
-
      }
 
      public void notificar(String produto){
@@ -34,7 +31,6 @@ public class ServerNotifier {
                     System.out.println("[NOTIFICAÇÃO ENVIADA AO CLIENTE] -> " + nvs.getSocket().getInetAddress().toString() + " (Produtos: " + nvs.getProd1() + ", " + nvs.getProd2() + ")");
                     //Remover da lista
                     listavs.remove(nvs);
-                    break;
                }
           }
           String produto_atual = NotificationVCCounter.getProduto();
@@ -57,7 +53,6 @@ public class ServerNotifier {
                     nvc.resetCounter();
                }
           }
-          
      }
 
      public void add(NotificacaoVC noti, Socket socket){

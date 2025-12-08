@@ -1,4 +1,4 @@
-package structs;
+package structs.client;
 
 import entities.Mensagem;
 import enums.TipoMsg;

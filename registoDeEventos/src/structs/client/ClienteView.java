@@ -1,4 +1,4 @@
-package structs;
+package structs.client;
 import enums.TipoMsg;
 import java.io.IOException;
 import java.util.ArrayList;

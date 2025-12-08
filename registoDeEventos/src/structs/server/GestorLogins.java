@@ -1,4 +1,4 @@
-package structs;
+package structs.server;
 import data.BDUsers;
 
 public class GestorLogins {

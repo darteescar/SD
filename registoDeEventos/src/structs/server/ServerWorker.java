@@ -1,4 +1,4 @@
-package structs;
+package structs.server;
 
 import entities.Mensagem;
 import entities.payloads.Agregacao;
@@ -8,102 +8,69 @@ import entities.payloads.Login;
 import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
-import java.net.Socket;
 import java.util.List;
 
 public class ServerWorker implements Runnable {
-    private final Socket socket;
     private final GestorLogins logins;
     private final GestorSeries gestorSeries;
-    private final DataOutputStream out;
-    private final DataInputStream in;
     private final int cliente;
     private final int d;
     private final ServerNotifier notifier;
+    private final ClientContext contexto;
 
-    public ServerWorker(Socket socket, GestorLogins logins, int cliente, GestorSeries gestorSeries, int d, ServerNotifier notifier) throws IOException{
-        this.socket = socket;
+    public ServerWorker(ClientContext contexto,GestorLogins logins, int cliente, GestorSeries gestorSeries, int d, ServerNotifier notifier) throws IOException{
         this.logins = logins;
         this.gestorSeries = gestorSeries;
-        this.out = new DataOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
-        this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
         this.cliente = cliente;
         this.d = d;
         this.notifier = notifier;
+        this.contexto = contexto;
     }
 
     @Override
     public void run() {
         try {
             while (true) {
-                Mensagem mensagem = null;
-                try {
-                    mensagem = Mensagem.deserialize(in);
-                } catch (IOException e) {
+                Mensagem mensagem;
+                mensagem = this.contexto.receive();
+                if (mensagem == null) {
                     // Quando o cliente fecha o socket
                     System.out.println("[CLIENTE DESCONECTOU-SE]");
                     break; // Sai do loop, e termina a thread
                 }
-
+                
                 int id = mensagem.getID();
                 TipoMsg tipo = mensagem.getTipo();
                 //System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
 
                 if (TipoMsg.NOTIFICACAO_VC == tipo) {
-                    try {
-                        processNOTIFICACAOVC(mensagem.getData());
-                    }
-                    catch (IOException e) {
-                        System.out.println("[ERRO AO EXECUTAR NOTIFICACAO DE VENDAS CONSECUTIVAS] " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                    
+                    processNOTIFICACAOVC(mensagem.getData());
+
                 } else if (TipoMsg.NOTIFICACAO_VS == tipo)
                 {   
-                    try {
-                        processNOTIFICACAOVS(mensagem.getData());
-                    }
-                    catch (IOException e) {
-                        System.out.println("[ERRO AO EXECUTAR NOTIFICACAO DE VENDAS SIMULTÂNEAS] " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                    processNOTIFICACAOVS(mensagem.getData());
+
                 } else {
                     String result = "";
-                    try {
-                        result = execute(mensagem);
-                    } catch (Exception e) {
-                        System.out.println("[ERRO AO EXECUTAR MENSAGEM] " + e.getMessage());
-                        e.printStackTrace();
-                    }
-
-                    try {
-                        Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
-                        reply.serialize(out);
-                        out.flush();
-                        //System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
-                    } catch (IOException e) {
-                        System.out.println("[ERRO AO ENVIAR RESPOSTA] " + e.getMessage());
-                        e.printStackTrace();
-                    }
+                    
+                    result = execute(mensagem);
+                
+                    Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
+                    
+                    this.contexto.send(reply);
+                    //System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
                 }
             }
         } finally {
-            try {
-                this.in.close();
-                this.out.close();
-                this.socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            this.contexto.close();
             System.out.println("[THREAD DO CLIENTE TERMINOU]");
         }
     }
 
-    private String execute(Mensagem mensagem) throws IOException{
+    private String execute(Mensagem mensagem) {
         String result = "";
         TipoMsg tipo = mensagem.getTipo();
 
@@ -122,7 +89,7 @@ public class ServerWorker implements Runnable {
         return result;
     }
 
-    private String processLOGIN(byte[] bytes) throws IOException{
+    private String processLOGIN(byte[] bytes){
         Login login = Login.deserialize(bytes);
         String username = login.getUsername();
         String password = login.getPassword();
@@ -133,7 +100,7 @@ public class ServerWorker implements Runnable {
         return (b ? "true" : "false");
     }
 
-    private String processREGISTA_LOGIN(byte[] bytes) throws IOException{
+    private String processREGISTA_LOGIN(byte[] bytes){
         Login login = Login.deserialize(bytes);
         String username = login.getUsername();
         String password = login.getPassword();
@@ -145,7 +112,7 @@ public class ServerWorker implements Runnable {
         return (b ? "true" : "false");
     }
     
-    private String processREGISTO(byte[] bytes) throws IOException{
+    private String processREGISTO(byte[] bytes) {
         Evento evento = Evento.deserialize(bytes);
 
         this.gestorSeries.getSerieAtual().add(evento);
@@ -155,12 +122,12 @@ public class ServerWorker implements Runnable {
         return resposta;
     }
 
-    private String processQUANTIDADE_VENDAS(byte[] bytes) throws IOException{
+    private String processQUANTIDADE_VENDAS(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (this.d <= 0 || dias > this.d) {
+        if (dIsValid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             int x = this.gestorSeries.calcQuantidadeVendas(produto, dias);
@@ -170,12 +137,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private String processVOLUME_VENDAS(byte[] bytes) throws IOException{
+    private String processVOLUME_VENDAS(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (this.d <= 0 || dias > this.d) {
+        if (dIsValid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcVolumeVendas(produto, dias);
@@ -184,12 +151,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private String processPRECO_MEDIO(byte[] bytes) throws IOException{
+    private String processPRECO_MEDIO(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (this.d <= 0 || dias > this.d) {
+        if (dIsValid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcPrecoMedio(produto, dias);
@@ -198,12 +165,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private String processPRECO_MAXIMO(byte[] bytes) throws IOException{
+    private String processPRECO_MAXIMO(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (this.d <= 0 || dias > this.d) {
+        if (dIsValid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcPrecoMaximo(produto, dias);
@@ -213,13 +180,13 @@ public class ServerWorker implements Runnable {
 
     }
 
-    private String processLISTA(byte[] bytes) throws IOException{
+    private String processLISTA(byte[] bytes) {
         Filtrar filtrar = Filtrar.deserialize(bytes);
         List<String> produto = filtrar.getProdutos();
         int dia = filtrar.getDias();
 
         // Lógica de realizar a query da lista
-        if (this.d <= 0 || dia > this.d) {
+        if (dIsValid(dia)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
@@ -227,15 +194,19 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private void processNOTIFICACAOVC(byte[] bytes) throws IOException{
+    private void processNOTIFICACAOVC(byte[] bytes) {
         NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
 
-        this.notifier.add(noti,this.socket);
+        this.notifier.add(noti,this.contexto);
     }
 
-    private void processNOTIFICACAOVS(byte[] bytes) throws IOException{
+    private void processNOTIFICACAOVS(byte[] bytes) {
         NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
 
-        this.notifier.add(noti,this.socket);
+        this.notifier.add(noti,this.contexto);
+    }
+
+    private boolean dIsValid(int dias) {
+        return !(this.d <= 0 || dias > this.d);
     }
 }

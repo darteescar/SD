@@ -11,9 +11,10 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import structs.ClienteView;
-import structs.Demultiplexer;
-import structs.Sender;
+
+import structs.client.ClienteView;
+import structs.client.Demultiplexer;
+import structs.client.Sender;
 
 public class Cliente implements AutoCloseable{
     private final Socket socket;
