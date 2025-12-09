@@ -32,13 +32,12 @@ public class ClientContext {
      public void send(Mensagem mensagem) {
           lock.lock();
           try {
-
                mensagem.serialize(out);
                out.flush();
 
           }
           catch (IOException e) {
-               e.printStackTrace();
+               System.err.println("Erro ao enviar mensagem "+ mensagem.toString() + " para o cliente.");
           }
           finally {
                lock.unlock();
@@ -62,7 +61,7 @@ public class ClientContext {
                this.socket.close();
 
           } catch (IOException e) {
-               e.printStackTrace();
+               System.err.println("Erro ao fechar conexão com o cliente.");
           }
      }
 }

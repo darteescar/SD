@@ -57,4 +57,13 @@ public class Mensagem {
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return "Mensagem{" +
+                "id=" + id +
+                ", tipo=" + tipo +
+                ", dataLength=" + data.length +
+                '}';
+    }
 }

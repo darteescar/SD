@@ -127,7 +127,7 @@ public class ServerWorker implements Runnable {
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (dIsValid(dias)) {
+        if (dIsInvalid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             int x = this.gestorSeries.calcQuantidadeVendas(produto, dias);
@@ -142,7 +142,7 @@ public class ServerWorker implements Runnable {
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (dIsValid(dias)) {
+        if (dIsInvalid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcVolumeVendas(produto, dias);
@@ -156,7 +156,7 @@ public class ServerWorker implements Runnable {
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (dIsValid(dias)) {
+        if (dIsInvalid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcPrecoMedio(produto, dias);
@@ -170,7 +170,7 @@ public class ServerWorker implements Runnable {
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
-        if (dIsValid(dias)) {
+        if (dIsInvalid(dias)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             double x = this.gestorSeries.calcPrecoMaximo(produto, dias);
@@ -185,8 +185,7 @@ public class ServerWorker implements Runnable {
         List<String> produto = filtrar.getProdutos();
         int dia = filtrar.getDias();
 
-        // Lógica de realizar a query da lista
-        if (dIsValid(dia)) {
+        if (dIsInvalid(dia)) {
             return "Insira num valor entre 1 e " + this.d + ".";
         } else {
             List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
@@ -206,7 +205,7 @@ public class ServerWorker implements Runnable {
         this.notifier.add(id,noti,this.contexto);
     }
 
-    private boolean dIsValid(int dias) {
-       return !(this.d <= 0 || dias > this.d);
+    private boolean dIsInvalid(int dias) {
+       return (dias < 1 || dias > this.d);
     }
 }

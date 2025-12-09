@@ -11,7 +11,7 @@ public class NotificationVCCounter {
 
      public NotificationVCCounter(int id ,ClientContext context, int number) {
           this.context = context;
-          this.counter = 0;
+          this.counter = 1;
           this.number = number;
           this.id = id;
      }
@@ -48,7 +48,7 @@ public class NotificationVCCounter {
      }
 
      public void resetCounter() {
-          this.counter = 0;
+          this.counter = 1;
      }
 
 }

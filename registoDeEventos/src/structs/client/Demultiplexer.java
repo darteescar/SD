@@ -100,6 +100,7 @@ public class Demultiplexer implements AutoCloseable{
                 }
             }
             String reply = entry.queue.poll();
+            System.out.println("[DEMULTIPLEXER] Recebida reply para ID " + id + ": " + reply);
             return reply;
         }finally{
             this.lock.unlock();
