@@ -73,8 +73,7 @@ public class ServerNotifier implements Runnable {
                     it.remove(); // Remove da lista após enviar a notificação
                }
           }
-          }
-
+     }
 
      private void processarNotificacoesVC(String produto) {
           String produtoAtual = NotificationVCCounter.getProduto(); // Produto da sequência atual
@@ -103,8 +102,6 @@ public class ServerNotifier implements Runnable {
                }
           }
      }
-
-
 
      public void add(int id, NotificacaoVC noti, ClientContext context){
           this.lock1.lock();

@@ -19,10 +19,12 @@ public class NotificationDispatcher implements Runnable {
           while (true) {
                NotificationMessage mensagem = buffer.poll();
                if (mensagem != null) {
-                    Mensagem notificacao = mensagem.getMensagem();
-                    ClientContext contexto = mensagem.getContexto();
-                    System.out.println("Enviando notificação para o cliente: " + notificacao);
-                    contexto.send(notificacao);
+                    Thread notificacaoThread = new Thread(() -> {
+                         Mensagem notificacao = mensagem.getMensagem();
+                         ClientContext contexto = mensagem.getContexto();
+                         contexto.send(notificacao);
+                    });
+                    notificacaoThread.start();
                }
           }
      }
