@@ -13,15 +13,13 @@ import structs.server.ClientContext;
 public class ServerNotifier implements Runnable {
      private List<NotificationVSCounter> listavs;
      private List<NotificationVCCounter> listavc;
-     private final NotificationDispatcher dispatcher;
      private final ConcurrentBuffer<String> buffer;
      private final ReentrantLock lock1 = new ReentrantLock();
      private final ReentrantLock lock2 = new ReentrantLock();
 
-     public ServerNotifier(NotificationDispatcher dispatcher) {
+     public ServerNotifier() {
           this.listavc = new ArrayList<>();
           this.listavs = new ArrayList<>();
-          this.dispatcher = dispatcher;
           this.buffer = new ConcurrentBuffer<>();
      }
 
@@ -64,11 +62,9 @@ public class ServerNotifier implements Runnable {
                }
 
                if (nvs.isProd_1_sold() && nvs.isProd_2_sold()) {
-                    Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "true".getBytes());
-                    ClientContext context = nvs.getContext();
-                    NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+                    // Ambos os produtos foram vendidos → envia notificação e remove
 
-                    this.dispatcher.add(mensagemNot);
+                    envia_notificacao(nvs, "true");
 
                     it.remove(); // Remove da lista após enviar a notificação
                }
@@ -86,11 +82,7 @@ public class ServerNotifier implements Runnable {
 
                     if (nvc.getCounter() >= nvc.getN()) {
                          // Sequência atingida → envia notificação e remove
-                         Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, produto.getBytes());
-                         ClientContext context = nvc.getContext();
-                         NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
-                         this.dispatcher.add(mensagemNot);
-
+                         envia_notificacao(nvc, produto);
                          it.remove();
                     }
                }
@@ -149,10 +141,7 @@ public class ServerNotifier implements Runnable {
           this.lock1.lock();
           try {
                for (NotificationVCCounter nvc : listavc) {
-                    Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, "null".getBytes());
-                    ClientContext context = nvc.getContext();
-                    NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
-                    this.dispatcher.add(mensagemNot);
+                    envia_notificacao(nvc, "null");              
                } 
           } finally {
                this.lock1.unlock();
@@ -163,14 +152,28 @@ public class ServerNotifier implements Runnable {
           this.lock2.lock();
           try {
                for (NotificationVSCounter nvs : listavs) {
-                    Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "false".getBytes());
-                    ClientContext context = nvs.getContext();
-                    NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
-                    this.dispatcher.add(mensagemNot);
+                    envia_notificacao(nvs, "false");
                }
           } finally {
                this.lock2.unlock();
           }
      }
 
+     private void envia_notificacao(NotificationVCCounter nvc, String produto) {
+          Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, produto.getBytes());
+          ClientContext context = nvc.getContext();
+          Thread t = new Thread(() -> {
+               context.send(mensagem);
+          });
+          t.start();
+     }
+
+     private void envia_notificacao(NotificationVSCounter nvs, String produto) {
+          Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, produto.getBytes());
+          ClientContext context = nvs.getContext();
+          Thread t = new Thread(() -> {
+               context.send(mensagem);
+          });
+          t.start();
+     }
 }

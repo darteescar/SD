@@ -4,7 +4,6 @@ import entities.Serie;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import structs.notification.NotificationDispatcher;
 import structs.notification.ServerNotifier;
 import structs.server.ClientContext;
 import structs.server.GestorLogins;
@@ -20,7 +19,6 @@ public class Server implements AutoCloseable{
     private final int d;
     private final ServerSimulator simulator;
     private final ServerNotifier notifier;
-    private final NotificationDispatcher dispatcher;
 
     public Server(int d, int s) throws IOException{
         this.ss = new ServerSocket(12345);
@@ -31,8 +29,7 @@ public class Server implements AutoCloseable{
         this.cliente = 0;
         this.d = d;
         this.simulator = new ServerSimulator(this);
-        this.dispatcher = new NotificationDispatcher();
-        this.notifier = new ServerNotifier(dispatcher);
+        this.notifier = new ServerNotifier();
     }
 
     public void start() throws IOException{
@@ -42,9 +39,6 @@ public class Server implements AutoCloseable{
 
         Thread notifierThread = new Thread(this.notifier); // Inicia a thread que gere as notificações
         notifierThread.start();
-
-        Thread dispatcherThread = new Thread(this.dispatcher); // Inicia a thread que despacha as notificações
-        dispatcherThread.start();
 
         while(true){
             // Aceita a conexão de um cliente
