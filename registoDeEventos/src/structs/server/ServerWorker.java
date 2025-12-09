@@ -33,6 +33,7 @@ public class ServerWorker implements Runnable {
     public void run() {
         try {
             while (true) {
+
                 Mensagem mensagem;
                 mensagem = this.contexto.receive();
                 if (mensagem == null) {

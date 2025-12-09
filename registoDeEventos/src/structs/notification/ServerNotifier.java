@@ -149,20 +149,30 @@ public class ServerNotifier implements Runnable {
      }
 
      private void sendFalseToAllVCCounters() {
-          for (NotificationVCCounter nvc : listavc) {
-               Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, "null".getBytes());
-               ClientContext context = nvc.getContext();
-               NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
-               this.dispatcher.add(mensagemNot);
+          this.lock1.lock();
+          try {
+               for (NotificationVCCounter nvc : listavc) {
+                    Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, "null".getBytes());
+                    ClientContext context = nvc.getContext();
+                    NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+                    this.dispatcher.add(mensagemNot);
+               } 
+          } finally {
+               this.lock1.unlock();
           }
      }
 
      private void sendFalseToAllVSCounters() {
-          for (NotificationVSCounter nvs : listavs) {
-               Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "false".getBytes());
-               ClientContext context = nvs.getContext();
-               NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
-               this.dispatcher.add(mensagemNot);
+          this.lock2.lock();
+          try {
+               for (NotificationVSCounter nvs : listavs) {
+                    Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, "false".getBytes());
+                    ClientContext context = nvs.getContext();
+                    NotificationMessage mensagemNot = new NotificationMessage(mensagem, context);
+                    this.dispatcher.add(mensagemNot);
+               }
+          } finally {
+               this.lock2.unlock();
           }
      }
 
