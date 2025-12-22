@@ -43,20 +43,30 @@ public class Mensagem {
 
     public static Mensagem deserialize(DataInputStream dis) {
         try {
-
             int id = dis.readInt();
             int tipoOrdinal = dis.readInt();
+            if (tipoOrdinal < 0 || tipoOrdinal >= TipoMsg.values().length) {
+                System.out.println("[AVISO] Tipo de mensagem inválido: " + tipoOrdinal);
+                return null;
+            }
             TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
+
             int length = dis.readInt();
+            if (length < 0 || length > 10_000_000) {
+                System.out.println("[AVISO] Tamanho inválido de mensagem: " + length);
+                return null;
+            }
+
             byte[] data = new byte[length];
             dis.readFully(data);
-            
+
             return new Mensagem(id, tipo, data);
-            
-        } catch (IOException e) {
+
+        } catch (IOException | IndexOutOfBoundsException | NegativeArraySizeException e) {
             return null;
         }
     }
+
 
     @Override
     public String toString() {

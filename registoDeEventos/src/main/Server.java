@@ -1,20 +1,23 @@
 package main;
 import data.BDServerDay;
 import entities.Data;
+import entities.Mensagem;
 import entities.Serie;
+import entities.ServerData;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.util.Scanner;
-
+import structs.notification.ConcurrentBuffer;
 import structs.notification.ServerNotifier;
-import structs.server.ClientContext;
 import structs.server.GestorLogins;
 import structs.server.GestorSeries;
+import structs.server.SafeMap;
+import structs.server.ServerReader;
 import structs.server.ServerSimulator;
-import structs.server.ServerWorker;
-
+import structs.server.ServerWriter;
+import structs.server.ThreadPool;
 
 public class Server implements AutoCloseable{
     private final ServerSocket ss;
@@ -25,33 +28,46 @@ public class Server implements AutoCloseable{
     private final ServerSimulator simulator;
     private final ServerNotifier notifier;
 
+    private final ThreadPool threadPool;
+    private final SafeMap<Integer, ServerReader> readers;
+    private final SafeMap<Integer, ServerWriter> writers;
+    private final SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers;
+    private final ConcurrentBuffer<ServerData> taskBuffer;
+
     public Server(int d, int s) throws IOException {
         this.ss = new ServerSocket(12345);
         this.logins = new GestorLogins(s + 1);
+        this.cliente = 0;
+        this.d = d;
 
+        Data dataAtual = carregarDataAtual();
+        Serie serie_inicial = new Serie(dataAtual.getData());
+        this.series = new GestorSeries(s, dataAtual, serie_inicial);
+
+        this.readers = new SafeMap<>();
+        this.writers = new SafeMap<>();
+        this.clientBuffers = new SafeMap<>();
+
+        this.simulator = new ServerSimulator(this);
+        this.notifier = new ServerNotifier(this.clientBuffers);
+
+        this.taskBuffer = new ConcurrentBuffer<>();
+        this.threadPool = new ThreadPool(8, this.taskBuffer, d, this.logins, this.series, this.notifier, this.clientBuffers);
+    }
+
+    private Data carregarDataAtual() {
         LocalDate ultimaData = BDServerDay.getCurrentDate();
         LocalDate dataArranque = ultimaData.plusDays(1);
-
         BDServerDay.setCurrentDate(dataArranque);
-
         Data dataAtual = new Data(
                 dataArranque.getDayOfMonth(),
                 dataArranque.getMonthValue(),
                 dataArranque.getYear()
         );
-
         String data = dataAtual.toString();
         System.out.println("Servidor arrancado na data: " + data);
-
-        Serie serie_inicial = new Serie(dataAtual.getData());
-        this.series = new GestorSeries(s, dataAtual, serie_inicial);
-
-        this.cliente = 0;
-        this.d = d;
-        this.simulator = new ServerSimulator(this);
-        this.notifier = new ServerNotifier();
+        return dataAtual;
     }
-
 
     public void start() throws IOException{
 
@@ -64,11 +80,18 @@ public class Server implements AutoCloseable{
         while(true){
             // Aceita a conexão de um cliente
             Socket socket = this.ss.accept();
-            // Cria o contexto do cliente
-            ClientContext context = new ClientContext(socket);
-            // Cada cliente tem um thread dedicada a processar e executar mensagens
-            Thread worker  = new Thread(new ServerWorker(context,logins, cliente++, series, d, notifier));
-            worker.start();
+            System.out.println("[NOVO CLIENTE " + this.cliente + " LIGADO]");
+            ConcurrentBuffer<Mensagem> bufferCliente = new ConcurrentBuffer<>();
+            this.clientBuffers.put(this.cliente, bufferCliente);
+            ServerReader reader = new ServerReader(socket, this.taskBuffer, this.cliente);
+            ServerWriter writer = new ServerWriter(socket, this.cliente, bufferCliente);
+            Thread readerThread = new Thread(reader);
+            Thread writerThread = new Thread(writer);
+            writers.put(this.cliente, writer);
+            readers.put(this.cliente, reader);
+            this.cliente++;
+            readerThread.start();
+            writerThread.start();
         }
     }
 

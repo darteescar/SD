@@ -1,6 +1,7 @@
 package structs.server;
 
 import entities.Mensagem;
+import entities.ServerData;
 import entities.payloads.Agregacao;
 import entities.payloads.Evento;
 import entities.payloads.Filtrar;
@@ -10,23 +11,29 @@ import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
 import java.io.IOException;
 import java.util.List;
+import structs.notification.ConcurrentBuffer;
 import structs.notification.ServerNotifier;
 
 public class ServerWorker implements Runnable {
+    private final int d;
     private final GestorLogins logins;
     private final GestorSeries gestorSeries;
-    private final int cliente;
-    private final int d;
     private final ServerNotifier notifier;
-    private final ClientContext contexto;
+    private final ConcurrentBuffer<ServerData> taskBuffer;
+    private final SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers;
 
-    public ServerWorker(ClientContext contexto,GestorLogins logins, int cliente, GestorSeries gestorSeries, int d, ServerNotifier notifier) throws IOException{
+    public ServerWorker(GestorLogins logins, 
+        GestorSeries gestorSeries, 
+        ServerNotifier notifier, 
+        ConcurrentBuffer<ServerData> taskBuffer,
+        SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers,
+        int d) throws IOException{
         this.logins = logins;
         this.gestorSeries = gestorSeries;
-        this.cliente = cliente;
-        this.d = d;
         this.notifier = notifier;
-        this.contexto = contexto;
+        this.taskBuffer = taskBuffer;
+        this.clientBuffers = clientBuffers;
+        this.d = d;
     }
 
     @Override
@@ -34,25 +41,22 @@ public class ServerWorker implements Runnable {
         try {
             while (true) {
 
-                Mensagem mensagem;
-                mensagem = this.contexto.receive();
-                if (mensagem == null) {
-                    // Quando o cliente fecha o socket
-                    System.out.println("[CLIENTE DESCONECTOU-SE]");
-                    break; // Sai do loop, e termina a thread
-                }
+                ServerData serverData;
+                serverData = this.taskBuffer.poll();
+
+                Mensagem mensagem = serverData.getMensagem();
                 
                 int id = mensagem.getID();
                 TipoMsg tipo = mensagem.getTipo();
-                //System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
+                int clienteID = serverData.getClienteID();
 
                 if (TipoMsg.NOTIFICACAO_VC == tipo) {
                     
-                    processNOTIFICACAOVC(id,mensagem.getData());
+                    processNOTIFICACAOVC(id,mensagem.getData(),clienteID);
 
                 } else if (TipoMsg.NOTIFICACAO_VS == tipo)
                 {   
-                    processNOTIFICACAOVS(id,mensagem.getData());
+                    processNOTIFICACAOVS(id,mensagem.getData(),clienteID);
 
                 } else {
                     String result = "";
@@ -60,13 +64,12 @@ public class ServerWorker implements Runnable {
                     result = execute(mensagem);
                 
                     Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
-                    
-                    this.contexto.send(reply);
-                    //System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
+
+                    ConcurrentBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
+                    bufferCliente.add(reply);
                 }
             }
         } finally {
-            this.contexto.close();
             System.out.println("[THREAD DO CLIENTE TERMINOU]");
         }
     }
@@ -92,6 +95,12 @@ public class ServerWorker implements Runnable {
 
     private String processLOGIN(byte[] bytes){
         Login login = Login.deserialize(bytes);
+
+        if (login == null) {
+            System.out.println("[AVISO] Login inválido ou incompleto recebido, ignorando.");
+            return "Erro: login inválido ou corrompido.";
+        }
+
         String username = login.getUsername();
         String password = login.getPassword();
 
@@ -103,6 +112,12 @@ public class ServerWorker implements Runnable {
 
     private String processREGISTA_LOGIN(byte[] bytes){
         Login login = Login.deserialize(bytes);
+
+        if (login == null) {
+            System.out.println("[AVISO] Login inválido ou incompleto recebido, ignorando.");
+            return "Erro: login inválido ou corrompido.";
+        }
+
         String username = login.getUsername();
         String password = login.getPassword();
 
@@ -116,6 +131,11 @@ public class ServerWorker implements Runnable {
     private String processREGISTO(byte[] bytes) {
         Evento evento = Evento.deserialize(bytes);
 
+        if (evento == null) {
+            System.out.println("[AVISO] Evento inválido ou incompleto recebido, ignorando.");
+            return "Erro: evento inválido ou corrompido.";
+        }
+
         this.gestorSeries.addSerieAtual(evento);
         this.notifier.signall(evento.getProduto());
         String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.gestorSeries.getDataAtual().getData() + ".";
@@ -125,6 +145,12 @@ public class ServerWorker implements Runnable {
 
     private String processQUANTIDADE_VENDAS(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
+
+        if (agregacao == null) {
+            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            return "Erro: agregação inválida ou corrompida.";
+        }
+
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
@@ -140,6 +166,12 @@ public class ServerWorker implements Runnable {
 
     private String processVOLUME_VENDAS(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
+
+        if (agregacao == null) {
+            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            return "Erro: agregação inválida ou corrompida.";
+        }
+
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
@@ -154,6 +186,13 @@ public class ServerWorker implements Runnable {
 
     private String processPRECO_MEDIO(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
+
+        if (agregacao == null) {
+            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            return "Erro: agregação inválida ou corrompida.";
+        }
+
+
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
@@ -168,6 +207,12 @@ public class ServerWorker implements Runnable {
 
     private String processPRECO_MAXIMO(byte[] bytes) {
         Agregacao agregacao = Agregacao.deserialize(bytes);
+
+        if (agregacao == null) {
+            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            return "Erro: agregação inválida ou corrompida.";
+        }
+
         String produto = agregacao.getProduto();
         int dias = agregacao.getDias();
 
@@ -183,6 +228,12 @@ public class ServerWorker implements Runnable {
 
     private String processLISTA(byte[] bytes) {
         Filtrar filtrar = Filtrar.deserialize(bytes);
+
+        if (filtrar == null) {
+            System.out.println("[AVISO] Filtro inválido ou incompleto recebido, ignorando.");
+            return "Erro: filtro inválido ou corrompido.";
+        }
+
         List<String> produto = filtrar.getProdutos();
         int dia = filtrar.getDias();
 
@@ -194,16 +245,30 @@ public class ServerWorker implements Runnable {
         }
     }
 
-    private void processNOTIFICACAOVC(int id, byte[] bytes) {
+    private void processNOTIFICACAOVC(int id, byte[] bytes, int clienteID) {
         NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
 
-        this.notifier.add(id,noti,this.contexto);
+        //////////////////////// ler README ////////////////////////
+
+        if (noti == null) {
+            System.out.println("[AVISO] Notificação VC inválida ou incompleta recebida, ignorando.");
+            return;
+        }
+
+        this.notifier.add(id,noti,clienteID);
     }
 
-    private void processNOTIFICACAOVS(int id, byte[] bytes) {
+    private void processNOTIFICACAOVS(int id, byte[] bytes, int clienteID) {
         NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
 
-        this.notifier.add(id,noti,this.contexto);
+        //////////////////////// ler README ////////////////////////
+
+        if (noti == null) {
+            System.out.println("[AVISO] Notificação VS inválida ou incompleta recebida, ignorando.");
+            return;
+        }
+
+        this.notifier.add(id,noti,clienteID);
     }
 
     private boolean dIsInvalid(int dias) {

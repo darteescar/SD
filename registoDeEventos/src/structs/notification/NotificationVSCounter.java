@@ -1,17 +1,15 @@
 package structs.notification;
 
-import structs.server.ClientContext;
-
 public class NotificationVSCounter {
-     private final ClientContext context;
+     private final int clienteID;
      private final String prod1;
      private final String prod2;
      private boolean prod_1_sold;
      private boolean prod_2_sold;
      private int id;
 
-     public NotificationVSCounter(int id, ClientContext context, String prod1, String prod2) {
-          this.context = context;
+     public NotificationVSCounter(int id, int clienteID, String prod1, String prod2) {
+          this.clienteID = clienteID;
           this.prod1 = prod1;
           this.prod2 = prod2;
           this.prod_1_sold = false;
@@ -19,8 +17,8 @@ public class NotificationVSCounter {
           this.id = id;
      }
 
-     public ClientContext getContext() {
-          return context;
+     public int getClienteID() {
+          return clienteID;
      }
 
      public String getProd1() {

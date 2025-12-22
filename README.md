@@ -4,4 +4,4 @@
  tem de se criar a bd na mariaDB
 
 
- remover Cliente de ServerWorker porque nao e necessario
+criar mensagem de confirmação quando o cliente se regista para notificações

@@ -1,16 +1,14 @@
 package structs.notification;
 
-import structs.server.ClientContext;
-
 public class NotificationVCCounter {
      private static String produto = "";
-     private ClientContext context;
+     private final int clienteID;
      private int counter;
      private int number;
      private int id;
 
-     public NotificationVCCounter(int id ,ClientContext context, int number) {
-          this.context = context;
+     public NotificationVCCounter(int id ,int clienteID, int number) {
+          this.clienteID = clienteID;
           this.counter = 1;
           this.number = number;
           this.id = id;
@@ -21,8 +19,8 @@ public class NotificationVCCounter {
           return produto;
      }
 
-     public ClientContext getContext() {
-          return context;
+     public int getClienteID() {
+          return clienteID;
      }
 
      public int getCounter() {

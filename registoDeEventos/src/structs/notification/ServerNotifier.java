@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import structs.server.ClientContext;
+import structs.server.SafeMap;
 
 public class ServerNotifier implements Runnable {
      private List<NotificationVSCounter> listavs;
@@ -16,11 +16,13 @@ public class ServerNotifier implements Runnable {
      private final ConcurrentBuffer<String> buffer;
      private final ReentrantLock lock1 = new ReentrantLock();
      private final ReentrantLock lock2 = new ReentrantLock();
+     private final SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers;
 
-     public ServerNotifier() {
+     public ServerNotifier(SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers) {
           this.listavc = new ArrayList<>();
           this.listavs = new ArrayList<>();
           this.buffer = new ConcurrentBuffer<>();
+          this.clientBuffers = clientBuffers;
      }
 
      @Override
@@ -95,20 +97,20 @@ public class ServerNotifier implements Runnable {
           }
      }
 
-     public void add(int id, NotificacaoVC noti, ClientContext context){
+     public void add(int id, NotificacaoVC noti, int clienteID){
           this.lock1.lock();
           try {
-               NotificationVCCounter nvc = new NotificationVCCounter(id, context, noti.getN());
+               NotificationVCCounter nvc = new NotificationVCCounter(id, clienteID, noti.getN());
                this.listavc.add(nvc);
           } finally {
                this.lock1.unlock();
           }
      }
 
-     public void add(int id, NotificacaoVS noti, ClientContext context){
+     public void add(int id, NotificacaoVS noti, int clienteID){
           this.lock2.lock();
           try {
-               NotificationVSCounter nvs = new NotificationVSCounter(id, context, noti.getProduto_1(), noti.getProduto_2());
+               NotificationVSCounter nvs = new NotificationVSCounter(id, clienteID, noti.getProduto_1(), noti.getProduto_2());
                this.listavs.add(nvs);
           } finally {
                this.lock2.unlock();
@@ -161,19 +163,13 @@ public class ServerNotifier implements Runnable {
 
      private void envia_notificacao(NotificationVCCounter nvc, String produto) {
           Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, produto.getBytes());
-          ClientContext context = nvc.getContext();
-          Thread t = new Thread(() -> {
-               context.send(mensagem);
-          });
-          t.start();
+          int clienteID = nvc.getClienteID();
+          clientBuffers.get(clienteID).add(mensagem);
      }
 
      private void envia_notificacao(NotificationVSCounter nvs, String produto) {
           Mensagem mensagem = new Mensagem(nvs.getId(), TipoMsg.NOTIFICACAO_VS, produto.getBytes());
-          ClientContext context = nvs.getContext();
-          Thread t = new Thread(() -> {
-               context.send(mensagem);
-          });
-          t.start();
+          int clienteID = nvs.getClienteID();
+          clientBuffers.get(clienteID).add(mensagem);
      }
 }
