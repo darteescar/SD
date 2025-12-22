@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NUM_CLIENTES=50
+NUM_CLIENTES=100
 
 for i in $(seq 1 $NUM_CLIENTES); do
     gnome-terminal -- bash -c "./fast_insertions.exp; exit"

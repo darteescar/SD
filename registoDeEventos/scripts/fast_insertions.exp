@@ -27,11 +27,11 @@ for {set i 1} {$i <= 100} {incr i} {
     send "1\r"
 }
 
-# Enviar CTRL+C para terminar o cliente
-send "\003"
-
 # Espera um instante para garantir que o processo termina
 sleep 10
+
+# Enviar CTRL+C para terminar o cliente
+send "\003"
 
 # Fechar a janela do terminal
 exit
