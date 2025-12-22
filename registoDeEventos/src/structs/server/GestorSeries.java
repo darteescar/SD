@@ -24,15 +24,20 @@ public class GestorSeries {
      // Métodos de gestão de séries
 
      public boolean add(Serie serie) {
-          if (serie == null || serie.getData() == null) {
-               return false; // campos inválidos
+          lock.lock();
+          try {
+               if (serie == null || serie.getData() == null) {
+                    return false; // campos inválidos
+               }
+               if (!bd.containsKey(serie.getData())){ // se não está na BD, insere na BD e na Cache
+                    bd.put(serie.getData(), serie);
+                    cache.put(serie.getData(), serie);
+                    return true;
+               }
+               return false; // série existe
+          } finally {
+               lock.unlock();
           }
-          if (!bd.containsKey(serie.getData())){ // se não está na BD, insere na BD e na Cache
-               bd.put(serie.getData(), serie);
-               cache.put(serie.getData(), serie);
-               return true;
-          }
-          return false; // série existe
      }
 
      public boolean remove(String dia) {

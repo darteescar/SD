@@ -92,6 +92,12 @@ public class Server implements AutoCloseable{
         this.ss.close();
         //this.logins.close();
         //this.series.close();
+        
+        // Guarda a série atual na BD antes de fechar
+        Serie serieAtual = this.series.getSerieAtual();
+        if (serieAtual != null) {
+            this.series.add(serieAtual);
+    }
     }
 
     public static void main(String[] args) {
