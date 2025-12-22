@@ -1,15 +1,20 @@
 package main;
+import data.BDServerDay;
 import entities.Data;
 import entities.Serie;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDate;
+import java.util.Scanner;
+
 import structs.notification.ServerNotifier;
 import structs.server.ClientContext;
 import structs.server.GestorLogins;
 import structs.server.GestorSeries;
 import structs.server.ServerSimulator;
 import structs.server.ServerWorker;
+
 
 public class Server implements AutoCloseable{
     private final ServerSocket ss;
@@ -20,17 +25,33 @@ public class Server implements AutoCloseable{
     private final ServerSimulator simulator;
     private final ServerNotifier notifier;
 
-    public Server(int d, int s) throws IOException{
+    public Server(int d, int s) throws IOException {
         this.ss = new ServerSocket(12345);
-        this.logins = new GestorLogins(s+1);
-        Data data_inicial = new Data(01, 01, 2025);
-        Serie serie_inicial = new Serie(data_inicial.getData());
-        this.series = new GestorSeries(s, data_inicial, serie_inicial);
+        this.logins = new GestorLogins(s + 1);
+
+        LocalDate ultimaData = BDServerDay.getCurrentDate();
+        LocalDate dataArranque = ultimaData.plusDays(1);
+
+        BDServerDay.setCurrentDate(dataArranque);
+
+        Data dataAtual = new Data(
+                dataArranque.getDayOfMonth(),
+                dataArranque.getMonthValue(),
+                dataArranque.getYear()
+        );
+
+        String data = dataAtual.toString();
+        System.out.println("Servidor arrancado na data: " + data);
+
+        Serie serie_inicial = new Serie(dataAtual.getData());
+        this.series = new GestorSeries(s, dataAtual, serie_inicial);
+
         this.cliente = 0;
         this.d = d;
         this.simulator = new ServerSimulator(this);
         this.notifier = new ServerNotifier();
     }
+
 
     public void start() throws IOException{
 
@@ -51,8 +72,14 @@ public class Server implements AutoCloseable{
         }
     }
 
-    public void passarDia(){
+    public void passarDia() {
         this.series.passarDia();
+
+        Data d = this.series.getDataAtual();
+        BDServerDay.setCurrentDate(
+            LocalDate.of(d.getAno(), d.getMes(), d.getDia())
+        );
+
         this.notifier.clear();
     }
 
@@ -67,25 +94,42 @@ public class Server implements AutoCloseable{
         //this.series.close();
     }
 
-    public static void main(String[] args){
-        if (args.length != 2){
-            System.out.println("Uso: make server <D> <S>");
+    public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Uso: make server <D> <S> <RESET>");
             return;
-        } 
+        }
+
         int d = Integer.parseInt(args[0]);
         int s = Integer.parseInt(args[1]);
 
-        if ( s >= d ) {
+        boolean reset = args.length == 3 && args[2].equals("1");
+
+        if (s >= d) {
             System.out.println("Erro: S deve ser menor que D.");
             return;
         }
 
-        try (Server server = new Server(d,s);){
-            server.start();
+        if (reset) {
+            System.out.println("RESET DA BASE DE DADOS!!!");
+            System.out.println("Tem a certeza que quer apagar toda a base de dados? (sim/nao)");
 
-        }catch(Exception e){
-            System.out.println("[ERRO SERVER] " + e.getMessage());
+            Scanner scanner = new Scanner(System.in);
+            String resposta = scanner.nextLine().trim().toLowerCase();
+
+            if (resposta.equals("sim") || resposta.equals("s")) {
+                data.BDReset.resetAll();
+                System.out.println("Base de dados apagada.");
+            } else {
+                System.out.println("Reset cancelado.");
+            }
+        }
+
+        try (Server server = new Server(d, s)) {
+            server.start();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 }

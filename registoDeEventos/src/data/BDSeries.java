@@ -37,8 +37,6 @@ public class BDSeries implements Map<String, Serie> {
                     " data VARCHAR(50) NOT NULL," +
                     " FOREIGN KEY (id_serie) REFERENCES serie(id_serie) ON DELETE CASCADE" +
                     ");";
-            stm.executeUpdate("DELETE FROM evento");
-            stm.executeUpdate("DELETE FROM serie");
             stm.executeUpdate(sqlSerie);
             stm.executeUpdate(sqlEvento);
 

@@ -11,6 +11,18 @@ public class Data {
         this.ano = ano;
     }
 
+    public int getDia(){
+        return this.dia;
+    }
+
+    public int getMes(){
+        return this.mes;
+    }
+
+    public int getAno(){
+        return this.ano;
+    }
+
     public String getData(){
         return dia + "/" +  mes + "/" + ano;
     }
@@ -99,6 +111,11 @@ public class Data {
         else if (!anoBi() && fevereiro() && dia == 28) return true;
         else if(mes31() && dia == 31) return true;
         else return mes30() && dia == 30;
+    }
+
+    @Override
+    public String toString(){
+        return this.dia + "/" + this.mes + "/" + this.ano;
     }
 
     @Override
