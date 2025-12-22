@@ -25,8 +25,8 @@ expect {
 send "tiago\r"
 
 
-# Inserir 50 produtos
-for {set i 1} {$i <= 50} {incr i} {
+# Inserir 10 produtos
+for {set i 1} {$i <= 10} {incr i} {
 
     expect {
         "Escolha uma das opções >" {}
@@ -46,14 +46,14 @@ for {set i 1} {$i <= 50} {incr i} {
         "Introduza a quantidade>" {}
         eof { exit }
     }
-    send "$i\r"
+    send "1\r"
     after 100
 
     expect {
         "Introduza o preço>" {}
         eof { exit }
     }
-    send "$i\r"
+    send "1\r"
     after 100
 }
 

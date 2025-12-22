@@ -15,23 +15,23 @@ send "tiago\r"
 expect "Introduza a password >"
 send "tiago\r"
 
-# Inserir 10 produtos
-for {set i 1} {$i <= 10} {incr i} {
+# Inserir 100 produtos
+for {set i 1} {$i <= 100} {incr i} {
     expect "Escolha uma das opções >"
     send "1\r"
     expect "Introduza o nome do produto >"
     send "produto_$i\r"
     expect "Introduza a quantidade> "
-    send "$i\r"
+    send "1\r"
     expect "Introduza o preço> "
-    send "[expr {0.5 + $i}]\r"
+    send "1\r"
 }
 
 # Enviar CTRL+C para terminar o cliente
 send "\003"
 
 # Espera um instante para garantir que o processo termina
-sleep 1
+sleep 10
 
 # Fechar a janela do terminal
 exit

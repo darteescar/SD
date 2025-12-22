@@ -151,6 +151,7 @@ public class BDSeries implements Map<String, Serie> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println("Série do dia " + key + " adicionada com sucesso à base de dados.");
         return value;
     }
 

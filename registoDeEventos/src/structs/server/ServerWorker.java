@@ -116,7 +116,7 @@ public class ServerWorker implements Runnable {
     private String processREGISTO(byte[] bytes) {
         Evento evento = Evento.deserialize(bytes);
 
-        this.gestorSeries.getSerieAtual().add(evento);
+        this.gestorSeries.addSerieAtual(evento);
         this.notifier.signall(evento.getProduto());
         String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.gestorSeries.getDataAtual().getData() + ".";
 

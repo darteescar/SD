@@ -52,11 +52,13 @@ public class GestorSeries {
           return false; // série não existe
      }
 
-     public boolean contains(String dia){    
+     public boolean contains(String dia){
           return cache.containsKey(dia) || bd.containsKey(dia); 
      }
 
      public Serie get(String dia) {
+          lock.lock();
+          try {
           if (cache.containsKey(dia)){ // HIT - se está na cache
                return cache.get(dia);
           } else if (bd.containsKey(dia)){ // MISS - se está na BD
@@ -65,6 +67,9 @@ public class GestorSeries {
                return s;
           } 
           return null; // série não existe
+          } finally {
+               lock.unlock();
+          }
      }
 
      // Métodos sobre a série atual do dia atual
@@ -76,6 +81,15 @@ public class GestorSeries {
                add(this.serie_atual);  // guarda a série antiga
                this.data_atual.incrementData();
                this.serie_atual = new Serie(data_atual.getData());
+          } finally {
+               lock.unlock();
+          }
+     }
+
+     public void addSerieAtual(Evento evento) {
+          lock.lock();
+          try {
+               this.serie_atual.add(evento);
           } finally {
                lock.unlock();
           }
