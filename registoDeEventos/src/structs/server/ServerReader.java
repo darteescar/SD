@@ -28,7 +28,7 @@ public class ServerReader implements Runnable {
                Mensagem mensagem = Mensagem.deserialize(input);
 
                if (mensagem == null) {
-                    System.out.println("[CLIENTE " + cliente + " DESCONECTOU-SE]");
+                    System.out.println("SR: [CLIENTE " + cliente + " DESCONECTOU-SE]");
                     break; // Sai do loop e termina a thread
                }
 
@@ -40,10 +40,10 @@ public class ServerReader implements Runnable {
                input.close();
                socket.close();
           } catch (IOException e) {
-               System.out.println("[ERRO] Fechando recursos do cliente " + cliente);
+               System.out.println("SR: [ERRO] Fechando recursos do cliente " + cliente);
                e.printStackTrace();
           }
-          System.out.println("[THREAD DO CLIENTE " + cliente + " TERMINOU]");
+          System.out.println("SR: [THREAD DO CLIENTE " + cliente + " TERMINOU]");
      }
      }
 

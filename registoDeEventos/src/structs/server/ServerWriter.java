@@ -19,7 +19,7 @@ public class ServerWriter implements Runnable {
           try {
                this.output = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
           } catch (Exception e) {
-               throw new RuntimeException("Error initializing output stream", e);
+               throw new RuntimeException("SW: [ERRO] Erro a inicializar o output stream", e);
           }
      }
 
@@ -32,13 +32,13 @@ public class ServerWriter implements Runnable {
                     output.flush();
                }
           } catch (Exception e) {
-               System.out.println("Connection with client " + cliente + " closed.");
+               System.out.println("SW: [CLIENTE " + cliente + " DESCONECTOU-SE]");
           } finally {
                try {
                     output.close();
                     socket.close();
                } catch (Exception e) {
-                    System.out.println("Error closing resources for client " + cliente);
+                    System.out.println("SW: [ERRO] Fechando recursos para o cliente " + cliente);
                }
           }
      }
