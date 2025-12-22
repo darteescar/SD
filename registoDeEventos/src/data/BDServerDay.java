@@ -21,7 +21,7 @@ public class BDServerDay {
             // inicializa se ainda não existir
             stm.executeUpdate(
                 "INSERT IGNORE INTO server_state (id, server_day) " +
-                "VALUES (1, '2025-01-01')"
+                " VALUES (1, '2024-12-31')"
             );
 
         } catch (SQLException e) {
@@ -30,20 +30,35 @@ public class BDServerDay {
     }
 
     public static LocalDate getCurrentDate() {
-        try (Connection conn = DriverManager.getConnection(
-                BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
-             PreparedStatement ps = conn.prepareStatement(
-                     "SELECT server_day FROM server_state WHERE id = 1")) {
+        try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
+            Statement stm = conn.createStatement()) {
 
-            ResultSet rs = ps.executeQuery();
-            if (rs.next())
-                return rs.getDate(1).toLocalDate();
+            // cria a tabela se não existir
+            stm.executeUpdate(
+                "CREATE TABLE IF NOT EXISTS server_state (" +
+                "id INT PRIMARY KEY," +
+                "server_day DATE NOT NULL)"
+            );
+
+            ResultSet rs = stm.executeQuery("SELECT server_day FROM server_state WHERE id=1");
+            if (rs.next()) {
+                return rs.getDate("server_day").toLocalDate();
+            } else {
+                // nenhum valor guardado, logo, inicializa a data para 31/12/2024
+                LocalDate inicial = LocalDate.of(2024, 12, 31);
+                try (PreparedStatement ps = conn.prepareStatement(
+                        "INSERT INTO server_state (id, server_day) VALUES (1, ?)")) {
+                    ps.setDate(1, Date.valueOf(inicial));
+                    ps.executeUpdate();
+                }
+                return inicial;
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return null;
     }
+
 
     public static void setCurrentDate(LocalDate date) {
         try (Connection conn = DriverManager.getConnection(
