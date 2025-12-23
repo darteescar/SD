@@ -7,7 +7,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.util.Scanner;
-
 import structs.notification.ServerNotifier;
 import structs.server.ClientContext;
 import structs.server.GestorLogins;

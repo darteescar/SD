@@ -78,7 +78,10 @@ public class GestorSeries {
           lock.lock();
           try {
                System.out.println("Passando do dia");
-               add(this.serie_atual);  // guarda a série antiga
+               Thread guardaNaBD = new Thread(() -> {
+                    add(this.serie_atual);
+               });
+               guardaNaBD.start();
                this.data_atual.incrementData();
                this.serie_atual = new Serie(data_atual.getData());
           } finally {
