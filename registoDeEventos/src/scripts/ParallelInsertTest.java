@@ -11,7 +11,7 @@ import structs.client.Stud;
 public class ParallelInsertTest {
 
     private static final int NUM_CLIENTES = 1000;
-    private static final int NUM_PRODUTOS = 10;
+    private static final int NUM_PRODUTOS = 1;
 
     private static final ReentrantLock lock = new ReentrantLock();
     private static final Condition startCondition  = lock.newCondition();

@@ -44,7 +44,7 @@ public class ServerWorker implements Runnable {
                 
                 int id = mensagem.getID();
                 TipoMsg tipo = mensagem.getTipo();
-                //System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
+                System.out.println("[RECEIVED MESSAGE] -> " + id + " (" + tipo + ") [FROM] -> " + cliente);
 
                 if (TipoMsg.NOTIFICACAO_VC == tipo) {
                     
@@ -60,9 +60,10 @@ public class ServerWorker implements Runnable {
                     result = execute(mensagem);
                 
                     Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
-                    
+                    String replyStr = reply.toString();
+                    System.out.println("Reply: " + replyStr);
                     this.contexto.send(reply);
-                    //System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
+                    System.out.println("[SENT MESSAGE] -> " + id + " (" + tipo + ") [TO] -> " + cliente);
                 }
             }
         } finally {
@@ -133,7 +134,7 @@ public class ServerWorker implements Runnable {
         } else {
             int x = this.gestorSeries.calcQuantidadeVendas(produto, dias);
             String resposta = "Quantidade de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x;
-
+            System.out.println(resposta);
             return resposta;
         }
     }

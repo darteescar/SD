@@ -225,16 +225,6 @@ public class ClienteUI {
         }
     }
 
-    private void enviarNotificacaoVC(){
-        try {
-            System.out.print("Número de vendas consecutivas > ");
-            int n = Integer.parseInt(scanner.nextLine());
-            cliente.sendNotificacaoVC(TipoMsg.NOTIFICACAO_VC, n);
-        } catch(Exception e){
-            e.printStackTrace();
-        }
-    }
-
     private void enviarNotificacaoVS(){
         try {
             System.out.print("Produto 1 > ");
@@ -242,6 +232,18 @@ public class ClienteUI {
             System.out.print("Produto 2 > ");
             String p2 = scanner.nextLine();
             cliente.sendNotificacaoVS(TipoMsg.NOTIFICACAO_VS, p1, p2);
+            switchNotificacao1();
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void enviarNotificacaoVC(){
+        try {
+            System.out.print("Número de vendas consecutivas > ");
+            int n = Integer.parseInt(scanner.nextLine());
+            cliente.sendNotificacaoVC(TipoMsg.NOTIFICACAO_VC, n);
+            switchNotificacao2();
         } catch(Exception e){
             e.printStackTrace();
         }
