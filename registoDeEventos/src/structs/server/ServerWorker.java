@@ -67,7 +67,7 @@ public class ServerWorker implements Runnable {
             }
         } finally {
             this.contexto.close();
-            System.out.println("[THREAD DO CLIENTE TERMINOU]");
+            System.out.println("[THREAD DO CLIENTE " + cliente + " TERMINOU]");
         }
     }
 
