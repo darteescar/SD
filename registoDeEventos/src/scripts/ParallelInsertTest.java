@@ -36,26 +36,21 @@ public class ParallelInsertTest {
 
             threads[i] = new Thread(() -> {
                 try {
-                    //System.out.println("[DEBUG] Cliente " + clienteId + " a fazer login...");
                     studs[clienteId].sendLOGIN(
                             TipoMsg.LOGIN,
                             "tiago",
                             "tiago" 
                     );
-                    //System.out.println("[DEBUG] Cliente " + clienteId + " login enviado");
 
                     // Espera pelo sinal de arranque
                     lock.lock();
                     try {
                         while (!ready) {
-                            //System.out.println("[DEBUG] Cliente " + clienteId + " à espera do GO");
                             startCondition.await();
                         }
                     } finally {
                         lock.unlock();
                     }
-
-                    //System.out.println("[DEBUG] Cliente " + clienteId + " iniciou bombardeamento");
 
                     // Bombardeamento de eventos
                     for (int j = 0; j < NUM_PRODUTOS; j++) {
@@ -66,17 +61,14 @@ public class ParallelInsertTest {
                                 1,
                                 1.0
                         );
-                        //System.out.println("[DEBUG] Cliente " + clienteId + " enviou produto_" + j);
                     }
 
                     // Sinaliza fim
                     lock.lock();
                     try {
                         finished++;
-                        //System.out.println("[DEBUG] Cliente " + clienteId + " terminou. Total finished: " + finished);
                         if (finished == NUM_CLIENTES) {
                             finishCondition.signal();
-                            //System.out.println("[DEBUG] Último cliente sinalizou fim");
                         }
                     } finally {
                         lock.unlock();
@@ -96,7 +88,6 @@ public class ParallelInsertTest {
         try {
             ready = true;
             startCondition.signalAll();
-            //System.out.println("[DEBUG] Sinal de arranque enviado para todos os clientes");
         } finally {
             lock.unlock();
         }
@@ -107,7 +98,6 @@ public class ParallelInsertTest {
             while (finished < NUM_CLIENTES) {
                 finishCondition.await();
             }
-            //System.out.println("[DEBUG] Todos os clientes terminaram envio de eventos");
         } finally {
             lock.unlock();
         }
@@ -118,7 +108,6 @@ public class ParallelInsertTest {
                 List<String> replies = studs[i].getRepliesList();
                 for (String r : replies) {
                     logFile.write(i + ";" + r + "\n");
-                    //System.out.println("[DEBUG] Cliente " + i + " recebeu resposta: " + r);
                 }
             }
             logFile.flush();
