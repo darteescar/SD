@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class Stud implements AutoCloseable {
     private final Socket socket;
@@ -14,6 +15,7 @@ public class Stud implements AutoCloseable {
     private int idMensagem = 0;
     private final List<String> replies;
     private NotificacaoListener listener;
+    private ReentrantLock lock = new ReentrantLock();
 
     public Stud() {
         try {
@@ -39,7 +41,7 @@ public class Stud implements AutoCloseable {
     }
 
     public void send(Mensagem mensagem){
-        Thread sender = new Thread(new Sender(this.demu, mensagem, replies, listener));
+        Thread sender = new Thread(new Sender(this.demu, mensagem, replies, listener, lock));
         sender.start();
     }
 
@@ -93,9 +95,12 @@ public class Stud implements AutoCloseable {
         this.send(mensagem);
     }
 
-    public List<String> getRepliesList() {
-        synchronized (replies){
+    public List<String> getRepliesList() { // o sender pode estar a modificar a lista
+        lock.lock(); 
+        try {
             return new ArrayList<>(replies);
+        } finally {
+            lock.unlock();
         }
     }
 }

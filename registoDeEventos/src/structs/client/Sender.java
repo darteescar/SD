@@ -10,13 +10,14 @@ public class Sender implements Runnable {
     private final Mensagem mToSend;
     private final List<String> replies;
     private final NotificacaoListener listener;
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock;
 
-    public Sender(Demultiplexer demu, Mensagem mToSend, List<String> replies, NotificacaoListener listener){
+    public Sender(Demultiplexer demu, Mensagem mToSend, List<String> replies, NotificacaoListener listener, ReentrantLock lock){
         this.demu = demu;
         this.mToSend = mToSend;
         this.replies = replies;
         this.listener = listener;
+        this.lock = lock;
     }
 
     @Override
