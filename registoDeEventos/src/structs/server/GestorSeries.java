@@ -30,6 +30,7 @@ public class GestorSeries {
                     return false; // campos inválidos
                }
                if (!bd.containsKey(serie.getData())){ // se não está na BD, insere na BD e na Cache
+                    //System.out.println("Adicionando série do dia " + serie.getData() + " à BD e Cache");
                     bd.put(serie.getData(), serie);
                     cache.put(serie.getData(), serie);
                     return true;
@@ -75,23 +76,26 @@ public class GestorSeries {
      // Métodos sobre a série atual do dia atual
 
      public void passarDia() {
-          lock.lock();
-          try {
-               System.out.println("Passando do dia");
-               Thread guardaNaBD = new Thread(() -> {
-                    add(this.serie_atual);
-               });
-               guardaNaBD.start();
-               this.data_atual.incrementData();
-               this.serie_atual = new Serie(data_atual.getData());
-          } finally {
-               lock.unlock();
-          }
+          Serie serieParaGuardar;
+               lock.lock();
+               try {
+                    System.out.println("Passando do dia");
+                    serieParaGuardar = this.serie_atual; // guarda a série atual
+                    this.data_atual.incrementData();
+                    this.serie_atual = new Serie(data_atual.getData());
+               } finally {
+                    lock.unlock();
+               }
+
+               // Thread fora do lock
+               new Thread(() -> add(serieParaGuardar)).start();
      }
+
 
      public void addSerieAtual(Evento evento) {
           lock.lock();
           try {
+               System.out.println("Adicionando evento à série atual");
                this.serie_atual.add(evento);
           } finally {
                lock.unlock();
