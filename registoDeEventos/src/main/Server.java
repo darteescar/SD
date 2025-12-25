@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.util.Scanner;
 import structs.notification.ConcurrentBuffer;
 import structs.notification.ServerNotifier;
+import structs.server.ClientSession;
 import structs.server.GestorLogins;
 import structs.server.GestorSeries;
 import structs.server.SafeMap;
@@ -69,31 +70,31 @@ public class Server implements AutoCloseable{
         return dataAtual;
     }
 
-    public void start() throws IOException{
+    public void start() throws IOException {
+        new Thread(simulator).start();
+        new Thread(notifier).start();
 
-        Thread simulator = new Thread(this.simulator); // Inicia a thread que simula a passagem dos dias
-        simulator.start();
+        while (true) {
+            Socket socket = ss.accept();
+            int id = cliente++;
 
-        Thread notifierThread = new Thread(this.notifier); // Inicia a thread que gere as notificações
-        notifierThread.start();
-
-        while(true){
-            // Aceita a conexão de um cliente
-            Socket socket = this.ss.accept();
-            System.out.println("[NOVO CLIENTE " + this.cliente + " LIGADO]");
-            ConcurrentBuffer<Mensagem> bufferCliente = new ConcurrentBuffer<>();
-            this.clientBuffers.put(this.cliente, bufferCliente);
-            ServerReader reader = new ServerReader(socket, this.taskBuffer, this.cliente);
-            ServerWriter writer = new ServerWriter(socket, this.cliente, bufferCliente);
-            Thread readerThread = new Thread(reader);
-            Thread writerThread = new Thread(writer);
-            writers.put(this.cliente, writer);
-            readers.put(this.cliente, reader);
-            this.cliente++;
-            readerThread.start();
-            writerThread.start();
+            try {
+                ClientSession session = new ClientSession(id, socket, taskBuffer);
+                clientBuffers.put(id, session.getOutBuffer());
+                session.start();
+                System.out.println("[NOVO CLIENTE " + id + " LIGADO]");
+            } catch (IOException e) {
+                System.err.println("Falha ao criar sessão para o cliente " + id + ": " + e.getMessage());
+                e.printStackTrace();
+                try {
+                    socket.close(); // fecha socket para não vazar recurso
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
-    }
+
+}
 
     public void passarDia() {
         this.series.passarDia();

@@ -95,7 +95,7 @@ public class GestorSeries {
      public void addSerieAtual(Evento evento) {
           lock.lock();
           try {
-               System.out.println("Adicionando evento à série atual");
+               //System.out.println("Adicionando evento à série atual");
                this.serie_atual.add(evento);
           } finally {
                lock.unlock();

@@ -2,9 +2,8 @@ package structs.server;
 
 import entities.Mensagem;
 import entities.ServerData;
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.ProtocolException;
 import java.net.Socket;
 import structs.notification.ConcurrentBuffer;
 
@@ -14,39 +13,51 @@ public class ServerReader implements Runnable {
      private final ConcurrentBuffer<ServerData> taskBuffer;
      private final int cliente;
 
-     public ServerReader(Socket socket, ConcurrentBuffer<ServerData> taskBuffer, int cliente) throws IOException {
+     public ServerReader(Socket socket,
+                         ConcurrentBuffer<ServerData> taskBuffer,
+                         int cliente) throws IOException {
+
           this.socket = socket;
-          this.input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+          this.input = new DataInputStream(
+                    new BufferedInputStream(socket.getInputStream()));
           this.taskBuffer = taskBuffer;
           this.cliente = cliente;
      }
-     
+
      @Override
      public void run() {
-     try {
-          while (true) {
-               Mensagem mensagem = Mensagem.deserialize(input);
+          try {
+               while (true) {
+                    Mensagem mensagem = Mensagem.deserialize(input);
 
-               if (mensagem == null) {
-                    System.out.println("SR: [CLIENTE " + cliente + " DESCONECTOU-SE]");
-                    break; // Sai do loop e termina a thread
+                    ServerData serverData = new ServerData(cliente, mensagem);
+                    taskBuffer.add(serverData);
                }
 
-               ServerData serverData = new ServerData(cliente, mensagem);
-               taskBuffer.add(serverData);
+          } catch (EOFException e) {
+               // Cliente fechou o socket (fecho limpo ou durante escrita)
+               System.out.println("SR: [CLIENTE " + cliente + " FECHOU A LIGACAO]");
+
+          } catch (ProtocolException e) {
+               // Mensagem mal formada
+               System.out.println("SR: [PROTOCOLO INVALIDO CLIENTE " + cliente + "] " + e.getMessage());
+
+          } catch (IOException e) {
+               // Problema de rede / crash / reset
+               System.out.println("SR: [ERRO IO CLIENTE " + cliente + "] " + e.getMessage());
+
+          } finally {
+               close();
           }
-     } finally {
+     }
+
+     private void close() {
           try {
                input.close();
                socket.close();
           } catch (IOException e) {
-               System.out.println("SR: [ERRO] Fechando recursos do cliente " + cliente);
-               e.printStackTrace();
+               System.out.println("SR: [ERRO AO FECHAR CLIENTE " + cliente + "]");
           }
           System.out.println("SR: [THREAD DO CLIENTE " + cliente + " TERMINOU]");
      }
-     }
-
-
-
 }

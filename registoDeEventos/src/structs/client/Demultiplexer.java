@@ -51,7 +51,7 @@ public class Demultiplexer implements AutoCloseable{
     // Começar Thread de background que vai orientar as replies para a thread correta
     public void start(){
         Thread background = new Thread(() -> {
-            System.out.println("[DEMULTIPLEXER INICIADO]");
+            //System.out.println("[DEMULTIPLEXER INICIADO]");
             try{
                 while(true){
                     Mensagem m = Mensagem.deserialize(in);

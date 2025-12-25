@@ -3,12 +3,15 @@ package entities;
 import enums.TipoMsg;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
+import java.net.ProtocolException;
 
 public class Mensagem {
     private int id;
     private TipoMsg tipo;
     private byte[] data;
+    private static final int MAX_MSG_SIZE = 10_000_000;
 
     public Mensagem(int id, TipoMsg tipo, byte[] data){
         this.id = id;
@@ -28,45 +31,41 @@ public class Mensagem {
         return this.data;
     }
 
-    public void serialize(DataOutputStream dos) {
-        try {
-
-            dos.writeInt(id);
-            dos.writeInt(this.tipo.ordinal());
-            dos.writeInt(this.data.length);
-            dos.write(this.data);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void serialize(DataOutputStream dos) throws IOException {
+        dos.writeInt(id);
+        dos.writeInt(this.tipo.ordinal());
+        dos.writeInt(this.data.length);
+        dos.write(this.data);
     }
 
-    public static Mensagem deserialize(DataInputStream dis) {
+
+    public static Mensagem deserialize(DataInputStream dis)
+            throws IOException, ProtocolException {
+
+        int id;
         try {
-            int id = dis.readInt();
-            int tipoOrdinal = dis.readInt();
-            if (tipoOrdinal < 0 || tipoOrdinal >= TipoMsg.values().length) {
-                System.out.println("[AVISO] Tipo de mensagem inválido: " + tipoOrdinal);
-                return null;
-            }
-            TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
-
-            int length = dis.readInt();
-            if (length < 0 || length > 10_000_000) {
-                System.out.println("[AVISO] Tamanho inválido de mensagem: " + length);
-                return null;
-            }
-
-            byte[] data = new byte[length];
-            dis.readFully(data);
-
-            return new Mensagem(id, tipo, data);
-
-        } catch (IOException | IndexOutOfBoundsException | NegativeArraySizeException e) {
-            return null;
+            id = dis.readInt();
+        } catch (EOFException e) {
+            // Cliente fechou a ligação
+            throw e;
         }
-    }
 
+        int tipoOrdinal = dis.readInt();
+        if (tipoOrdinal < 0 || tipoOrdinal >= TipoMsg.values().length) {
+            throw new ProtocolException("Tipo de mensagem inválido: " + tipoOrdinal);
+        }
+        TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
+
+        int length = dis.readInt();
+        if (length < 0 || length > MAX_MSG_SIZE) {
+            throw new ProtocolException("Tamanho inválido da mensagem: " + length);
+        }
+
+        byte[] data = new byte[length];
+        dis.readFully(data);
+
+        return new Mensagem(id, tipo, data);
+    }
 
     @Override
     public String toString() {
