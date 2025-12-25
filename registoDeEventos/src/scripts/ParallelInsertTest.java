@@ -1,103 +1,124 @@
 package scripts;
 
-import entities.Mensagem;
 import enums.TipoMsg;
-import entities.payloads.Evento;
-
-import java.io.*;
-import java.net.Socket;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.List;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
+import structs.client.Stud;
 
 public class ParallelInsertTest {
 
-    private static final int NUM_CLIENTES = 10;
-    private static final int NUM_PRODUTOS = 20;
-    private static final String HOST = "localhost";
-    private static final int PORT = 12345;
-    private static final int WAIT_AFTER_INSERT_MS = 5000; // espera 5 segundos
+    private static final int NUM_CLIENTES = 1000;
+    private static final int NUM_PRODUTOS = 10;
 
-    public static void main(String[] args) throws InterruptedException, IOException {
-        CountDownLatch latch = new CountDownLatch(NUM_CLIENTES);
+    private static final ReentrantLock lock = new ReentrantLock();
+    private static final Condition startCondition  = lock.newCondition();
+    private static final Condition finishCondition = lock.newCondition();
 
-        // Cria um ficheiro para logar resultados
-        BufferedWriter logFile = new BufferedWriter(new FileWriter("resultados_test.txt"));
-        logFile.write("ID_CLIENTE;PRODUTO;RESPOSTA\n");
+    private static boolean ready = false;
+    private static int finished = 0;
 
-        Thread[] clientes = new Thread[NUM_CLIENTES];
+    public static void main(String[] args) throws Exception {
+
+        Stud[] studs = new Stud[NUM_CLIENTES];
+        Thread[] threads = new Thread[NUM_CLIENTES];
+
+        BufferedWriter logFile = new BufferedWriter(
+                new FileWriter("resultados_test.txt"));
+        logFile.write("CLIENTE;RESPOSTA\n");
+
         for (int i = 0; i < NUM_CLIENTES; i++) {
-            final int clientId = i;
-            clientes[i] = new Thread(() -> {
+            final int clienteId = i;
+            studs[i] = new Stud();
+            studs[i].start();
+
+            threads[i] = new Thread(() -> {
                 try {
-                    runCliente(clientId, logFile);
+                    studs[clienteId].sendLOGIN(
+                            TipoMsg.LOGIN,
+                            "tiago",
+                            "tiago" 
+                    );
+
+                    // Espera pelo sinal de arranque
+                    lock.lock();
+                    try {
+                        while (!ready) {
+                            startCondition.await();
+                        }
+                    } finally {
+                        lock.unlock();
+                    }
+
+                    // Bombardeamento de eventos
+                    for (int j = 0; j < NUM_PRODUTOS; j++) {
+                        Thread.sleep(1); // Pequena pausa para evitar sobrecarga total
+                        studs[clienteId].sendEVENTO(
+                                TipoMsg.REGISTO,
+                                "produto_" + j,
+                                1,
+                                1.0
+                        );
+                    }
+
+                    // Sinaliza fim
+                    lock.lock();
+                    try {
+                        finished++;
+                        if (finished == NUM_CLIENTES) {
+                            finishCondition.signal();
+                        }
+                    } finally {
+                        lock.unlock();
+                    }
+
                 } catch (Exception e) {
+                    System.out.println("[ERROR] Cliente " + clienteId + " exception:");
                     e.printStackTrace();
-                } finally {
-                    latch.countDown();
                 }
             });
-            clientes[i].start();
+
+            threads[i].start();
         }
 
-        // Espera todas as threads terminarem
-        latch.await();
+        // Sinal de START
+        lock.lock();
+        try {
+            ready = true;
+            startCondition.signalAll();
+        } finally {
+            lock.unlock();
+        }
 
-        logFile.close();
-        System.out.println("Todos os clientes finalizaram. Resultados gravados em 'resultados_test.txt'");
-    }
-
-    private static void runCliente(int clientId, BufferedWriter logFile) throws IOException, InterruptedException {
-        Socket socket = new Socket(HOST, PORT);
-        DataOutputStream dos = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-        DataInputStream dis = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-
-        System.out.println("[CLIENTE " + clientId + "] Conectado");
-
-        // --- Login fictício ---
-        sendLogin(dos, clientId);
-
-        // --- Inserir produtos ---
-        Map<String, String> respostasRecebidas = new HashMap<>();
-        for (int i = 1; i <= NUM_PRODUTOS; i++) {
-            Evento evento = new Evento("produto_" + i, 1, 1.0);
-            sendEvento(dos, evento);
-
-            // Recebe resposta do servidor (pode chegar fora de ordem)
-            Mensagem resposta = Mensagem.deserialize(dis);
-            if (resposta != null) {
-                respostasRecebidas.put(evento.getProduto(), new String(resposta.getData()));
+        // Espera até todos terminarem
+        lock.lock();
+        try {
+            while (finished < NUM_CLIENTES) {
+                finishCondition.await();
             }
+        } finally {
+            lock.unlock();
         }
 
-        // --- Espera para garantir que todas as mensagens chegam ---
-        Thread.sleep(WAIT_AFTER_INSERT_MS);
-
-        // --- Grava os resultados no ficheiro ---
+        // Recolhe respostas
         synchronized (logFile) {
-            for (Map.Entry<String, String> entry : respostasRecebidas.entrySet()) {
-                logFile.write(clientId + ";" + entry.getKey() + ";" + entry.getValue() + "\n");
+            for (int i = 0; i < NUM_CLIENTES; i++) {
+                List<String> replies = studs[i].getRepliesList();
+                for (String r : replies) {
+                    logFile.write(i + ";" + r + "\n");
+                }
             }
             logFile.flush();
         }
 
-        socket.close();
-        System.out.println("[CLIENTE " + clientId + "] Finalizado");
-    }
+        // Cleanup
+        for (Stud s : studs) {
+            s.close();
+        }
 
-    private static void sendLogin(DataOutputStream dos, int clientId) throws IOException {
-        String username = "usuario" + clientId;
-        String password = "senha" + clientId;
-        byte[] payload = (username + ":" + password).getBytes();
-
-        Mensagem msg = new Mensagem(clientId, TipoMsg.LOGIN, payload);
-        msg.serialize(dos);
-        dos.flush();
-    }
-
-    private static void sendEvento(DataOutputStream dos, Evento evento) throws IOException {
-        byte[] payload = evento.serialize(); // supondo que Evento tem serialize()
-        Mensagem msg = new Mensagem(0, TipoMsg.REGISTO, payload);
-        msg.serialize(dos);
-        dos.flush();
+        logFile.close();
+        System.out.println("Teste concluído com sucesso!");
     }
 }

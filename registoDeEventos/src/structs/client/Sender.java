@@ -5,50 +5,44 @@ import enums.TipoMsg;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Sender implements Runnable{
+public class Sender implements Runnable {
     private final Demultiplexer demu;
+    private final Mensagem mToSend;
+    private final List<String> replies;
+    private final NotificacaoListener listener;
     private final ReentrantLock lock;
-    private final ClienteView view;
-    private Mensagem mToSend;
-    private List<String> replies;
 
-    public Sender(Demultiplexer demu, Mensagem mToSend, List<String> replies, ClienteView view){
+    public Sender(Demultiplexer demu, Mensagem mToSend, List<String> replies, NotificacaoListener listener, ReentrantLock lock){
         this.demu = demu;
-        this.lock =  new ReentrantLock();
         this.mToSend = mToSend;
         this.replies = replies;
-        this.view = view;
+        this.listener = listener;
+        this.lock = lock;
     }
 
     @Override
     public void run(){
-        try{
-            int id = this.mToSend.getID();
-            TipoMsg tipo = this.mToSend.getTipo();
+        try {
+            int id = mToSend.getID();
+            TipoMsg tipo = mToSend.getTipo();
 
-            // Enviar a mensagem
-            this.demu.send(this.mToSend);
-
-            // Esperar pela resposta (especificamente com o ID passado)
+            demu.send(mToSend);
             String reply = demu.receive(id);
 
             if(tipo != TipoMsg.REGISTA_LOGIN && tipo != TipoMsg.LOGIN){
-                String paraLista = "Resposta da mensagem " + id + " -> " + reply;
-                if (tipo == TipoMsg.NOTIFICACAO_VS) {
-                    this.view.switchNotificacao1();
-                } else if (tipo == TipoMsg.NOTIFICACAO_VC) {
-                    this.view.switchNotificacao2();
+                lock.lock();
+                try {
+                    replies.add("Resposta da mensagem " + id + " -> " + reply);
+                } finally {
+                    lock.unlock();
                 }
-                this.lock.lock();
-                try{
-                    this.replies.add(paraLista);
-                }finally{
-                    this.lock.unlock();
+
+                if(listener != null){
+                    if(tipo == TipoMsg.NOTIFICACAO_VS) listener.notificacaoVSEnviada();
+                    else if(tipo == TipoMsg.NOTIFICACAO_VC) listener.notificacaoVCEnviada();
                 }
             }
-
-        }catch(Exception e){
-            System.out.println("[ERRO CLIENTE-WORKER] " + e.getMessage());
+        } catch(Exception e){
             e.printStackTrace();
         }
     }

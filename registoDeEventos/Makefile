@@ -8,7 +8,7 @@ CLASSPATH = $(BIN_DIR):$(LIB_DIR)/*
 
 # Classe principal
 SERVER_MAIN = main.Server
-SERVER_CLIENTE = main.Cliente
+SERVER_CLIENTE = main.ClienteUI
 
 # Argumentos para o servidor (passados com make server D=.. S=.. RESET=..)
 D ?= 0
@@ -44,6 +44,12 @@ server:
 cliente:
 	@echo ">> Iniciando o cliente..."
 	java -cp "$(CLASSPATH)" $(SERVER_CLIENTE)
+
+# Executar Stress Test de Inserções
+stress-test:
+	@echo ">> A executar Stress Test de Inserções..."
+	java -cp "$(CLASSPATH)" scripts.ParallelInsertTest
+
 
 # Clean
 clean:

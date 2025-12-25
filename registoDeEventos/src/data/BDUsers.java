@@ -1,7 +1,13 @@
 package data;
 import java.sql.*;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class BDUsers {
+     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+     private final ReentrantReadWriteLock.WriteLock writelock =  lock.writeLock();
+     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+
+
      private static BDUsers singleton = null;
 
      public static BDUsers getInstance() {
@@ -29,77 +35,98 @@ public class BDUsers {
 
      // Verifica se o utilizador existe
      public boolean containsUser(String username) {
-          boolean exists;
-          try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
-               PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS count FROM users WHERE username = ?")) {
+          readLock.lock();
+          try {
+               boolean exists;
+               try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
+                    PreparedStatement pstmt = conn.prepareStatement("SELECT COUNT(*) AS count FROM users WHERE username = ?")) {
 
-               pstmt.setString(1, username);
-               try (ResultSet rs = pstmt.executeQuery()) {
-                    rs.next();
-                    exists = rs.getInt("count") > 0;
+                    pstmt.setString(1, username);
+                    try (ResultSet rs = pstmt.executeQuery()) {
+                         rs.next();
+                         exists = rs.getInt("count") > 0;
+                    }
+
+               } catch (SQLException e) {
+                    System.out.println("Erro ao verificar utilizador: " + e.getMessage());
+                    e.printStackTrace();
+                    throw new NullPointerException(e.getMessage());
                }
-
-          } catch (SQLException e) {
-               System.out.println("Erro ao verificar utilizador: " + e.getMessage());
-               e.printStackTrace();
-               throw new NullPointerException(e.getMessage());
+               return exists;
+          } finally {
+               readLock.unlock();
           }
-          return exists;
      }
 
      // Adiciona um utilizador
      public void add(String username, String password) {
-          try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
-               PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users (username, password) VALUES (?, ?)")) {
+          writelock.lock();
+          try {
 
-               pstmt.setString(1, username);
-               pstmt.setString(2, password);
-               pstmt.executeUpdate();
+               try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
+                    PreparedStatement pstmt = conn.prepareStatement("INSERT INTO users (username, password) VALUES (?, ?)")) {
 
-          } catch (SQLException e) {
-               System.out.println("Erro ao adicionar utilizador: " + e.getMessage());
-               e.printStackTrace();
-               throw new NullPointerException(e.getMessage());
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, password);
+                    pstmt.executeUpdate();
+
+               } catch (SQLException e) {
+                    System.out.println("Erro ao adicionar utilizador: " + e.getMessage());
+                    e.printStackTrace();
+                    throw new NullPointerException(e.getMessage());
+               }
+          } finally {
+               writelock.unlock();
           }
      }
 
      // Remove um utilizador com username e password
      public boolean remove(String username, String password) {
-          boolean success;
-          try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
-               PreparedStatement pstmt = conn.prepareStatement("DELETE FROM users WHERE username = ? AND password = ?")) {
+          writelock.lock();
+          try {
+               boolean success;
+               try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
+                    PreparedStatement pstmt = conn.prepareStatement("DELETE FROM users WHERE username = ? AND password = ?")) {
 
-               pstmt.setString(1, username);
-               pstmt.setString(2, password);
-               int rowsAffected = pstmt.executeUpdate();
-               success = rowsAffected > 0;
+                    pstmt.setString(1, username);
+                    pstmt.setString(2, password);
+                    int rowsAffected = pstmt.executeUpdate();
+                    success = rowsAffected > 0;
 
-          } catch (SQLException e) {
-               System.out.println("Erro ao remover utilizador: " + e.getMessage());
-               e.printStackTrace();
-               throw new NullPointerException(e.getMessage());
+               } catch (SQLException e) {
+                    System.out.println("Erro ao remover utilizador: " + e.getMessage());
+                    e.printStackTrace();
+                    throw new NullPointerException(e.getMessage());
+               }
+               return success;
+          } finally {
+               writelock.unlock();
           }
-          return success;
      }
 
      // Devolve a password de um utilizador
      public String get(String username) {
-          String password = null;
-          try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
-               PreparedStatement pstmt = conn.prepareStatement("SELECT password FROM users WHERE username = ?")) {
+          readLock.lock();
+          try {
+               String password = null;
+               try(Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
+                    PreparedStatement pstmt = conn.prepareStatement("SELECT password FROM users WHERE username = ?")) {
 
-               pstmt.setString(1, username);
-               try (ResultSet rs = pstmt.executeQuery()) {
-                    if (rs.next()) {
-                         password = rs.getString("password");
+                    pstmt.setString(1, username);
+                    try (ResultSet rs = pstmt.executeQuery()) {
+                         if (rs.next()) {
+                              password = rs.getString("password");
+                         }
                     }
-               }
 
-          } catch (SQLException e) {
-               System.out.println("Erro ao obter password do utilizador: " + e.getMessage());
-               e.printStackTrace();
-               throw new NullPointerException(e.getMessage());
+               } catch (SQLException e) {
+                    System.out.println("Erro ao obter password do utilizador: " + e.getMessage());
+                    e.printStackTrace();
+                    throw new NullPointerException(e.getMessage());
+               }
+               return password;
+          } finally {
+               readLock.unlock();
           }
-          return password;
      }
 }
