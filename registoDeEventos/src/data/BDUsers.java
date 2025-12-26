@@ -94,7 +94,7 @@ public class BDUsers {
                     success = rowsAffected > 0;
 
                } catch (SQLException e) {
-                    System.out.println("Erro ao remover utilizador: " + e.getMessage());
+                    System.out.println("[BDU]: Erro ao remover utilizador: " + e.getMessage());
                     e.printStackTrace();
                     throw new NullPointerException(e.getMessage());
                }
@@ -120,7 +120,7 @@ public class BDUsers {
                     }
 
                } catch (SQLException e) {
-                    System.out.println("Erro ao obter password do utilizador: " + e.getMessage());
+                    System.out.println("[BDU]: Erro ao obter password do utilizador: " + e.getMessage());
                     e.printStackTrace();
                     throw new NullPointerException(e.getMessage());
                }

@@ -30,7 +30,7 @@ public class GestorSeries {
                     return false; // campos inválidos
                }
                if (!bd.containsKey(serie.getData())){ // se não está na BD, insere na BD e na Cache
-                    //System.out.println("Adicionando série do dia " + serie.getData() + " à BD e Cache");
+                    System.out.println("[GS]: Adicionando série do dia " + serie.getData() + " à BD e Cache");
                     bd.put(serie.getData(), serie);
                     cache.put(serie.getData(), serie);
                     return true;

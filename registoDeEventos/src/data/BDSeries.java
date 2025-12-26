@@ -47,7 +47,7 @@ public class BDSeries implements Map<String, Serie> {
             stm.executeUpdate(sqlEvento);
 
         } catch (SQLException e) {
-            System.out.println("Erro ao criar tabelas de séries/eventos: " + e.getMessage());
+            System.out.println("[BDS]: Erro ao criar tabelas de séries/eventos: " + e.getMessage());
             e.printStackTrace();
             throw new NullPointerException(e.getMessage());
         }
@@ -155,8 +155,8 @@ public class BDSeries implements Map<String, Serie> {
     public Serie put(String key, Serie value) {
         writelock.lock();
         try {
-            System.out.println("Adicionando série do dia " + key + " à base de dados.");
-            System.out.println("Eventos na série: " + value.getEventos().size());
+            System.out.println("[BDS]: Adicionando série do dia " + key + " à base de dados.");
+            System.out.println("[BDS]: Eventos na série: " + value.getEventos().size());
             // cria nova série com data=key e adiciona eventos
             try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
                 PreparedStatement stmtSerie = conn.prepareStatement(
@@ -184,7 +184,7 @@ public class BDSeries implements Map<String, Serie> {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            System.out.println("Série do dia " + key + " adicionada com sucesso à base de dados.");
+            System.out.println("[BDS]: Série do dia " + key + " adicionada com sucesso à base de dados.");
             return value;   
         } finally {
             writelock.unlock();

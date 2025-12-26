@@ -25,7 +25,7 @@ public class BDReset {
                 "INSERT INTO server_state (id, server_day) VALUES (1, '2024-12-31')"
             );
 
-            System.out.println("Base de dados apagada e data reiniciada.");
+            System.out.println("[BDR]: Base de dados apagada e data reiniciada.");
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
