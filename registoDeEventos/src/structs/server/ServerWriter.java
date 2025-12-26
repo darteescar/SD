@@ -3,7 +3,6 @@ package structs.server;
 import entities.Mensagem;
 import enums.TipoMsg;
 import java.io.*;
-import java.net.SocketException;
 import structs.notification.ConcurrentBuffer;
 
 public class ServerWriter implements Runnable {
@@ -26,29 +25,22 @@ public class ServerWriter implements Runnable {
 
      @Override
      public void run() {
-          try {
-               while (true) {
-                    Mensagem msg = taskBuffer.poll();
-                    if (msg.getTipo() == TipoMsg.POISON_PILL) {
-                         System.out.println("SW: [RECEBEU POISON PILL, A TERMINAR THREAD DO CLIENTE " + cliente + "]");
-                         break;
-                    }
-                    msg.serialize(output);
-                    output.flush();
+          while (true) {
+               Mensagem msg = taskBuffer.poll();
+
+               if (msg.getTipo() == TipoMsg.POISON_PILL) {
+                    break;
                }
 
-          } catch (SocketException | EOFException e) {
-               // Cliente fechou o socket
-               System.out.println("SW: [CLIENTE " + cliente + " DESCONECTOU-SE]");
-
-          } catch (IOException e) {
-               // Problema de rede / crash / reset
-               System.out.println("SW: [ERRO IO CLIENTE " + cliente + "] " + e.getMessage());
-
-          } finally {
-               System.out.println("SW: [THREAD WRITER CLIENTE " + cliente + " TERMINOU]");
-               session.close();
+               try {
+                    msg.serialize(output);
+                    output.flush();
+               } catch (IOException e) {
+                    System.out.println("[ERRO] Não foi possível enviar mensagem para o cliente " + cliente + ": " + e.getMessage());
+                    break; // sai do loop e fecha a sessão
+               }
           }
+          session.close();
      }
 
      public void send(Mensagem data) {

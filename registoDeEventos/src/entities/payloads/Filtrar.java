@@ -5,12 +5,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Filtrar {
     private List<String> produtos;
     private int dias;
+    private static final int MAX_PRODUTO_LENGTH = 1_000; // limite arbitrário
 
     public Filtrar(List<String> produtos, int dias){
         this.produtos = new ArrayList<>(produtos);
@@ -46,9 +48,7 @@ public class Filtrar {
         return new Filtrar(this);
     }
 
-    public byte[] serialize(){
-        try {
-            
+    public byte[] serialize() throws IOException {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             DataOutputStream dos = new DataOutputStream(baos);
             dos.writeInt(produtos.size());
@@ -59,30 +59,33 @@ public class Filtrar {
             dos.flush();
 
             return baos.toByteArray();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
-    public static Filtrar deserialize(byte[] bytes){
-        try {
-
-            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
-
-            int size = dis.readInt();
-            List<String> produtos = new ArrayList<>();
-            for(int i = 0; i < size; i++){
-                produtos.add(dis.readUTF());
-            }
-            int dias = dis.readInt();
-
-            return new Filtrar(produtos, dias);  
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+    public static Filtrar deserialize(byte[] bytes) throws IOException, ProtocolException {
+        if (bytes == null) {
+            throw new ProtocolException("Bytes nulos recebidos");
         }
+
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+
+        int size = dis.readInt();
+        if (size < 0) {
+            throw new ProtocolException("Quantidade negativa inválida: " + size);
+        }
+
+        List<String> produtos = new ArrayList<>();
+        for(int i = 0; i < size; i++){
+            String produto = dis.readUTF();
+            if (produto.length() > MAX_PRODUTO_LENGTH) { // limite arbitrário
+                throw new ProtocolException("Nome do produto muito longo: " + produto.length());
+            }
+            produtos.add(produto);
+        }
+        int dias = dis.readInt();
+        if (dias < 0) {
+            throw new ProtocolException("Número de dias negativo inválido: " + dias);
+        }
+
+        return new Filtrar(produtos, dias);
     }
 }

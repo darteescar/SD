@@ -24,29 +24,20 @@ public class ServerReader implements Runnable {
 
      @Override
      public void run() {
-          try {
-               while (true) {
+          while (true) {
+               try {
                     Mensagem mensagem = Mensagem.deserialize(input);
-
                     ServerData serverData = new ServerData(cliente, mensagem);
                     taskBuffer.add(serverData);
+               } catch (ProtocolException e) {
+                    System.out.println("[AVISO] Mensagem inválida do cliente " + cliente);
+                    // opcional: enviar feedback de erro para o cliente
+               } catch (IOException e) {
+                    System.out.println("[ERRO] Problema de IO com o cliente " + cliente);
+                    break; // sai do while e fecha sessão
                }
-
-          } catch (EOFException e) {
-               // Cliente fechou o socket
-               System.out.println("SR: [CLIENTE " + cliente + " FECHOU A LIGACAO]");
-
-          } catch (ProtocolException e) {
-               // Mensagem mal formada
-               System.out.println("SR: [PROTOCOLO INVALIDO CLIENTE " + cliente + "] " + e.getMessage());
-
-          } catch (IOException e) {
-               // Problema de rede / crash / reset
-               System.out.println("SR: [ERRO IO CLIENTE " + cliente + "] " + e.getMessage());
-
-          } finally {
-               System.out.println("SR: [THREAD READER CLIENTE " + cliente + " TERMINOU]");
-               session.close();
           }
+          session.close();
+
      }
 }

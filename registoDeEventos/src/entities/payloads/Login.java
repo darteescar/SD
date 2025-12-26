@@ -5,10 +5,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ProtocolException;
 
 public class Login {
     private String username;
     private String password;
+    private static final int MAX_USERNAME_LENGTH = 1_000; // limite arbitrário
 
     public Login(String username, String password){
         this.username = username;
@@ -38,37 +40,33 @@ public class Login {
         return new Login(this);
     }
 
-    public byte[] serialize(){
-        try {
+    public byte[] serialize() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
+        dos.writeUTF(username);
+        dos.writeUTF(password);
+        dos.flush();
 
-            dos.writeUTF(username);
-            dos.writeUTF(password);
-            dos.flush();
-
-            return baos.toByteArray();  
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return baos.toByteArray();  
     }
 
-    public static Login deserialize(byte[] bytes){
-        try {
-            
+    public static Login deserialize(byte[] bytes) throws IOException, ProtocolException{
+            if (bytes == null) {
+                throw new ProtocolException("Bytes nulos recebidos");
+            }
+
             DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
 
             String username = dis.readUTF();
+            if (username.length() > MAX_USERNAME_LENGTH) {
+                throw new ProtocolException("Username muito longo: " + username.length());
+            }
             String password = dis.readUTF();
+            if (password.length() > MAX_USERNAME_LENGTH) {
+                throw new ProtocolException("Password muito longa: " + password.length());
+            }
 
             return new Login(username, password);
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 }

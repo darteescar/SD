@@ -53,10 +53,10 @@ public class ClientSession {
             if (!socket.isClosed()) {
                 socket.close();
                 writer.send(ServerWriter.POISON_PILL);
-                System.out.println("CS: [LIGACAO COM CLIENTE " + clienteId + " FECHADA]");
+                //System.out.println("CS: [LIGACAO COM CLIENTE " + clienteId + " FECHADA]");
             }
         } catch (IOException e) {
-            System.out.println("CS: [ERRO AO FECHAR SOCKET CLIENTE " + clienteId + "] " + e.getMessage());
+            //System.out.println("CS: [ERRO AO FECHAR SOCKET CLIENTE " + clienteId + "] " + e.getMessage());
         } finally {
             lock.unlock();
         }

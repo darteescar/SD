@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.ProtocolException;
 
 public class NotificacaoVC {
     private int n;
@@ -31,35 +32,28 @@ public class NotificacaoVC {
         return new NotificacaoVC(this);
     }
 
-    public byte[] serialize(){
-        try {
+    public byte[] serialize() throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream dos = new DataOutputStream(baos);
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            DataOutputStream dos = new DataOutputStream(baos);
+        dos.writeInt(this.n);
+        dos.flush();
 
-            dos.writeInt(this.n);
-            dos.flush();
-
-            return baos.toByteArray(); 
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return baos.toByteArray(); 
     }
 
-    public static NotificacaoVC deserialize(byte[] bytes){
-        try {
-            
-            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
-            
-            int n = dis.readInt();
-
-            return new NotificacaoVC(n);
-            
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+    public static NotificacaoVC deserialize(byte[] bytes) throws IOException, ProtocolException{
+        if (bytes == null) {
+            throw new IOException("Bytes nulos recebidos");
         }
+    
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+        
+        int n = dis.readInt();
+        if (n < 0) {
+            throw new ProtocolException("Valor de n inválido: " + n);
+        }
+
+        return new NotificacaoVC(n);   
     }
 }

@@ -51,27 +51,31 @@ public class ServerWorker implements Runnable {
                 TipoMsg tipo = mensagem.getTipo();
                 int clienteID = serverData.getClienteID();
 
+                String result = null;
+
                 if (TipoMsg.NOTIFICACAO_VC == tipo) {
                     
-                    processNOTIFICACAOVC(id,mensagem.getData(),clienteID);
+                    if (!processNOTIFICACAOVC(id,mensagem.getData(),clienteID)){
+                        result = "Erro ao processar Notificação VC.";
+                    }
 
                 } else if (TipoMsg.NOTIFICACAO_VS == tipo)
                 {   
-                    processNOTIFICACAOVS(id,mensagem.getData(),clienteID);
+                    if (!processNOTIFICACAOVS(id,mensagem.getData(),clienteID)){
+                        result = "Erro ao processar Notificação VS.";
+                    }
 
                 } else {
-                    String result = "";
                     
                     result = execute(mensagem);
-                
-                    Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
-
-                    ConcurrentBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
-                    bufferCliente.add(reply);
                 }
+                Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
+
+                ConcurrentBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
+                bufferCliente.add(reply);
             }
         } finally {
-            System.out.println("[THREAD DO CLIENTE TERMINOU]");
+            System.out.println("[THREAD DO SERVIDOR TERMINOU]");
         }
     }
 
@@ -95,38 +99,43 @@ public class ServerWorker implements Runnable {
     }
 
     private String processLOGIN(byte[] bytes){
-        Login login = Login.deserialize(bytes);
+        try {
+            Login login = Login.deserialize(bytes);
 
-        if (login == null) {
+            String username = login.getUsername();
+            String password = login.getPassword();
+
+            // Lógica de verificar se o cliente está registado
+            boolean b = this.logins.autenticar(username, password);
+            
+            return (b ? "true" : "false");   
+        } catch (ProtocolException e) {
             System.out.println("[AVISO] Login inválido ou incompleto recebido, ignorando.");
-            return "Erro: login inválido ou corrompido.";
+            return "false";
+        } catch (IOException e) {
+            System.out.println("[ERRO] Erro na desserialização do login recebido.");
+            return "false";
         }
-
-        String username = login.getUsername();
-        String password = login.getPassword();
-
-        // Lógica de verificar se o cliente está registado
-        boolean b = this.logins.autenticar(username, password);
-        
-        return (b ? "true" : "false");
     }
 
     private String processREGISTA_LOGIN(byte[] bytes){
-        Login login = Login.deserialize(bytes);
+        try {
+            Login login = Login.deserialize(bytes);
 
-        if (login == null) {
+            String username = login.getUsername();
+            String password = login.getPassword();
+
+            // Lógica de verificar se o cliente está registado
+            boolean b = this.logins.registar(username, password);
+            
+            return (b ? "true" : "false");   
+        } catch (ProtocolException e) {
             System.out.println("[AVISO] Login inválido ou incompleto recebido, ignorando.");
-            return "Erro: login inválido ou corrompido.";
+            return "false";
+        } catch (IOException e) {
+            System.out.println("[ERRO] Erro na desserialização do login recebido.");
+            return "false";
         }
-
-        String username = login.getUsername();
-        String password = login.getPassword();
-
-        // Lógica de resgistar o cliente no sistema
-
-        boolean b = this.logins.registar(username, password);
-        
-        return (b ? "true" : "false");
     }
     
     private String processREGISTO(byte[] bytes) {
@@ -259,48 +268,67 @@ public class ServerWorker implements Runnable {
     }
 
     private String processLISTA(byte[] bytes) {
-        Filtrar filtrar = Filtrar.deserialize(bytes);
 
-        if (filtrar == null) {
-            System.out.println("[AVISO] Filtro inválido ou incompleto recebido, ignorando.");
-            return "Erro: filtro inválido ou corrompido.";
-        }
+        String resposta;
+        try {
 
-        List<String> produto = filtrar.getProdutos();
-        int dia = filtrar.getDias();
+            Filtrar filtrar = Filtrar.deserialize(bytes);
 
-        if (dIsInvalid(dia)) {
-            return "Insira num valor entre 1 e " + this.d + ".";
-        } else {
-            List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
-            return eventos.toString();
+            List<String> produto = filtrar.getProdutos();
+            int dia = filtrar.getDias();
+
+            if (dIsInvalid(dia)) {
+                return "Insira num valor entre 1 e " + this.d + ".";
+            } else {
+                List<Evento> eventos = this.gestorSeries.filtrarEventos(produto, dia);
+                return eventos.toString();
+            }
+        } catch (ProtocolException e) {
+            resposta = "Erro, dados do filtro inválidos ou corrompidos.";
+            System.out.println("[AVISO] Filtro inválido ou incompleto recebido, ignorando");
+            return resposta;
+        } catch (IOException e) {
+            resposta = "Erro na desserialização do filtro.";
+            System.out.println("[ERRO] Erro na desserialização do filtro recebido.");
+            return resposta;    
         }
     }
 
-    private void processNOTIFICACAOVC(int id, byte[] bytes, int clienteID) {
-        NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
+    private boolean processNOTIFICACAOVC(int id, byte[] bytes, int clienteID) {
+        try {
+            NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
 
-        //////////////////////// ler README ////////////////////////
+            //////////////////////// ler README ////////////////////////
 
-        if (noti == null) {
+            this.notifier.add(id,noti,clienteID);
+            return true;
+        } catch (ProtocolException e) {
             System.out.println("[AVISO] Notificação VC inválida ou incompleta recebida, ignorando.");
-            return;
-        }
+            return false;
 
-        this.notifier.add(id,noti,clienteID);
+        } catch (IOException e) {
+            System.out.println("[ERRO] Erro na desserialização da notificação VC recebida.");
+            return false;
+        }
     }
 
-    private void processNOTIFICACAOVS(int id, byte[] bytes, int clienteID) {
-        NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
+    private boolean processNOTIFICACAOVS(int id, byte[] bytes, int clienteID) {
 
-        //////////////////////// ler README ////////////////////////
+        try {
+             NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
 
-        if (noti == null) {
+            //////////////////////// ler README ////////////////////////
+
+            this.notifier.add(id,noti,clienteID);
+            return true;
+        } catch (ProtocolException e) {
             System.out.println("[AVISO] Notificação VS inválida ou incompleta recebida, ignorando.");
-            return;
-        }
+            return false;
 
-        this.notifier.add(id,noti,clienteID);
+        } catch (IOException e) {
+            System.out.println("[ERRO] Erro na desserialização da notificação VS recebida.");
+            return false;
+        }
     }
 
     private boolean dIsInvalid(int dias) {
