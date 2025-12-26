@@ -10,8 +10,8 @@ import structs.client.Stud;
 
 public class ParallelInsertTest {
 
-    private static final int NUM_CLIENTES = 1000;
-    private static final int NUM_PRODUTOS = 10;
+    private static final int NUM_CLIENTES = 10;
+    private static final int NUM_PRODUTOS = 1000;
 
     private static final ReentrantLock lock = new ReentrantLock();
     private static final Condition startCondition  = lock.newCondition();
@@ -57,7 +57,7 @@ public class ParallelInsertTest {
                         Thread.sleep(5); // Pequena pausa para evitar sobrecarga total
                         studs[clienteId].sendEVENTO(
                                 TipoMsg.REGISTO,
-                                "produto_" + j,
+                                "banana",
                                 1,
                                 1.0
                         );

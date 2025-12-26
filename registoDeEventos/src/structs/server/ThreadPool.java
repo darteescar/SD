@@ -14,6 +14,7 @@ public class ThreadPool {
      
           for (int i = 0; i < numWorkers; i++) {
                workers[i] = new ServerWorker(logins, gestorSeries, notifier, taskBuffer, clientBuffers, d);
+               System.out.println("[THREAD-POOL]: Worker-" + i + " criado.");
           }
           startWorkers();
      }
@@ -21,6 +22,7 @@ public class ThreadPool {
      private void startWorkers() {
           for (int i = 0; i < workers.length; i++) {
                new Thread(workers[i], "Worker-" + i).start();
+               System.out.println("[THREAD-POOL]: Worker-" + i + " começou.");
           }
      }
 }
