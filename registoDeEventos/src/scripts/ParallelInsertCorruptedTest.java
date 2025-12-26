@@ -8,7 +8,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import structs.client.Stud;
 
-public class ParallelInsertTest {
+public class ParallelInsertCorruptedTest {
 
     private static final int NUM_CLIENTES = 1000;
     private static final int NUM_PRODUTOS = 10;
@@ -55,12 +55,7 @@ public class ParallelInsertTest {
                     // Bombardeamento de eventos
                     for (int j = 0; j < NUM_PRODUTOS; j++) {
                         Thread.sleep(5); // Pequena pausa para evitar sobrecarga total
-                        studs[clienteId].sendEVENTO(
-                                TipoMsg.REGISTO,
-                                "produto_" + j,
-                                1,
-                                1.0
-                        );
+                        studs[clienteId].sendEVENTO_INVALIDO(TipoMsg.REGISTO);
                     }
 
                     // Sinaliza fim
@@ -122,3 +117,4 @@ public class ParallelInsertTest {
         System.out.println("Teste concluído com sucesso!");
     }
 }
+

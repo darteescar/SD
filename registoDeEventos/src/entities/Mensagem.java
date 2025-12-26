@@ -1,5 +1,11 @@
 package entities;
 
+import entities.payloads.Agregacao;
+import entities.payloads.Evento;
+import entities.payloads.Filtrar;
+import entities.payloads.Login;
+import entities.payloads.NotificacaoVC;
+import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -40,7 +46,7 @@ public class Mensagem {
 
 
     public static Mensagem deserialize(DataInputStream dis)
-            throws IOException, ProtocolException {
+        throws IOException, ProtocolException {
 
         int id;
         try {
@@ -69,10 +75,48 @@ public class Mensagem {
 
     @Override
     public String toString() {
-        return "Mensagem{" +
-                "id=" + id +
-                ", tipo=" + tipo +
-                ", dataLength=" + data.length +
-                '}';
+        if (data == null) {
+            return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Dados=nulos]";
+        }
+
+        try {
+            switch (tipo) {
+                case LOGIN -> {
+                    Login login = Login.deserialize(data);
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Conteudo=" + login + "]";
+                }
+                case REGISTA_LOGIN -> {
+                    Login login = Login.deserialize(data);
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Conteudo=" + login + "]";
+                }
+                case REGISTO -> {
+                    Evento evento = Evento.deserialize(data);
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Conteudo=" + evento + "]";
+                }
+                case QUANTIDADE_VENDAS, VOLUME_VENDAS, PRECO_MEDIO, PRECO_MAXIMO -> {
+                    Agregacao agregacao = Agregacao.deserialize(data);
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Conteudo=" + agregacao + "]";
+                }
+                case LISTA -> {
+                    Filtrar filtrar = Filtrar.deserialize(data);
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Conteudo=" + filtrar + "]";
+                }
+                case NOTIFICACAO_VC -> {
+                    NotificacaoVC noti = NotificacaoVC.deserialize(data);
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Conteudo=" + noti + "]";
+                }
+                case NOTIFICACAO_VS -> {
+                    NotificacaoVS noti = NotificacaoVS.deserialize(data);
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", Conteudo=" + noti + "]";
+                }
+                default -> {
+                    return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", TamanhoDados=" + data.length + " bytes]";
+                }
+            }
+        } catch (Exception e) {
+            // Se houver problema na desserialização, mostra apenas o tamanho
+            return "Mensagem[ID=" + id + ", Tipo=" + tipo + ", TamanhoDados=" + data.length + " bytes, ErroAoDesserializar]";
+        }
     }
+
 }

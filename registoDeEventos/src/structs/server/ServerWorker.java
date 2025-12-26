@@ -75,12 +75,12 @@ public class ServerWorker implements Runnable {
                 bufferCliente.add(reply);
             }
         } finally {
-            System.out.println("[THREAD DO SERVIDOR TERMINOU]");
+            System.out.println("[SERVERWORKER]: [THREAD " + Thread.currentThread().getName() +  " DO SERVIDOR TERMINOU]");
         }
     }
 
     private String execute(Mensagem mensagem) {
-        String result = "";
+        String result = null;
         TipoMsg tipo = mensagem.getTipo();
 
         switch(tipo){
@@ -93,7 +93,7 @@ public class ServerWorker implements Runnable {
             case PRECO_MAXIMO -> result = processPRECO_MAXIMO(mensagem.getData());
             case LISTA -> result = processLISTA(mensagem.getData());
             default -> {
-                System.out.println("[AVISO] Tipo de mensagem inválido: " + tipo);
+                //System.out.println("[ERRO] Tipo de mensagem inválido: " + tipo);
                 return "Erro: tipo de mensagem inválido.";
             }
 
@@ -114,10 +114,10 @@ public class ServerWorker implements Runnable {
             
             return (b ? "true" : "false");   
         } catch (ProtocolException e) {
-            System.out.println("[AVISO] Login inválido ou incompleto recebido, ignorando.");
+            //System.out.println("[ERRO] Login inválido ou incompleto recebido, ignorando.");
             return "false";
         } catch (IOException e) {
-            System.out.println("[ERRO] Erro na desserialização do login recebido.");
+            //System.out.println("[ERRO] Erro na desserialização do login recebido.");
             return "false";
         }
     }
@@ -134,10 +134,10 @@ public class ServerWorker implements Runnable {
             
             return (b ? "true" : "false");   
         } catch (ProtocolException e) {
-            System.out.println("[AVISO] Login inválido ou incompleto recebido, ignorando.");
+            //System.out.println("[ERRO] Login inválido ou incompleto recebido, ignorando.");
             return "false";
         } catch (IOException e) {
-            System.out.println("[ERRO] Erro na desserialização do login recebido.");
+            //System.out.println("[ERRO] Erro na desserialização do login recebido.");
             return "false";
         }
     }
@@ -154,7 +154,7 @@ public class ServerWorker implements Runnable {
             
         } catch (ProtocolException e) {
             resposta = "Erro, dados do evento inválidos ou corrompidos.";
-            System.out.println("[AVISO] Evento inválido ou incompleto recebido, ignorando.");
+            //System.out.println("[ERRO] Evento inválido ou incompleto recebido, ignorando.");
             return resposta;
         } catch (IOException e) {
             resposta = "Erro na desserialização do evento.";
@@ -181,11 +181,11 @@ public class ServerWorker implements Runnable {
             
         } catch (ProtocolException e) {
             resposta = "Erro, dados da agregação inválidos ou corrompidos.";
-            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            //System.out.println("[ERRO] Agregação inválida ou incompleta recebida, ignorando.");
             return resposta;
         } catch (IOException e) {
             resposta = "Erro na desserialização da agregação.";
-            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
+            //System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
             return resposta;
         }
 
@@ -208,11 +208,11 @@ public class ServerWorker implements Runnable {
             }   
         } catch (ProtocolException e) {
             resposta = "Erro, dados da agregação inválidos ou corrompidos.";
-            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            //System.out.println("[ERRO] Agregação inválida ou incompleta recebida, ignorando.");
             return resposta;
         } catch (IOException e) {
             resposta = "Erro na desserialização da agregação.";
-            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
+            //System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
             return resposta;
         }
     }
@@ -234,11 +234,11 @@ public class ServerWorker implements Runnable {
             }   
         } catch (ProtocolException e) {
             resposta = "Erro, dados da agregação inválidos ou corrompidos.";
-            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            //System.out.println("[ERRO] Agregação inválida ou incompleta recebida, ignorando.");
             return resposta;
         } catch (IOException e) {
             resposta = "Erro na desserialização da agregação.";
-            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
+            //System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
             return resposta;
         }
     }
@@ -262,11 +262,11 @@ public class ServerWorker implements Runnable {
             
         } catch (ProtocolException e) {
             resposta = "Erro, dados da agregação inválidos ou corrompidos.";
-            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            //System.out.println("[ERRO] Agregação inválida ou incompleta recebida, ignorando.");
             return resposta;
         } catch (IOException e) {
             resposta = "Erro na desserialização da agregação.";
-            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
+            //System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
             return resposta;
         }
     }
@@ -289,7 +289,7 @@ public class ServerWorker implements Runnable {
             }
         } catch (ProtocolException e) {
             resposta = "Erro, dados do filtro inválidos ou corrompidos.";
-            System.out.println("[AVISO] Filtro inválido ou incompleto recebido, ignorando");
+            //System.out.println("[ERRO] Filtro inválido ou incompleto recebido, ignorando");
             return resposta;
         } catch (IOException e) {
             resposta = "Erro na desserialização do filtro.";
@@ -307,11 +307,11 @@ public class ServerWorker implements Runnable {
             this.notifier.add(id,noti,clienteID);
             return true;
         } catch (ProtocolException e) {
-            System.out.println("[AVISO] Notificação VC inválida ou incompleta recebida, ignorando.");
+            //System.out.println("[ERRO] Notificação VC inválida ou incompleta recebida, ignorando.");
             return false;
 
         } catch (IOException e) {
-            System.out.println("[ERRO] Erro na desserialização da notificação VC recebida.");
+            //System.out.println("[ERRO] Erro na desserialização da notificação VC recebida.");
             return false;
         }
     }
@@ -326,11 +326,11 @@ public class ServerWorker implements Runnable {
             this.notifier.add(id,noti,clienteID);
             return true;
         } catch (ProtocolException e) {
-            System.out.println("[AVISO] Notificação VS inválida ou incompleta recebida, ignorando.");
+            //System.out.println("[ERRO] Notificação VS inválida ou incompleta recebida, ignorando.");
             return false;
 
         } catch (IOException e) {
-            System.out.println("[ERRO] Erro na desserialização da notificação VS recebida.");
+            //System.out.println("[ERRO] Erro na desserialização da notificação VS recebida.");
             return false;
         }
     }

@@ -79,7 +79,7 @@ public class GestorSeries {
           Serie serieParaGuardar;
                lock.lock();
                try {
-                    System.out.println("Passando do dia");
+                    System.out.println("[GS]: Passando do dia");
                     serieParaGuardar = this.serie_atual; // guarda a série atual
                     this.data_atual.incrementData();
                     this.serie_atual = new Serie(data_atual.getData());

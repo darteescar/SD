@@ -66,7 +66,7 @@ public class Server implements AutoCloseable{
                 dataArranque.getYear()
         );
         String data = dataAtual.toString();
-        System.out.println("Servidor arrancado na data: " + data);
+        System.out.println("[SERVER]: Servidor arrancado na data: " + data);
         return dataAtual;
     }
 
@@ -82,9 +82,9 @@ public class Server implements AutoCloseable{
                 ClientSession session = new ClientSession(socket, id, taskBuffer);
                 clientBuffers.put(id, session.getOutBuffer());
                 session.start();
-                System.out.println("[NOVO CLIENTE " + id + " LIGADO]");
+                //System.out.println("[NOVO CLIENTE " + id + " LIGADO]");
             } catch (IOException e) {
-                System.err.println("Falha ao criar sessão para o cliente " + id + ": " + e.getMessage());
+                System.err.println("[SERVER]: Falha ao criar sessão para o cliente " + id + ": " + e.getMessage());
                 e.printStackTrace();
                 try {
                     socket.close(); // fecha socket

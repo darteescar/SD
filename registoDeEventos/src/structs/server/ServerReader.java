@@ -4,6 +4,7 @@ import entities.Mensagem;
 import entities.ServerData;
 import java.io.*;
 import java.net.ProtocolException;
+import java.net.SocketException;
 import structs.notification.ConcurrentBuffer;
 
 public class ServerReader implements Runnable {
@@ -30,14 +31,20 @@ public class ServerReader implements Runnable {
                     ServerData serverData = new ServerData(cliente, mensagem);
                     taskBuffer.add(serverData);
                } catch (ProtocolException e) {
-                    System.out.println("[AVISO] Mensagem inválida do cliente " + cliente);
-                    // opcional: enviar feedback de erro para o cliente
+                    // System.out.println("SR: [ERRO] Mensagem inválida do cliente " + cliente + " e mensagem numero " + a + ", ignorando.");
+               } catch (EOFException e) {
+                    // System.out.println("SR: [INFO] Cliente " + cliente + " fechou a conexão.");
+                    break;
+               } catch (SocketException e) {
+                    //System.out.println("SR: [ERRO] Conexão com cliente " + cliente + " terminada.");
+                    break;
                } catch (IOException e) {
-                    System.out.println("[ERRO] Problema de IO com o cliente " + cliente);
-                    break; // sai do while e fecha sessão
+                    // System.out.println("SR: [ERRO] Problema de IO com o cliente " + cliente);
+                    break;
                }
           }
           session.close();
+          //System.out.println("SR: [THREAD READER DO CLIENTE " + cliente + " TERMINADA]");
 
      }
 }

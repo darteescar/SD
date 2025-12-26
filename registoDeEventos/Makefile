@@ -45,11 +45,14 @@ cliente:
 	@echo ">> Iniciando o cliente..."
 	java -cp "$(CLASSPATH)" $(SERVER_CLIENTE)
 
-# Executar Stress Test de Inserções
+# Executar Stress Test de Inserções Corretas
 stress-test:
 	@echo ">> A executar Stress Test de Inserções..."
 	java -cp "$(CLASSPATH)" scripts.ParallelInsertTest
 
+stress-test-invalid:
+	@echo ">> A executar Stress Test de Inserções Inválidas..."
+	java -cp "$(CLASSPATH)" scripts.ParallelInsertCorruptedTest
 
 # Clean
 clean:

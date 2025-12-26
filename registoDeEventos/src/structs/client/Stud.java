@@ -65,6 +65,23 @@ public class Stud implements AutoCloseable {
         return sendAndWait(mensagem);
     }
 
+    public void sendEVENTO_INVALIDO(TipoMsg tipo) throws IOException {
+        // Cria dados deliberadamente inválidos
+        String produtoInvalido = "";   // Produto vazio
+        int quantidadeInvalida = -10;  // Quantidade negativa
+        double precoInvalido = -5.0;   // Preço negativo
+
+        Evento eventoInvalido = new Evento(produtoInvalido, quantidadeInvalida, precoInvalido);
+        
+        // Serializa normalmente, mas o payload é inválido
+        byte[] bytes = eventoInvalido.serialize();
+        
+        // Envia a mensagem ao servidor
+        Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
+        this.send(mensagem);
+    }
+
+
     public void sendEVENTO(TipoMsg tipo, String produto, int quantidade, double preco) throws IOException{
         Evento evento = new Evento(produto, quantidade, preco);
         Mensagem mensagem = new Mensagem(idMensagem++, tipo, evento.serialize());
