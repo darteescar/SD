@@ -32,6 +32,9 @@ public class ServerReader implements Runnable {
                     taskBuffer.add(serverData);
                } catch (ProtocolException e) {
                     // System.out.println("SR: [ERRO] Mensagem inválida do cliente " + cliente + " e mensagem numero " + a + ", ignorando.");
+                    Mensagem mensagem = new Mensagem("Erro: Mensagem inválida ou corrompida.");
+                    ServerData serverData = new ServerData(cliente, mensagem);
+                    taskBuffer.add(serverData);
                } catch (EOFException e) {
                     // System.out.println("SR: [INFO] Cliente " + cliente + " fechou a conexão.");
                     break;

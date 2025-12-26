@@ -24,6 +24,14 @@ public class Mensagem {
         this.tipo = tipo;
         this.data = data;
     }
+
+    // Construtor usado no ServerReader para criar mensagens de erro (caso a mensagem recebida seja inválida)
+    // envia uma mensagem com tipo ERRO e o texto do erro como dados
+    public Mensagem(String errorMsg) {
+        this.id = -1;
+        this.tipo = TipoMsg.ERRO;
+        this.data = errorMsg.getBytes();
+    }
     
     public int getID(){
         return this.id;
