@@ -93,8 +93,7 @@ public class Server implements AutoCloseable{
                 }
             }
         }
-
-}
+    }
 
     public void passarDia() {
         this.series.passarDia();

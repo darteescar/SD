@@ -52,6 +52,7 @@ public class ClienteUI {
     public void start(){
         Menu menuPrincipal = criaMenuPrincipal();
         menuPrincipal.run();
+        System.exit(0);
     }
 
     // --------------------------
@@ -63,7 +64,6 @@ public class ClienteUI {
         menuPrincipal.add(new MenuOpcao("Registar", this::fazerRegisto));
         menuPrincipal.add(new MenuOpcao("Enviar mensagem", this::isAutenticado, this::irParaMenuMensagens));
         menuPrincipal.add(new MenuOpcao("Ver Respostas", this::isAutenticado, this::verRespostas));
-        menuPrincipal.add(new MenuOpcao("Sair", () -> System.exit(0)));
         return new Menu(menuPrincipal);
     }
 
@@ -79,7 +79,6 @@ public class ClienteUI {
                 this::noti1IsAvailable, this::enviarNotificacaoVS));
         menuMensagens.add(new MenuOpcao("Notificação de Vendas Consecutivas",
                 this::noti2IsAvailable, this::enviarNotificacaoVC));
-        menuMensagens.add(new MenuOpcao("Voltar", () -> {}));
         return new Menu(menuMensagens);
     }
 
