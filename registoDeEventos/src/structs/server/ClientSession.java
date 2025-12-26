@@ -1,5 +1,6 @@
 package structs.server;
 
+import entities.Mensagem;
 import entities.ServerData;
 import java.io.IOException;
 import java.net.Socket;
@@ -35,4 +36,9 @@ public class ClientSession {
         new Thread(reader).start();
         new Thread(writer).start();
     }
+
+    public ConcurrentBuffer<Mensagem> getOutBuffer() {
+        return writer.getOutBuffer();
+    }
+
 }

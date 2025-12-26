@@ -56,4 +56,8 @@ public class ServerWriter implements Runnable {
      public void send(Mensagem data) {
           taskBuffer.add(data);
      }
+
+     public ConcurrentBuffer<Mensagem> getOutBuffer() {
+          return taskBuffer;
+     }
 }

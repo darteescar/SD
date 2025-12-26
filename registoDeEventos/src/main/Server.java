@@ -79,7 +79,7 @@ public class Server implements AutoCloseable{
             int id = cliente++;
 
             try {
-                ClientSession session = new ClientSession(id, socket, taskBuffer);
+                ClientSession session = new ClientSession(socket, id, taskBuffer);
                 clientBuffers.put(id, session.getOutBuffer());
                 session.start();
                 System.out.println("[NOVO CLIENTE " + id + " LIGADO]");
@@ -87,7 +87,7 @@ public class Server implements AutoCloseable{
                 System.err.println("Falha ao criar sessão para o cliente " + id + ": " + e.getMessage());
                 e.printStackTrace();
                 try {
-                    socket.close(); // fecha socket para não vazar recurso
+                    socket.close(); // fecha socket
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
