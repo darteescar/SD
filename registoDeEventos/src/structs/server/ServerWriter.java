@@ -1,26 +1,27 @@
 package structs.server;
 
 import entities.Mensagem;
+import enums.TipoMsg;
 import java.io.*;
-import java.net.Socket;
 import java.net.SocketException;
 import structs.notification.ConcurrentBuffer;
 
 public class ServerWriter implements Runnable {
-     private final Socket socket;
+     private final ClientSession session;
      private final DataOutputStream output;
      private final ConcurrentBuffer<Mensagem> taskBuffer;
      private final int cliente;
+     public static final Mensagem POISON_PILL = new Mensagem(0, TipoMsg.POISON_PILL, null);
 
-     public ServerWriter(Socket socket,
+     public ServerWriter(ClientSession session,
+                         ConcurrentBuffer<Mensagem> taskBuffer,
                          int cliente,
-                         ConcurrentBuffer<Mensagem> taskBuffer) throws IOException {
-
-          this.socket = socket;
+                         DataOutputStream output
+                         ) throws IOException {
+          this.session = session;
           this.taskBuffer = taskBuffer;
           this.cliente = cliente;
-          this.output = new DataOutputStream(
-                    new BufferedOutputStream(socket.getOutputStream()));
+          this.output = output;
      }
 
      @Override
@@ -28,6 +29,10 @@ public class ServerWriter implements Runnable {
           try {
                while (true) {
                     Mensagem msg = taskBuffer.poll();
+                    if (msg.getTipo() == TipoMsg.POISON_PILL) {
+                         System.out.println("SW: [RECEBEU POISON PILL, A TERMINAR THREAD DO CLIENTE " + cliente + "]");
+                         break;
+                    }
                     msg.serialize(output);
                     output.flush();
                }
@@ -39,18 +44,9 @@ public class ServerWriter implements Runnable {
                System.out.println("SW: [ERRO IO CLIENTE " + cliente + "] " + e.getMessage());
 
           } finally {
-               close();
+               System.out.println("SW: [THREAD WRITER CLIENTE " + cliente + " TERMINOU]");
+               session.close();
           }
-     }
-
-     private void close() {
-          try {
-               output.close();
-               socket.close();
-          } catch (IOException e) {
-               System.out.println("SW: [ERRO AO FECHAR CLIENTE " + cliente + "]");
-          }
-          System.out.println("SW: [THREAD WRITER CLIENTE " + cliente + " TERMINOU]");
      }
 
      public void send(Mensagem data) {

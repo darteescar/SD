@@ -2,8 +2,13 @@ package structs.server;
 
 import entities.Mensagem;
 import entities.ServerData;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.locks.ReentrantLock;
 import structs.notification.ConcurrentBuffer;
 
 public class ClientSession {
@@ -12,6 +17,8 @@ public class ClientSession {
     private final Socket socket;
     private ServerReader reader;
     private ServerWriter writer;
+    private final ReentrantLock lock = new ReentrantLock();
+    private final boolean closed = false;
 
     public ClientSession(Socket socket, int clienteId,
                          ConcurrentBuffer<ServerData> taskBuffer)
@@ -22,8 +29,11 @@ public class ClientSession {
 
         boolean ok = false;
         try {
-            this.reader = new ServerReader(socket, taskBuffer, clienteId);
-            this.writer = new ServerWriter(socket, clienteId, new ConcurrentBuffer<>());
+            DataInputStream input = new DataInputStream( new BufferedInputStream(socket.getInputStream()));
+            DataOutputStream output = new DataOutputStream( new BufferedOutputStream(socket.getOutputStream()));
+
+            this.reader = new ServerReader(this,taskBuffer, clienteId, input);
+            this.writer = new ServerWriter(this,new ConcurrentBuffer<>(), clienteId, output);
             ok = true;
         } finally {
             if (!ok) {
@@ -35,6 +45,20 @@ public class ClientSession {
     public void start() {
         new Thread(reader).start();
         new Thread(writer).start();
+    }
+
+    public void close() {
+        lock.lock();
+        try {
+            if (!socket.isClosed()) {
+                socket.close();
+                writer.send(ServerWriter.POISON_PILL);
+            }
+        } catch (IOException e) {
+            System.out.println("CS: [ERRO AO FECHAR SOCKET CLIENTE " + clienteId + "] " + e.getMessage());
+        } finally {
+            lock.unlock();
+        }
     }
 
     public ConcurrentBuffer<Mensagem> getOutBuffer() {

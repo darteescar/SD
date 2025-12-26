@@ -4,22 +4,20 @@ import entities.Mensagem;
 import entities.ServerData;
 import java.io.*;
 import java.net.ProtocolException;
-import java.net.Socket;
 import structs.notification.ConcurrentBuffer;
 
 public class ServerReader implements Runnable {
-     private final Socket socket;
+     private final ClientSession session;
      private final DataInputStream input;
      private final ConcurrentBuffer<ServerData> taskBuffer;
      private final int cliente;
 
-     public ServerReader(Socket socket,
+     public ServerReader(ClientSession session,
                          ConcurrentBuffer<ServerData> taskBuffer,
-                         int cliente) throws IOException {
-
-          this.socket = socket;
-          this.input = new DataInputStream(
-                    new BufferedInputStream(socket.getInputStream()));
+                         int cliente, 
+                         DataInputStream input) throws IOException {
+          this.session = session;
+          this.input = input;
           this.taskBuffer = taskBuffer;
           this.cliente = cliente;
      }
@@ -47,17 +45,8 @@ public class ServerReader implements Runnable {
                System.out.println("SR: [ERRO IO CLIENTE " + cliente + "] " + e.getMessage());
 
           } finally {
-               close();
+               System.out.println("SR: [THREAD READER CLIENTE " + cliente + " TERMINOU]");
+               session.close();
           }
-     }
-
-     private void close() {
-          try {
-               input.close();
-               socket.close();
-          } catch (IOException e) {
-               System.out.println("SR: [ERRO AO FECHAR CLIENTE " + cliente + "]");
-          }
-          System.out.println("SR: [THREAD DO CLIENTE " + cliente + " TERMINOU]");
      }
 }

@@ -11,5 +11,6 @@ public enum TipoMsg {
     LISTA,
     NOTIFICACAO_VC,
     NOTIFICACAO_VS,
-    RESPOSTA;
+    RESPOSTA,
+    POISON_PILL
 }
