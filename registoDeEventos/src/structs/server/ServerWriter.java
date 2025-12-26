@@ -2,52 +2,65 @@ package structs.server;
 
 import entities.Mensagem;
 import enums.TipoMsg;
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import structs.notification.ConcurrentBuffer;
 
 public class ServerWriter implements Runnable {
-     private final ClientSession session;
-     private final DataOutputStream output;
-     private final ConcurrentBuffer<Mensagem> taskBuffer;
-     private final int cliente;
-     public static final Mensagem POISON_PILL = new Mensagem(0, TipoMsg.POISON_PILL, null);
+    private final ClientSession session;
+    private final DataOutputStream output;
+    private final ConcurrentBuffer<Mensagem> taskBuffer;
+    private final int cliente;
 
-     public ServerWriter(ClientSession session,
-                         ConcurrentBuffer<Mensagem> taskBuffer,
-                         int cliente,
-                         DataOutputStream output
-                         ) throws IOException {
-          this.session = session;
-          this.taskBuffer = taskBuffer;
-          this.cliente = cliente;
-          this.output = output;
-     }
+    public static final Mensagem POISON_PILL = new Mensagem(0, TipoMsg.POISON_PILL, null);
 
-     @Override
-     public void run() {
-          while (true) {
-               Mensagem msg = taskBuffer.poll();
+    public ServerWriter(ClientSession session,
+                        ConcurrentBuffer<Mensagem> taskBuffer,
+                        int cliente,
+                        DataOutputStream output) {
+        this.session = session;
+        this.taskBuffer = taskBuffer;
+        this.cliente = cliente;
+        this.output = output;
+    }
 
-               if (msg.getTipo() == TipoMsg.POISON_PILL) {
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                Mensagem msg = taskBuffer.poll();
+
+                if (msg.getTipo() == TipoMsg.POISON_PILL) {
+                    // Poison pill recebido - termina a thread
                     break;
-               }
+                }
 
-               try {
+                try {
                     msg.serialize(output);
                     output.flush();
-               } catch (IOException e) {
-                    System.out.println("[ERRO] Não foi possível enviar mensagem para o cliente " + cliente + ": " + e.getMessage());
-                    break; // sai do loop e fecha a sessão
-               }
-          }
-          session.close();
-     }
+                } catch (IOException e) {
+                    // Problema de rede ou socket fechado - encerra thread
+                    System.out.println("SW: [ERRO AO ENVIAR MENSAGEM PARA CLIENTE " + cliente + "]: " + e.getMessage());
+                    break;
+                } catch (Exception e) {
+                    // Qualquer outra exceção de serialização - loga e ignora
+                    System.out.println("SW: [ERRO AO SERIALIZAR MENSAGEM PARA CLIENTE " + cliente + "]: " + e.getMessage());
+                }
+            }
+        } finally {
+            // Garante que o socket e a sessão sejam fechados
+            session.close();
+            System.out.println("SW: [THREAD WRITER CLIENTE " + cliente + " TERMINOU]");
+        }
+    }
 
-     public void send(Mensagem data) {
-          taskBuffer.add(data);
-     }
+    public void send(Mensagem data) {
+        if (data != null) {
+            taskBuffer.add(data);
+        }
+    }
 
-     public ConcurrentBuffer<Mensagem> getOutBuffer() {
-          return taskBuffer;
-     }
+    public ConcurrentBuffer<Mensagem> getOutBuffer() {
+        return taskBuffer;
+    }
 }

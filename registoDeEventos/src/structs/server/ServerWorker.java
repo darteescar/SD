@@ -92,7 +92,11 @@ public class ServerWorker implements Runnable {
             case PRECO_MEDIO -> result =processPRECO_MEDIO(mensagem.getData());
             case PRECO_MAXIMO -> result = processPRECO_MAXIMO(mensagem.getData());
             case LISTA -> result = processLISTA(mensagem.getData());
-            default -> throw new IllegalArgumentException("[TIPO DE MENSAGEM INVALIDO]");
+            default -> {
+                System.out.println("[AVISO] Tipo de mensagem inválido: " + tipo);
+                return "Erro: tipo de mensagem inválido.";
+            }
+
         }
 
         return result;

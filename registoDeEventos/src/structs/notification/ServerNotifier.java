@@ -64,7 +64,7 @@ public class ServerNotifier implements Runnable {
                }
 
                if (nvs.isProd_1_sold() && nvs.isProd_2_sold()) {
-                    // Ambos os produtos foram vendidos → envia notificação e remove
+                    // Ambos os produtos foram vendidos - envia notificação e remove
 
                     envia_notificacao(nvs, "true");
 
@@ -83,13 +83,13 @@ public class ServerNotifier implements Runnable {
                     nvc.incrementCounter();
 
                     if (nvc.getCounter() >= nvc.getN()) {
-                         // Sequência atingida → envia notificação e remove
+                         // Sequência atingida - envia notificação e remove
                          envia_notificacao(nvc, produto);
                          it.remove();
                     }
                }
           } else {
-               // Produto diferente → reseta todos os contadores e atualiza o produto atual
+               // Produto diferente - reseta todos os contadores e atualiza o produto atual
                NotificationVCCounter.setProduto(produto);
                for (NotificationVCCounter nvc : listavc) {
                     nvc.resetCounter();
