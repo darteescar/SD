@@ -33,7 +33,7 @@ public class ServerReader implements Runnable {
                }
 
           } catch (EOFException e) {
-               // Cliente fechou o socket (fecho limpo ou durante escrita)
+               // Cliente fechou o socket
                System.out.println("SR: [CLIENTE " + cliente + " FECHOU A LIGACAO]");
 
           } catch (ProtocolException e) {

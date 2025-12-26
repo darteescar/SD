@@ -54,7 +54,7 @@ public class ParallelInsertTest {
 
                     // Bombardeamento de eventos
                     for (int j = 0; j < NUM_PRODUTOS; j++) {
-                        Thread.sleep(1); // Pequena pausa para evitar sobrecarga total
+                        //Thread.sleep(1); // Pequena pausa para evitar sobrecarga total
                         studs[clienteId].sendEVENTO(
                                 TipoMsg.REGISTO,
                                 "produto_" + j,

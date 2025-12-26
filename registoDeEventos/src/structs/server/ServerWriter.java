@@ -38,9 +38,11 @@ public class ServerWriter implements Runnable {
                }
 
           } catch (SocketException | EOFException e) {
+               // Cliente fechou o socket
                System.out.println("SW: [CLIENTE " + cliente + " DESCONECTOU-SE]");
 
           } catch (IOException e) {
+               // Problema de rede / crash / reset
                System.out.println("SW: [ERRO IO CLIENTE " + cliente + "] " + e.getMessage());
 
           } finally {

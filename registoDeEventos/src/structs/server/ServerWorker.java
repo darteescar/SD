@@ -10,6 +10,7 @@ import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.util.List;
 import structs.notification.ConcurrentBuffer;
 import structs.notification.ServerNotifier;
@@ -129,101 +130,132 @@ public class ServerWorker implements Runnable {
     }
     
     private String processREGISTO(byte[] bytes) {
-        Evento evento = Evento.deserialize(bytes);
+        String resposta;
+        try {
+            Evento evento = Evento.deserialize(bytes);   
 
-        if (evento == null) {
+            this.gestorSeries.addSerieAtual(evento);
+            this.notifier.signall(evento.getProduto());
+            resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.gestorSeries.getDataAtual().getData() + ".";
+            return resposta;
+            
+        } catch (ProtocolException e) {
+            resposta = "Erro, dados do evento inválidos ou corrompidos.";
             System.out.println("[AVISO] Evento inválido ou incompleto recebido, ignorando.");
-            return "Erro: evento inválido ou corrompido.";
-        }
-
-        this.gestorSeries.addSerieAtual(evento);
-        this.notifier.signall(evento.getProduto());
-        String resposta = evento.toString() + " adicionado com sucesso na série do dia " + this.gestorSeries.getDataAtual().getData() + ".";
-
-        return resposta;
-    }
-
-    private String processQUANTIDADE_VENDAS(byte[] bytes) {
-        Agregacao agregacao = Agregacao.deserialize(bytes);
-
-        if (agregacao == null) {
-            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
-            return "Erro: agregação inválida ou corrompida.";
-        }
-
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
-
-        if (dIsInvalid(dias)) {
-            return "Insira num valor entre 1 e " + this.d + ".";
-        } else {
-            int x = this.gestorSeries.calcQuantidadeVendas(produto, dias);
-            String resposta = "Quantidade de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x;
-
+            return resposta;
+        } catch (IOException e) {
+            resposta = "Erro na desserialização do evento.";
+            System.out.println("[ERRO] Erro na desserialização do evento recebido.");
             return resposta;
         }
     }
 
-    private String processVOLUME_VENDAS(byte[] bytes) {
-        Agregacao agregacao = Agregacao.deserialize(bytes);
+    private String processQUANTIDADE_VENDAS(byte[] bytes) {
+        String resposta;
+        try {
+            Agregacao agregacao = Agregacao.deserialize(bytes);
 
-        if (agregacao == null) {
+            String produto = agregacao.getProduto();
+            int dias = agregacao.getDias();
+
+            if (dIsInvalid(dias)) {
+                return "Insira num valor entre 1 e " + this.d + ".";
+            } else {
+                int x = this.gestorSeries.calcQuantidadeVendas(produto, dias);
+                resposta = "Quantidade de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x;
+                return resposta;
+            }
+            
+        } catch (ProtocolException e) {
+            resposta = "Erro, dados da agregação inválidos ou corrompidos.";
             System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
-            return "Erro: agregação inválida ou corrompida.";
+            return resposta;
+        } catch (IOException e) {
+            resposta = "Erro na desserialização da agregação.";
+            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
+            return resposta;
         }
 
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
+    }
 
-        if (dIsInvalid(dias)) {
-            return "Insira num valor entre 1 e " + this.d + ".";
-        } else {
-            double x = this.gestorSeries.calcVolumeVendas(produto, dias);
-            String resposta = "Volume de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
+    private String processVOLUME_VENDAS(byte[] bytes) {
+        String resposta;
+        try {
+            Agregacao agregacao = Agregacao.deserialize(bytes);
+
+            String produto = agregacao.getProduto();
+            int dias = agregacao.getDias();
+
+            if (dIsInvalid(dias)) {
+                return "Insira num valor entre 1 e " + this.d + ".";
+            } else {
+                double x = this.gestorSeries.calcVolumeVendas(produto, dias);
+                resposta = "Volume de vendas do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
+                return resposta;
+            }   
+        } catch (ProtocolException e) {
+            resposta = "Erro, dados da agregação inválidos ou corrompidos.";
+            System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
+            return resposta;
+        } catch (IOException e) {
+            resposta = "Erro na desserialização da agregação.";
+            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
             return resposta;
         }
     }
 
     private String processPRECO_MEDIO(byte[] bytes) {
-        Agregacao agregacao = Agregacao.deserialize(bytes);
+        String resposta;
+        try {
+            Agregacao agregacao = Agregacao.deserialize(bytes);
 
-        if (agregacao == null) {
+            String produto = agregacao.getProduto();
+            int dias = agregacao.getDias();
+
+            if (dIsInvalid(dias)) {
+                return "Insira num valor entre 1 e " + this.d + ".";
+            } else {
+                double x = this.gestorSeries.calcPrecoMedio(produto, dias);
+                resposta = "Preço médio de venda do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
+                return resposta;
+            }   
+        } catch (ProtocolException e) {
+            resposta = "Erro, dados da agregação inválidos ou corrompidos.";
             System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
-            return "Erro: agregação inválida ou corrompida.";
-        }
-
-
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
-
-        if (dIsInvalid(dias)) {
-            return "Insira num valor entre 1 e " + this.d + ".";
-        } else {
-            double x = this.gestorSeries.calcPrecoMedio(produto, dias);
-            String resposta = "Preço médio de venda do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
+            return resposta;
+        } catch (IOException e) {
+            resposta = "Erro na desserialização da agregação.";
+            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
             return resposta;
         }
     }
 
     private String processPRECO_MAXIMO(byte[] bytes) {
-        Agregacao agregacao = Agregacao.deserialize(bytes);
+        String resposta;
+        try {
 
-        if (agregacao == null) {
+            Agregacao agregacao = Agregacao.deserialize(bytes);
+
+            String produto = agregacao.getProduto();
+            int dias = agregacao.getDias();
+
+            if (dIsInvalid(dias)) {
+                return "Insira num valor entre 1 e " + this.d + ".";
+            } else {
+                double x = this.gestorSeries.calcPrecoMaximo(produto, dias);
+                resposta = "Preço máximo de venda do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
+                return resposta;
+            }
+            
+        } catch (ProtocolException e) {
+            resposta = "Erro, dados da agregação inválidos ou corrompidos.";
             System.out.println("[AVISO] Agregação inválida ou incompleta recebida, ignorando.");
-            return "Erro: agregação inválida ou corrompida.";
-        }
-
-        String produto = agregacao.getProduto();
-        int dias = agregacao.getDias();
-
-        if (dIsInvalid(dias)) {
-            return "Insira num valor entre 1 e " + this.d + ".";
-        } else {
-            double x = this.gestorSeries.calcPrecoMaximo(produto, dias);
-            String resposta = "Preço máximo de venda do produto " + produto + " nos últimos " + dias + " dias: " + x + ".";
+            return resposta;
+        } catch (IOException e) {
+            resposta = "Erro na desserialização da agregação.";
+            System.out.println("[ERRO] Erro na desserialização da agregação recebida.");
             return resposta;
         }
-
     }
 
     private String processLISTA(byte[] bytes) {
