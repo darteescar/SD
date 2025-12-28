@@ -59,6 +59,10 @@ stress-query:
 	@echo ">> A executar Stress Test de Consultas..."
 	java -cp "$(CLASSPATH)" scripts.ParallelQueryTest
 
+stress-notification:
+	@echo ">> A executar Stress Test de Notificações..."
+	java -cp "$(CLASSPATH)" scripts.ParallelNotificationTest
+
 # Clean
 clean:
 	@echo ">> A limpar ficheiros compilados..."

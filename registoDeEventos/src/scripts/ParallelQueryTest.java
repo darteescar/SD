@@ -10,7 +10,7 @@ import utils.structs.client.Stud;
 
 public class ParallelQueryTest {
 
-     private static final int NUM_CLIENTES = 10;
+    private static final int NUM_CLIENTES = 10;
     private static final int NUM_PRODUTOS = 1000;
 
     private static final ReentrantLock lock = new ReentrantLock();
