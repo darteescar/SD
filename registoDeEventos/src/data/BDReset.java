@@ -11,18 +11,18 @@ public class BDReset {
 
             stm.executeUpdate("DROP TABLE IF EXISTS evento");
             stm.executeUpdate("DROP TABLE IF EXISTS serie");
-            stm.executeUpdate("DROP TABLE IF EXISTS server_state");
+            stm.executeUpdate("DROP TABLE IF EXISTS server_day");
 
-            // recriar server_state com a data inicial
+            // recriar server_day com a data inicial
             stm.executeUpdate(
-                "CREATE TABLE IF NOT EXISTS server_state (" +
+                "CREATE TABLE IF NOT EXISTS server_day (" +
                 "id INT PRIMARY KEY," +
                 "server_day DATE NOT NULL" +
                 ")"
             );
 
             stm.executeUpdate(
-                "INSERT INTO server_state (id, server_day) VALUES (1, '2024-12-31')"
+                "INSERT INTO server_day (id, server_day) VALUES (1, '2024-12-31')"
             );
 
             System.out.println("[BDR]: Base de dados apagada e data reiniciada.");

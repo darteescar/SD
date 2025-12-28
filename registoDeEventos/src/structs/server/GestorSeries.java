@@ -25,6 +25,15 @@ public class GestorSeries {
           this.serie_atual = serie_atual;
      }
 
+     public void close() {
+          lock.lock();
+          try {
+               add(serie_atual);
+          } finally {
+               lock.unlock();
+          }
+     }
+
      // Métodos de gestão de séries
 
      public boolean add(Serie serie) {

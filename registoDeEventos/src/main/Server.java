@@ -114,13 +114,8 @@ public class Server implements AutoCloseable{
     public void close() throws IOException{
         this.ss.close();
         //this.logins.close();
-        //this.series.close();
+        this.series.close();
         
-        // Guarda a série atual na BD antes de fechar
-        Serie serieAtual = this.series.getSerieAtual();
-        if (serieAtual != null) {
-            this.series.add(serieAtual);
-        }
     }
 
     public static void main(String[] args) {
