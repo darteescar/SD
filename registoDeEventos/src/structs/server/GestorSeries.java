@@ -28,21 +28,16 @@ public class GestorSeries {
      // Métodos de gestão de séries
 
      public boolean add(Serie serie) {
-          lock.lock();
-          try {
-               if (serie == null || serie.getData() == null) {
-                    return false; // campos inválidos
-               }
-               if (!bd.containsKey(serie.getData())){ // se não está na BD, insere na BD e na Cache
-                    System.out.println("[GS]: Adicionando série do dia " + serie.getData() + " à BD e Cache");
-                    bd.put(serie.getData(), serie);
-                    cache.put(serie.getData(), serie);
-                    return true;
-               }
-               return false; // série existe
-          } finally {
-               lock.unlock();
+          if (serie == null || serie.getData() == null) {
+               return false; // campos inválidos
           }
+          if (!bd.containsKey(serie.getData())){ // se não está na BD, insere na BD e na Cache
+               System.out.println("[GS]: Adicionando série do dia " + serie.getData() + " à BD e Cache");
+               bd.put(serie.getData(), serie);
+               cache.put(serie.getData(), serie);
+               return true;
+          }
+          return false; // série existe
      }
 
      public boolean remove(String dia) {
@@ -62,8 +57,6 @@ public class GestorSeries {
      }
 
      public Serie get(String dia) {
-          lock.lock();
-          try {
           if (cache.containsKey(dia)){ // HIT - se está na cache
                return cache.get(dia);
           } else if (bd.containsKey(dia)){ // MISS - se está na BD
@@ -72,9 +65,6 @@ public class GestorSeries {
                return s;
           } 
           return null; // série não existe
-          } finally {
-               lock.unlock();
-          }
      }
 
      // Métodos sobre a série atual do dia atual
@@ -104,9 +94,6 @@ public class GestorSeries {
                lock.unlock();
           }
      }
-
-     // é de notar que como o lock é o mesmo passarDia e getSerieAtual são mutuamente exclusivos
-     // logo não há hipótese de se obter uma série incompleta quando se está a passar o dia
 
      public Serie getSerieAtual() {
           lock.lock();
