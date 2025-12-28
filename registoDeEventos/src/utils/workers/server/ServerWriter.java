@@ -36,7 +36,6 @@ public class ServerWriter implements Runnable {
                 }
 
                 try {
-                    String message = msg.toString();
                     msg.serialize(output);
                     output.flush();
                 } catch (Exception e) {
