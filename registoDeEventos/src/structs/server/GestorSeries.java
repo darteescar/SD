@@ -4,18 +4,22 @@ import data.BDSeries;
 import entities.Data;
 import entities.Serie;
 import entities.payloads.Evento;
+import enums.TipoMsg;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class GestorSeries {
      private final Cache<String,Serie> cache; //<Dia,Serie>
      private final BDSeries bd;
+     private final Cache<String, Map<TipoMsg, Map<String, Double>>> cacheQueries;
      private Data data_atual;
      private Serie serie_atual;
      private ReentrantLock lock = new ReentrantLock();
 
      public GestorSeries(int s, Data data, Serie serie_atual){
           this.cache = new Cache<>(s);
+          this.cacheQueries = new Cache<>(s);
           this.bd = BDSeries.getInstance();
           this.data_atual = data;
           this.serie_atual = serie_atual;
@@ -91,7 +95,6 @@ public class GestorSeries {
                new Thread(() -> add(serieParaGuardar)).start();
      }
 
-
      public void addSerieAtual(Evento evento) {
           lock.lock();
           try {
@@ -125,63 +128,92 @@ public class GestorSeries {
 
      // Métodos das Queries de Agregação
 
-     public int calcQuantidadeVendas(String produto, int dias){ 
-          // talvez devessemos lancar uma Thread por dia para paralelizar isto ???
+     public int calcQuantidadeVendas(String produto, int dias) {
           int total = 0;
           Data currentDate = this.data_atual.clone();
+          currentDate.decrementData(); // começa no dia fechado
 
           for (int i = 0; i < dias; i++) {
                String diaStr = currentDate.getData();
-               Serie serie = this.get(diaStr);
-               if (serie != null) {
-                    total += serie.calcQuantidadeVendas(produto);
-               }
-               currentDate.decrementData();
-          }
-          return total;
-     }
 
-     public double calcVolumeVendas(String produto, int dias){ 
-          // talvez devessemos lancar uma Thread por dia para paralelizar isto ???
-          double total = 0.0;
-          Data currentDate = this.data_atual.clone();
-
-          for (int i = 0; i < dias; i++) {
-               String diaStr = currentDate.getData();
-               Serie serie = this.get(diaStr);
-               if (serie != null) {
-                    total += serie.calcVolumeVendas(produto);
-               }
-               currentDate.decrementData();
-          }
-          return total;
-     }
-
-     public double calcPrecoMedio(String produto, int dias){
-
-          double totalPreco = calcVolumeVendas(produto, dias);
-          int totalQuantidade = calcQuantidadeVendas(produto, dias);
-
-          return (totalQuantidade == 0) ? 0.0 : (totalPreco / totalQuantidade);
-     }
-
-     public double calcPrecoMaximo(String produto, int dias){
-          double maxPreco = 0.0;
-          Data currentDate = this.data_atual.clone();
-
-          for (int i = 0; i < dias; i++) {
-               String diaStr = currentDate.getData();
-               Serie serie = this.get(diaStr);
-               if (serie != null) {
-                    double precoMaxDia = serie.calcPrecoMaximo(produto);
-                    if (precoMaxDia > maxPreco) {
-                         maxPreco = precoMaxDia;
+               Double cached = getCachedQuery(diaStr, TipoMsg.QUANTIDADE_VENDAS, produto);
+               if (cached != null) {
+                    total += cached.intValue();
+               } else {
+                    Serie serie = this.get(diaStr);
+                    if (serie != null) {
+                         int v = serie.calcQuantidadeVendas(produto);
+                         putCachedQuery(diaStr, TipoMsg.QUANTIDADE_VENDAS, produto, v);
+                         total += v;
                     }
                }
                currentDate.decrementData();
           }
-          return maxPreco;
+          return total;
      }
+
+
+     public double calcVolumeVendas(String produto, int dias) {
+          double total = 0.0;
+          Data currentDate = this.data_atual.clone();
+          currentDate.decrementData();
+
+          for (int i = 0; i < dias; i++) {
+               String diaStr = currentDate.getData();
+
+               Double cached = getCachedQuery(diaStr, TipoMsg.VOLUME_VENDAS, produto);
+               if (cached != null) {
+                    total += cached;
+               } else {
+                    Serie serie = this.get(diaStr);
+                    if (serie != null) {
+                         double v = serie.calcVolumeVendas(produto);
+                         putCachedQuery(diaStr, TipoMsg.VOLUME_VENDAS, produto, v);
+                         total += v;
+                    }
+               }
+               currentDate.decrementData();
+          }
+          return total;
+          }
+
+
+     public double calcPrecoMedio(String produto, int dias) {
+          double volume = calcVolumeVendas(produto, dias);
+          int quantidade = calcQuantidadeVendas(produto, dias);
+          return (quantidade == 0) ? 0.0 : volume / quantidade;
+     }
+
+
+     public double calcPrecoMaximo(String produto, int dias) {
+          double max = 0.0;
+          Data currentDate = this.data_atual.clone();
+          currentDate.decrementData();
+
+          for (int i = 0; i < dias; i++) {
+               String diaStr = currentDate.getData();
+
+               Double cached = getCachedQuery(diaStr, TipoMsg.PRECO_MAXIMO, produto);
+               double v;
+
+               if (cached != null) {
+                    v = cached;
+               } else {
+                    Serie serie = this.get(diaStr);
+                    if (serie == null) {
+                         currentDate.decrementData();
+                         continue;
+                    }
+                    v = serie.calcPrecoMaximo(produto);
+                    putCachedQuery(diaStr, TipoMsg.PRECO_MAXIMO, produto, v);
+               }
+
+               if (v > max) max = v;
+               currentDate.decrementData();
+          }
+          return max;
+     }
+
 
      public List<Evento> filtrarEventos(List<String> produtos, int dias){
           Data targetDate = this.data_atual.clone();
@@ -200,5 +232,24 @@ public class GestorSeries {
      public void print(){
           this.bd.print();
      }
+
+     private Double getCachedQuery(String dia, TipoMsg tipo, String produto) {
+          Map<TipoMsg, Map<String, Double>> byTipo = cacheQueries.get(dia);
+          if (byTipo == null) return null;
+
+          Map<String, Double> byProduto = byTipo.get(tipo);
+          if (byProduto == null) return null;
+
+          return byProduto.get(produto);
+     }
+
+     private void putCachedQuery(String dia, TipoMsg tipo, String produto, double valor) {
+          cacheQueries.putIfAbsent(dia, new java.util.EnumMap<>(TipoMsg.class));
+          Map<TipoMsg, Map<String, Double>> byTipo = cacheQueries.get(dia);
+
+          byTipo.putIfAbsent(tipo, new java.util.HashMap<>());
+          byTipo.get(tipo).put(produto, valor);
+     }
+
 
 }

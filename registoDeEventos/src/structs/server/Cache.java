@@ -1,17 +1,20 @@
 package structs.server;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 
 public class Cache<K,V>{
      private final int capacidade;
      private final Map<K,V> map;
-     private final ReentrantLock lock = new ReentrantLock();
+     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+     private final ReentrantReadWriteLock.WriteLock writelock =  lock.writeLock();
+     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
 
      public Cache(int capacidade){
           this.capacidade = capacidade;
-          this.map = new LinkedHashMap<>(capacidade, 1.0f, true){
+          this.map = new LinkedHashMap<>(capacidade, 1.0f, false){
+               @Override
                protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
                     // Remove o elemento mais antigo quando exceder a capacidade
                     return size() > Cache.this.capacidade;
@@ -20,68 +23,82 @@ public class Cache<K,V>{
      }
 
      public V get(K key){
-          lock.lock();
+          readLock.lock();
           try{
-               return map.get(key);
+               if (this.map.containsKey(key)){
+                    System.out.println("[Cache]: Cache hit para a chave " + key);
+                    return this.map.get(key);
+               }
+               System.out.println("[Cache]: Cache miss para a chave " + key);
+               return null;
           }finally{
-               lock.unlock();
+               readLock.unlock();
           }
      }
 
      public void put(K key, V value){
-          lock.lock();
+          writelock.lock();
           try{
                map.put(key, value);
           }finally{
-               lock.unlock();
+               writelock.unlock();
           }
      }
 
      public int size(){
-          lock.lock();
+          readLock.lock();
           try{
                return map.size();
           }finally{
-               lock.unlock();
+               readLock.unlock();
           }
      }
 
      public boolean containsKey(K key){
-          lock.lock();
+          readLock.lock();
           try{
                return map.containsKey(key);
           }finally{
-               lock.unlock();
+               readLock.unlock();
           }
      }
 
      public boolean remove(K key,V value){
-          lock.lock();
+          writelock.lock();
           try {
                return map.remove(key, value);
           } finally {
-               lock.unlock();
+               writelock.unlock();
           }
      }
 
      public boolean remove(K key){
-          lock.lock();
+          writelock.lock();
           try {
                map.remove(key);
                return true;
           } finally {
-               lock.unlock();
+               writelock.unlock();
+          }
+     }
+
+     public void putIfAbsent(K key, V value){
+          writelock.lock();
+          try {
+               map.putIfAbsent(key, value);
+          } finally {
+               writelock.unlock();
           }
      }
 
      // Para depuração: mostra o estado da cache
      @Override
      public String toString() {
-          lock.lock();
+          readLock.lock();
           try {
                return map.toString();
           } finally {
-               lock.unlock();
+               readLock.unlock();
           }
      }
 

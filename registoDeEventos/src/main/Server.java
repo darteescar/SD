@@ -120,7 +120,7 @@ public class Server implements AutoCloseable{
         Serie serieAtual = this.series.getSerieAtual();
         if (serieAtual != null) {
             this.series.add(serieAtual);
-    }
+        }
     }
 
     public static void main(String[] args) {

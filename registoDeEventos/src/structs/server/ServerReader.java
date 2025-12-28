@@ -48,6 +48,5 @@ public class ServerReader implements Runnable {
           }
           session.close();
           //System.out.println("SR: [THREAD READER DO CLIENTE " + cliente + " TERMINADA]");
-
      }
 }
