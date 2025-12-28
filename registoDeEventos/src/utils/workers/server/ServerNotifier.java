@@ -28,6 +28,8 @@ public class ServerNotifier implements Runnable {
           this.clientBuffers = clientBuffers;
      }
 
+     // Thread Notifier usa:
+
      @Override
      public void run() {
           while (true) {
@@ -38,7 +40,7 @@ public class ServerNotifier implements Runnable {
           }
      }
 
-     public void processar(String produto){
+     private void processar(String produto){
           this.lock1.lock();
           try {
               processarNotificacoesVC(produto);
@@ -100,6 +102,8 @@ public class ServerNotifier implements Runnable {
           }
      }
 
+     // Threads Workers usam:
+
      public void add(int id, NotificacaoVC noti, int clienteID){
           this.lock1.lock();
           try {
@@ -124,43 +128,47 @@ public class ServerNotifier implements Runnable {
           this.buffer.add(produto);
      }
 
+     // Thread Simulator usa:
+
      public void clear() {
-          this.lock1.lock();
+          List<NotificationVCCounter> tmpVCCounters;
+          List<NotificationVSCounter> tmpVSCounters;
+
+          lock1.lock();
           try {
-              sendFalseToAllVCCounters();
-              this.listavc.clear();
+               tmpVCCounters = new ArrayList<>(listavc);
+               listavc.clear();
           } finally {
-               this.lock1.unlock();
+               lock1.unlock();
           }
 
-          this.lock2.lock();
+          lock2.lock();
           try {
-               sendFalseToAllVSCounters();
-               this.listavs.clear();
+               tmpVSCounters = new ArrayList<>(listavs);
+               listavs.clear();
           } finally {
-               this.lock2.unlock();
+               lock2.unlock();
           }
+
+          // Thread separada para envio (ou mesmo a thread atual)
+          new Thread(() -> {
+               for (NotificationVCCounter nvc : tmpVCCounters)
+                    envia_notificacao(nvc, "null");
+               for (NotificationVSCounter nvs : tmpVSCounters)
+                    envia_notificacao(nvs, "false");
+          }).start();
      }
 
+
      private void sendFalseToAllVCCounters() {
-          this.lock1.lock();
-          try {
-               for (NotificationVCCounter nvc : listavc) {
-                    envia_notificacao(nvc, "null");              
-               } 
-          } finally {
-               this.lock1.unlock();
-          }
+          for (NotificationVCCounter nvc : listavc) {
+               envia_notificacao(nvc, "null");              
+          } 
      }
 
      private void sendFalseToAllVSCounters() {
-          this.lock2.lock();
-          try {
-               for (NotificationVSCounter nvs : listavs) {
-                    envia_notificacao(nvs, "false");
-               }
-          } finally {
-               this.lock2.unlock();
+          for (NotificationVSCounter nvs : listavs) {
+               envia_notificacao(nvs, "false");
           }
      }
 
