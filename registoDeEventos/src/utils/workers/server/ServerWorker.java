@@ -43,43 +43,44 @@ public class ServerWorker implements Runnable {
     public void run() {
         try {
             while (true) {
-
-                ServerData serverData;
-                serverData = this.taskBuffer.poll();
+                ServerData serverData = this.taskBuffer.poll();
+                int clienteID = serverData.getClienteID();
 
                 Mensagem mensagem = serverData.getMensagem();
                 
                 int id = mensagem.getID();
                 TipoMsg tipo = mensagem.getTipo();
-                int clienteID = serverData.getClienteID();
 
                 String result = null;
+                boolean enviadoErro = false;
 
-                if (TipoMsg.NOTIFICACAO_VC == tipo) {
-                    
-                    if (!processNOTIFICACAOVC(id,mensagem.getData(),clienteID)){
+                if (tipo == TipoMsg.NOTIFICACAO_VC) {
+                    if (!processNOTIFICACAOVC(id, mensagem.getData(), clienteID)) {
                         result = "Erro ao processar Notificação VC.";
+                        enviadoErro = true;
                     }
-
-                } else if (TipoMsg.NOTIFICACAO_VS == tipo)
-                {   
-                    if (!processNOTIFICACAOVS(id,mensagem.getData(),clienteID)){
+                } else if (tipo == TipoMsg.NOTIFICACAO_VS) {
+                    if (!processNOTIFICACAOVS(id, mensagem.getData(), clienteID)) {
                         result = "Erro ao processar Notificação VS.";
+                        enviadoErro = true;
                     }
-
                 } else {
-                    
                     result = execute(mensagem);
+                    enviadoErro = true; // para enviar sempre resultado
                 }
-                Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
 
-                BoundedBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
-                bufferCliente.add(reply);
+                // Só envia resposta se houver resultado/erro
+                if (enviadoErro) {
+                    BoundedBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
+                    Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
+                    bufferCliente.add(reply);
+                }
             }
         } finally {
-            System.out.println("[SERVERWORKER]: [THREAD " + Thread.currentThread().getName() +  " DO SERVIDOR TERMINOU]");
+            System.out.println("[SERVERWORKER]: [THREAD " + Thread.currentThread().getName() + " DO SERVIDOR TERMINOU]");
         }
     }
+
 
     private String execute(Mensagem mensagem) {
         String result = null;
@@ -305,8 +306,6 @@ public class ServerWorker implements Runnable {
         try {
             NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
 
-            //////////////////////// ler README ////////////////////////
-
             this.notifier.add(id,noti,clienteID);
             return true;
         } catch (ProtocolException e) {
@@ -322,9 +321,7 @@ public class ServerWorker implements Runnable {
     private boolean processNOTIFICACAOVS(int id, byte[] bytes, int clienteID) {
 
         try {
-             NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
-
-            //////////////////////// ler README ////////////////////////
+            NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
 
             this.notifier.add(id,noti,clienteID);
             return true;

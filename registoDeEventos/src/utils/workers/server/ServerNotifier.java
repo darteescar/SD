@@ -128,37 +128,25 @@ public class ServerNotifier implements Runnable {
           this.buffer.add(produto);
      }
 
-     // Thread Simulator usa:
+     // Thread Simulator
 
      public void clear() {
-          List<NotificationVCCounter> tmpVCCounters;
-          List<NotificationVSCounter> tmpVSCounters;
-
-          lock1.lock();
+          this.lock1.lock();
           try {
-               tmpVCCounters = new ArrayList<>(listavc);
-               listavc.clear();
+              sendFalseToAllVCCounters();
+              this.listavc.clear();
           } finally {
-               lock1.unlock();
+               this.lock1.unlock();
           }
 
-          lock2.lock();
+          this.lock2.lock();
           try {
-               tmpVSCounters = new ArrayList<>(listavs);
-               listavs.clear();
+               sendFalseToAllVSCounters();
+               this.listavs.clear();
           } finally {
-               lock2.unlock();
+               this.lock2.unlock();
           }
-
-          // Thread separada para envio
-          new Thread(() -> {
-               for (NotificationVCCounter nvc : tmpVCCounters)
-                    envia_notificacao(nvc, "null");
-               for (NotificationVSCounter nvs : tmpVSCounters)
-                    envia_notificacao(nvs, "false");
-          }).start();
      }
-
 
      private void sendFalseToAllVCCounters() {
           for (NotificationVCCounter nvc : listavc) {

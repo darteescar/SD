@@ -26,7 +26,7 @@ public class ParallelInsertCorruptedTest {
         Thread[] threads = new Thread[NUM_CLIENTES];
 
         BufferedWriter logFile = new BufferedWriter(
-                new FileWriter("resultados_test.txt"));
+                new FileWriter("resultados_test_invalid.txt"));
         logFile.write("CLIENTE;RESPOSTA\n");
 
         for (int i = 0; i < NUM_CLIENTES; i++) {
