@@ -26,10 +26,8 @@ public class Cache<K,V>{
           readLock.lock();
           try{
                if (this.map.containsKey(key)){
-                    System.out.println("[Cache]: Cache hit para a chave " + key);
                     return this.map.get(key);
                }
-               System.out.println("[Cache]: Cache miss para a chave " + key);
                return null;
           }finally{
                readLock.unlock();

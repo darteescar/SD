@@ -3,14 +3,13 @@ package utils.structs.client;
 import entities.Mensagem;
 import entities.payloads.*;
 import enums.TipoMsg;
-import utils.workers.client.Demultiplexer;
-import utils.workers.client.Sender;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import utils.workers.client.Demultiplexer;
+import utils.workers.client.Sender;
 
 public class Stud implements AutoCloseable {
     private final Socket socket;
@@ -80,7 +79,6 @@ public class Stud implements AutoCloseable {
         Mensagem mensagem = new Mensagem(idMensagem++, tipo, bytes);
         this.send(mensagem);
     }
-
 
     public void sendEVENTO(TipoMsg tipo, String produto, int quantidade, double preco) throws IOException{
         Evento evento = new Evento(produto, quantidade, preco);

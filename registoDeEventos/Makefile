@@ -67,6 +67,10 @@ stress-mixed:
 	@echo ">> A executar Stress Test Misto..."
 	java -cp "$(CLASSPATH)" scripts.ParallelMixedTest
 
+stress-all:
+	@echo ">> A executar Stress Test Completo..."
+	java -cp "$(CLASSPATH)" scripts.ParallelDeterministicTest
+
 # Clean
 clean:
 	@echo ">> A limpar ficheiros compilados..."

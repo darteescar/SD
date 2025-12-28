@@ -98,15 +98,13 @@ public class ParallelInsertCorruptedTest {
         }
 
         // Recolhe respostas
-        synchronized (logFile) {
-            for (int i = 0; i < NUM_CLIENTES; i++) {
-                List<String> replies = studs[i].getRepliesList();
-                for (String r : replies) {
-                    logFile.write(i + ";" + r + "\n");
-                }
+        for (int i = 0; i < NUM_CLIENTES; i++) {
+            List<String> replies = studs[i].getRepliesList();
+            for (String r : replies) {
+                logFile.write(i + ";" + r + "\n");
             }
-            logFile.flush();
         }
+        logFile.flush();
 
         // Cleanup
         for (Stud s : studs) {
