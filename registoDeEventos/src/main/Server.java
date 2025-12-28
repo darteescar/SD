@@ -126,9 +126,7 @@ public class Server implements AutoCloseable{
     @Override
     public void close() throws IOException{
         this.ss.close();
-        //this.logins.close();
         this.series.close();
-        
     }
 
     public static void main(String[] args) {

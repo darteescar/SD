@@ -80,18 +80,19 @@ public class GestorSeries {
 
      public void passarDia() {
           Serie serieParaGuardar;
-               lock.lock();
-               try {
-                    System.out.println("[GS]: Passando do dia");
-                    serieParaGuardar = this.serie_atual; // guarda a série atual
-                    this.data_atual.incrementData();
-                    this.serie_atual = new Serie(data_atual.getData());
-               } finally {
-                    lock.unlock();
-               }
+          lock.lock();
+          try {
+               System.out.println("[GS]: Passando o dia");
+               serieParaGuardar = this.serie_atual; // guarda a série atual
+               this.data_atual.incrementData();
+               this.serie_atual = new Serie(data_atual.getData());
+          } finally {
+               lock.unlock();
+          }
 
-               // Thread fora do lock
-               new Thread(() -> add(serieParaGuardar)).start();
+          // Thread fora do lock, para não bloquear outras operações enquanto guarda a série
+          // como a bd é thread-safe, não há problema em fazer isto fora do lock
+          new Thread(() -> add(serieParaGuardar)).start();
      }
 
      public void addSerieAtual(Evento evento) {

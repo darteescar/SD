@@ -131,27 +131,29 @@ public class ServerNotifier implements Runnable {
      // Thread Simulator
 
      public void clear() {
-          List<NotificationVCCounter> tmpVCCounters;
-          List<NotificationVSCounter> tmpVSCounters;
-
-          lock1.lock();
-          try {
-               tmpVCCounters = new ArrayList<>(listavc);
-               listavc.clear();
-          } finally {
-               lock1.unlock();
-          }
-
-          lock2.lock();
-          try {
-               tmpVSCounters = new ArrayList<>(listavs);
-               listavs.clear();
-          } finally {
-               lock2.unlock();
-          }
-
-          // Thread separada para envio (ou mesmo a thread atual)
+          // Thread separada faz tudo: bloqueio + cópia + envio
           new Thread(() -> {
+               List<NotificationVCCounter> tmpVCCounters;
+               List<NotificationVSCounter> tmpVSCounters;
+
+               // Locks feitos dentro da thread
+               lock1.lock();
+               try {
+                    tmpVCCounters = new ArrayList<>(listavc);
+                    listavc.clear();
+               } finally {
+                    lock1.unlock();
+               }
+
+               lock2.lock();
+               try {
+                    tmpVSCounters = new ArrayList<>(listavs);
+                    listavs.clear();
+               } finally {
+                    lock2.unlock();
+               }
+
+               // Envio das notificações
                for (NotificationVCCounter nvc : tmpVCCounters)
                     envia_notificacao(nvc, "null");
                for (NotificationVSCounter nvs : tmpVSCounters)
@@ -159,18 +161,6 @@ public class ServerNotifier implements Runnable {
           }).start();
      }
 
-
-     private void sendFalseToAllVCCounters() {
-          for (NotificationVCCounter nvc : listavc) {
-               envia_notificacao(nvc, "null");              
-          } 
-     }
-
-     private void sendFalseToAllVSCounters() {
-          for (NotificationVSCounter nvs : listavs) {
-               envia_notificacao(nvs, "false");
-          }
-     }
 
      private void envia_notificacao(NotificationVCCounter nvc, String produto) {
           Mensagem mensagem = new Mensagem(nvc.getId(), TipoMsg.NOTIFICACAO_VC, produto.getBytes());
