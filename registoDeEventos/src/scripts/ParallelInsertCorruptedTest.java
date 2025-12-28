@@ -54,7 +54,7 @@ public class ParallelInsertCorruptedTest {
 
                     // Bombardeamento de eventos
                     for (int j = 0; j < NUM_PRODUTOS; j++) {
-                        Thread.sleep(5); // Pequena pausa para evitar sobrecarga total
+                        //Thread.sleep(5); // Pequena pausa para evitar sobrecarga total
                         studs[clienteId].sendEVENTO_INVALIDO(TipoMsg.REGISTO);
                     }
 
@@ -96,6 +96,8 @@ public class ParallelInsertCorruptedTest {
         } finally {
             lock.unlock();
         }
+
+        Thread.sleep(5000); // Espera para garantir que todas as respostas foram recebidas
 
         // Recolhe respostas
         for (int i = 0; i < NUM_CLIENTES; i++) {

@@ -55,34 +55,34 @@ public class Mensagem {
     // Desserialização da mensagem a partir do DataInputStream
     // altera o id passado por referência para, caso lance exceção, sabermos o id da mensagem inválida
     // e podermos enviar uma mensagem de erro com esse id
-    public static Mensagem deserialize(DataInputStream dis, int id)
-        throws IOException, ProtocolException {
+    public static Mensagem deserializeWithId(DataInputStream dis) 
+        throws IOException, MensagemCorrompidaException {
 
-        int id2;
+        int id = -1;
         try {
-            id2 = dis.readInt();
-        } catch (EOFException e) {
-            // Cliente fechou a ligação
-            throw e;
+            id = dis.readInt(); // lê o id primeiro
+
+            int tipoOrdinal = dis.readInt();
+            if (tipoOrdinal < 0 || tipoOrdinal >= TipoMsg.values().length) {
+                throw new MensagemCorrompidaException(id, "Tipo de mensagem inválido: " + tipoOrdinal);
+            }
+            TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
+
+            int length = dis.readInt();
+            if (length < 0 || length > MAX_MSG_SIZE) {
+                throw new MensagemCorrompidaException(id, "Tamanho inválido da mensagem: " + length);
+            }
+
+            byte[] data = new byte[length];
+            dis.readFully(data);
+
+            return new Mensagem(id, tipo, data);
+
+        } catch (ProtocolException e) {
+            throw new MensagemCorrompidaException(id, e.getMessage());
         }
-        id = id2;
-
-        int tipoOrdinal = dis.readInt();
-        if (tipoOrdinal < 0 || tipoOrdinal >= TipoMsg.values().length) {
-            throw new ProtocolException("Tipo de mensagem inválido: " + tipoOrdinal);
-        }
-        TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
-
-        int length = dis.readInt();
-        if (length < 0 || length > MAX_MSG_SIZE) {
-            throw new ProtocolException("Tamanho inválido da mensagem: " + length);
-        }
-
-        byte[] data = new byte[length];
-        dis.readFully(data);
-
-        return new Mensagem(id, tipo, data);
     }
+
 
     public static Mensagem deserialize(DataInputStream dis)
         throws IOException, ProtocolException {

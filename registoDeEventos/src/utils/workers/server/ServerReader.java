@@ -1,9 +1,9 @@
 package utils.workers.server;
 
 import entities.Mensagem;
+import entities.MensagemCorrompidaException;
 import entities.ServerData;
 import java.io.*;
-import java.net.ProtocolException;
 import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.ClientSession;
 
@@ -25,20 +25,20 @@ public class ServerReader implements Runnable {
 
      @Override
      public void run() {
-          int id = 0;
-          while (true) {
-               try {
-                    Mensagem mensagem = Mensagem.deserialize(input,id);
-                    ServerData serverData = new ServerData(cliente, mensagem);
-                    taskBuffer.add(serverData);
-               } catch (ProtocolException e) {
-                    Mensagem mensagem = new Mensagem(id,"Erro: Mensagem inválida ou corrompida.");
-                    ServerData serverData = new ServerData(cliente, mensagem);
-                    taskBuffer.add(serverData);
-               } catch (Exception e) {
-                    break;
-               }
+     while (true) {
+          try {
+               Mensagem mensagem = Mensagem.deserializeWithId(input);
+               taskBuffer.add(new ServerData(cliente, mensagem));
+
+          } catch (MensagemCorrompidaException e) {
+               taskBuffer.add(new ServerData(cliente, new Mensagem(e.getId(), "Erro: Mensagem inválida ou corrompida.")));
+
+          } catch (Exception e) {
+               break;
           }
-          session.close();
      }
+
+     session.close();
+     }
+
 }

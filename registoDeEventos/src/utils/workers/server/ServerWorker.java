@@ -95,14 +95,15 @@ public class ServerWorker implements Runnable {
             case PRECO_MEDIO -> result =processPRECO_MEDIO(mensagem.getData());
             case PRECO_MAXIMO -> result = processPRECO_MAXIMO(mensagem.getData());
             case LISTA -> result = processLISTA(mensagem.getData());
-            case ERRO -> result = "Erro: Mensagem inválida ou corrompida.";
+            case ERRO ->{
+                result = "Erro: Mensagem inválida ou corrompida.";
+                System.out.println("[SERVERWORKER]: Mensagem de erro recebida do cliente.");
+            } 
+            
             default -> {
-                //System.out.println("[ERRO] Tipo de mensagem inválido: " + tipo);
                 return "Erro: tipo de mensagem inválido.";
             }
-
         }
-
         return result;
     }
 
@@ -158,11 +159,9 @@ public class ServerWorker implements Runnable {
             
         } catch (ProtocolException e) {
             resposta = "Erro, dados do evento inválidos ou corrompidos.";
-            //System.out.println("[ERRO] Evento inválido ou incompleto recebido, ignorando.");
             return resposta;
         } catch (IOException e) {
             resposta = "Erro na desserialização do evento.";
-            System.out.println("[ERRO] Erro na desserialização do evento recebido.");
             return resposta;
         }
     }

@@ -36,6 +36,7 @@ public class ServerWriter implements Runnable {
                 }
 
                 try {
+                    String message = msg.toString();
                     msg.serialize(output);
                     output.flush();
                 } catch (Exception e) {
@@ -45,7 +46,7 @@ public class ServerWriter implements Runnable {
             }
         } finally {
             // Garante que o socket e a sessão sejam fechados
-            session.close();
+            //session.close();
         }
     }
 
