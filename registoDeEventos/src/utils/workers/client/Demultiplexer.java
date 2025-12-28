@@ -1,4 +1,4 @@
-package structs.client;
+package utils.workers.client;
 
 import entities.Mensagem;
 import java.io.BufferedInputStream;

@@ -1,9 +1,10 @@
-package structs.client;
+package utils.workers.client;
 
 import entities.Mensagem;
 import enums.TipoMsg;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import utils.structs.client.NotificacaoListener;
 
 public class Sender implements Runnable {
     private final Demultiplexer demu;

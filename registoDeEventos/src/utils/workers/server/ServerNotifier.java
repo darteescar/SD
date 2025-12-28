@@ -1,14 +1,18 @@
-package structs.notification;
+package utils.workers.server;
 
 import entities.Mensagem;
 import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
+import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.notification.NotificationVCCounter;
+import utils.structs.notification.NotificationVSCounter;
+import utils.structs.server.SafeMap;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import structs.server.SafeMap;
 
 public class ServerNotifier implements Runnable {
      private List<NotificationVSCounter> listavs;

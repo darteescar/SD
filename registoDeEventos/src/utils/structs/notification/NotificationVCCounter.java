@@ -1,4 +1,4 @@
-package structs.notification;
+package utils.structs.notification;
 
 public class NotificationVCCounter {
      private static String produto = "";

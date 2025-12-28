@@ -1,6 +1,6 @@
-package structs.server;
+package utils.structs.server;
 
-import data.BDSeries;
+import databases.BDSeries;
 import entities.Data;
 import entities.Serie;
 import entities.payloads.Evento;

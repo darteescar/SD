@@ -1,5 +1,6 @@
 package main;
-import data.BDServerDay;
+
+import databases.BDServerDay;
 import entities.Data;
 import entities.Mensagem;
 import entities.Serie;
@@ -9,16 +10,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.util.Scanner;
-import structs.notification.ConcurrentBuffer;
-import structs.notification.ServerNotifier;
-import structs.server.ClientSession;
-import structs.server.GestorLogins;
-import structs.server.GestorSeries;
-import structs.server.SafeMap;
-import structs.server.ServerReader;
-import structs.server.ServerSimulator;
-import structs.server.ServerWriter;
-import structs.server.ThreadPool;
+import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.server.ClientSession;
+import utils.structs.server.GestorLogins;
+import utils.structs.server.GestorSeries;
+import utils.structs.server.SafeMap;
+import utils.structs.server.ThreadPool;
+import utils.workers.server.ServerNotifier;
+import utils.workers.server.ServerReader;
+import utils.workers.server.ServerSimulator;
+import utils.workers.server.ServerWriter;
 
 public class Server implements AutoCloseable{
     private final ServerSocket ss;
@@ -142,7 +143,7 @@ public class Server implements AutoCloseable{
             String resposta = scanner.nextLine().trim().toLowerCase();
 
             if (resposta.equals("sim") || resposta.equals("s")) {
-                data.BDReset.resetAll();
+                databases.BDReset.resetAll();
                 System.out.println("Base de dados apagada.");
             } else {
                 System.out.println("Reset cancelado.");

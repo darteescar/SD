@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Scanner;
 import menu.Menu;
 import menu.MenuOpcao;
-import structs.client.NotificacaoListener;
-import structs.client.Stud;
+import utils.structs.client.NotificacaoListener;
+import utils.structs.client.Stud;
 
 public class ClienteUI {
 

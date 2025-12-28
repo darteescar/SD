@@ -1,5 +1,5 @@
-package structs.server;
-import data.BDUsers;
+package utils.structs.server;
+import databases.BDUsers;
 
 public class GestorLogins {
      Cache<String,String> cache; //<USER,PASSWORD>

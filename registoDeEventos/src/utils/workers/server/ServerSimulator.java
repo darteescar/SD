@@ -1,4 +1,4 @@
-package structs.server;
+package utils.workers.server;
 
 import main.Server;
 

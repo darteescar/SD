@@ -1,10 +1,12 @@
-package structs.server;
+package utils.structs.server;
 
 import entities.Mensagem;
 import entities.ServerData;
+import utils.structs.notification.ConcurrentBuffer;
+import utils.workers.server.ServerNotifier;
+import utils.workers.server.ServerWorker;
+
 import java.io.IOException;
-import structs.notification.ConcurrentBuffer;
-import structs.notification.ServerNotifier;
 
 public class ThreadPool {
      private final ServerWorker[] workers;

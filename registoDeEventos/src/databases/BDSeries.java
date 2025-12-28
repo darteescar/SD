@@ -1,4 +1,4 @@
-package data;
+package databases;
 
 import entities.Serie;
 import entities.payloads.Evento;

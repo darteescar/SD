@@ -1,4 +1,4 @@
-package structs.notification;
+package utils.structs.notification;
 
 import java.util.ArrayDeque;
 import java.util.Queue;

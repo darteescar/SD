@@ -1,4 +1,4 @@
-package structs.client;
+package utils.structs.client;
 
 public interface NotificacaoListener {
     void notificacaoVSEnviada();

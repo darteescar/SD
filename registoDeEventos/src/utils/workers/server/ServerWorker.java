@@ -1,4 +1,4 @@
-package structs.server;
+package utils.workers.server;
 
 import entities.Mensagem;
 import entities.ServerData;
@@ -12,8 +12,10 @@ import enums.TipoMsg;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.List;
-import structs.notification.ConcurrentBuffer;
-import structs.notification.ServerNotifier;
+import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.server.GestorLogins;
+import utils.structs.server.GestorSeries;
+import utils.structs.server.SafeMap;
 
 public class ServerWorker implements Runnable {
     private final int d;

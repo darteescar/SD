@@ -1,7 +1,11 @@
-package structs.server;
+package utils.structs.server;
 
 import entities.Mensagem;
 import entities.ServerData;
+import utils.structs.notification.ConcurrentBuffer;
+import utils.workers.server.ServerReader;
+import utils.workers.server.ServerWriter;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -9,7 +13,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.locks.ReentrantLock;
-import structs.notification.ConcurrentBuffer;
 
 public class ClientSession {
 

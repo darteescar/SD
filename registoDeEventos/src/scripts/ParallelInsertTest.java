@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.util.List;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import structs.client.Stud;
+import utils.structs.client.Stud;
 
 public class ParallelInsertTest {
 

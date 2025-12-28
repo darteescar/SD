@@ -1,4 +1,4 @@
-package structs.notification;
+package utils.structs.notification;
 
 public class NotificationVSCounter {
      private final int clienteID;

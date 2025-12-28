@@ -1,11 +1,13 @@
-package structs.server;
+package utils.workers.server;
 
 import entities.Mensagem;
 import entities.ServerData;
+import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.server.ClientSession;
+
 import java.io.*;
 import java.net.ProtocolException;
 import java.net.SocketException;
-import structs.notification.ConcurrentBuffer;
 
 public class ServerReader implements Runnable {
      private final ClientSession session;

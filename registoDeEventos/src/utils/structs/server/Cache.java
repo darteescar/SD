@@ -1,4 +1,4 @@
-package structs.server;
+package utils.structs.server;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

@@ -1,4 +1,4 @@
-package data;
+package databases;
 
 public class BDConfig {
     static final String USERNAME = "me";

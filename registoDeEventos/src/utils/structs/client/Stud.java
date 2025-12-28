@@ -1,8 +1,11 @@
-package structs.client;
+package utils.structs.client;
 
 import entities.Mensagem;
 import entities.payloads.*;
 import enums.TipoMsg;
+import utils.workers.client.Demultiplexer;
+import utils.workers.client.Sender;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;

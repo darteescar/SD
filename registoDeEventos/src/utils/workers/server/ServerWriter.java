@@ -1,12 +1,14 @@
-package structs.server;
+package utils.workers.server;
 
 import entities.Mensagem;
 import enums.TipoMsg;
+import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.server.ClientSession;
+
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketException;
-import structs.notification.ConcurrentBuffer;
 
 public class ServerWriter implements Runnable {
     private final ClientSession session;
