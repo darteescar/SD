@@ -12,7 +12,6 @@ public class BDSeries implements Map<String, Serie> {
     private final ReentrantReadWriteLock.WriteLock writelock =  lock.writeLock();
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
 
-
     private static BDSeries singleton = null;
 
     public static BDSeries getInstance() {

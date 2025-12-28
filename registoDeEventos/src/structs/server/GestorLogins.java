@@ -48,7 +48,7 @@ public class GestorLogins {
                     return true; // correu bem
                }
           } 
-          return false; // correu bem 
+          return false; // user nao existe ou password incorreta
      }
 
 }

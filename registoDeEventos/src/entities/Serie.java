@@ -96,65 +96,45 @@ public class Serie {
     }
 
     public int calcQuantidadeVendas(String produto) { // precisa de lock ???
-        this.lock.lock();
-        try {
-            int total = 0;
-            for (Evento evento : this.eventos) {
-                if (evento.getProduto().equals(produto)) {
-                    total += evento.getQuantidade();
-                }
+        int total = 0;
+        for (Evento evento : this.eventos) {
+            if (evento.getProduto().equals(produto)) {
+                total += evento.getQuantidade();
             }
-            return total;
-        } finally {
-            this.lock.unlock();
         }
+        return total;
     }
 
     public double calcVolumeVendas(String produto) { // precisa de lock ???
-        this.lock.lock();
-        try {
-            double total = 0.0;
-            for (Evento evento : this.eventos) {
-                if (evento.getProduto().equals(produto)) {
-                    total += evento.getQuantidade() * evento.getPreco();
-                }
+        double total = 0.0;
+        for (Evento evento : this.eventos) {
+            if (evento.getProduto().equals(produto)) {
+                total += evento.getQuantidade() * evento.getPreco();
             }
-            return total;
-        } finally {
-            this.lock.unlock();
         }
+        return total;
     }
 
     public double calcPrecoMaximo(String produto) { // precisa de lock ???
-        this.lock.lock();
-        try {
-            double maxPreco = 0.0;
-            for (Evento evento : this.eventos) {
-                if (evento.getProduto().equals(produto)) {
-                    double preco = evento.getPreco();
-                    if (preco > maxPreco) {
-                        maxPreco = preco;
-                    }
+        double maxPreco = 0.0;
+        for (Evento evento : this.eventos) {
+            if (evento.getProduto().equals(produto)) {
+                double preco = evento.getPreco();
+                if (preco > maxPreco) {
+                    maxPreco = preco;
                 }
             }
-            return maxPreco;
-        } finally {
-            this.lock.unlock();
         }
+        return maxPreco;
     }
 
     public List<Evento> filtrarEventos(List<String> produtos) {
-        this.lock.lock();
-        try {
-            List<Evento> filtrados = new ArrayList<>();
-            for (Evento evento : this.eventos) {
-                if (produtos.contains(evento.getProduto())) {
-                    filtrados.add(evento);
-                }
+        List<Evento> filtrados = new ArrayList<>();
+        for (Evento evento : this.eventos) {
+            if (produtos.contains(evento.getProduto())) {
+                filtrados.add(evento);
             }
-            return filtrados;
-        } finally {
-            this.lock.unlock();
         }
+        return filtrados;
     }
 }

@@ -54,6 +54,10 @@ stress-test-invalid:
 	@echo ">> A executar Stress Test de Inserções Inválidas..."
 	java -cp "$(CLASSPATH)" scripts.ParallelInsertCorruptedTest
 
+stress-query:
+	@echo ">> A executar Stress Test de Consultas..."
+	java -cp "$(CLASSPATH)" scripts.ParallelQueryTest
+
 # Clean
 clean:
 	@echo ">> A limpar ficheiros compilados..."

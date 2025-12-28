@@ -88,7 +88,6 @@ public class GestorSeries {
      public void addSerieAtual(Evento evento) {
           lock.lock();
           try {
-               //System.out.println("Adicionando evento à série atual");
                this.serie_atual.add(evento);
           } finally {
                lock.unlock();
@@ -117,7 +116,7 @@ public class GestorSeries {
 
      public int calcQuantidadeVendas(String produto, int dias) {
           int total = 0;
-          Data currentDate = this.data_atual.clone();
+          Data currentDate = getDataAtual().clone();
           currentDate.decrementData(); // começa no dia fechado
 
           for (int i = 0; i < dias; i++) {
@@ -142,7 +141,7 @@ public class GestorSeries {
 
      public double calcVolumeVendas(String produto, int dias) {
           double total = 0.0;
-          Data currentDate = this.data_atual.clone();
+          Data currentDate = getDataAtual().clone();
           currentDate.decrementData();
 
           for (int i = 0; i < dias; i++) {
@@ -174,7 +173,7 @@ public class GestorSeries {
 
      public double calcPrecoMaximo(String produto, int dias) {
           double max = 0.0;
-          Data currentDate = this.data_atual.clone();
+          Data currentDate = getDataAtual().clone();
           currentDate.decrementData();
 
           for (int i = 0; i < dias; i++) {
@@ -203,7 +202,7 @@ public class GestorSeries {
 
 
      public List<Evento> filtrarEventos(List<String> produtos, int dias){
-          Data targetDate = this.data_atual.clone();
+          Data targetDate =  getDataAtual().clone();
           for (int i = 0; i < dias; i++) {
                targetDate.decrementData();
           }
@@ -237,6 +236,4 @@ public class GestorSeries {
           byTipo.putIfAbsent(tipo, new java.util.HashMap<>());
           byTipo.get(tipo).put(produto, valor);
      }
-
-
 }
