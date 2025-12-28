@@ -2,34 +2,34 @@ package utils.structs.server;
 import databases.BDUsers;
 
 public class GestorLogins {
-     Cache<String,String> cache; //<USER,PASSWORD>
-     BDUsers users;
+     Cache<String,String> CacheUsers; //<USER,PASSWORD>
+     BDUsers BDUsers;
 
      public GestorLogins(int capacidade){
-          this.cache = new Cache<>(capacidade);
-          this.users = BDUsers.getInstance();
+          this.CacheUsers = new Cache<>(capacidade);
+          this.BDUsers = BDUsers.getInstance();
      }
 
      public boolean registar(String username,String password) {
           if (username == null || password == null) {
                return false; // campos inválidos
           }
-          if (!users.containsUser(username)){ // se não está na BD, insere na BD e na Cache
-               users.add(username, password);
-               cache.put(username, password);
+          if (!BDUsers.containsUser(username)){ // se não está na BD, insere na BD e na Cache
+               BDUsers.add(username, password);
+               CacheUsers.put(username, password);
                return true;
           }
           return false; // user existe
      }
      
      public boolean autenticar(String username,String password) {
-          if (cache.containsKey(username)){ // MISS - se está na cache
-               if (cache.get(username).equals(password)){ // se a password guardada é igual à passada
+          if (CacheUsers.containsKey(username)){ // MISS - se está na cache
+               if (CacheUsers.get(username).equals(password)){ // se a password guardada é igual à passada
                     return true; // autenticação correta
                }
-          } else if (users.containsUser(username)){ // MISS - se está na BD
-               if (users.get(username).equals(password)) { // se a password guardada é igual à passada
-                    cache.put(username, password);
+          } else if (BDUsers.containsUser(username)){ // MISS - se está na BD
+               if (BDUsers.get(username).equals(password)) { // se a password guardada é igual à passada
+                    CacheUsers.put(username, password);
                     return true; // autenticação correta
                }
           } 
@@ -37,14 +37,14 @@ public class GestorLogins {
      }
 
      public boolean apagar(String username, String password) {
-          if (cache.containsKey(username)){ // se está na Cache
-               if (cache.get(username).equals(password)){ // se a password guardada é igual à passada
-                    cache.remove(username, password); // remove da cache
+          if (CacheUsers.containsKey(username)){ // se está na Cache
+               if (CacheUsers.get(username).equals(password)){ // se a password guardada é igual à passada
+                    CacheUsers.remove(username, password); // remove da cache
                     return true; // correu bem
                }
-          } else if (users.containsUser(username)){ // se está na BD
-               if (users.get(username).equals(password)) {  // se a password guardada é igual à passada
-                    users.remove(username,password); // remove da BD
+          } else if (BDUsers.containsUser(username)){ // se está na BD
+               if (BDUsers.get(username).equals(password)) {  // se a password guardada é igual à passada
+                    BDUsers.remove(username,password); // remove da BD
                     return true; // correu bem
                }
           } 

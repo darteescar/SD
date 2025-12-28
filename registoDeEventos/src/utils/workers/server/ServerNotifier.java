@@ -4,28 +4,27 @@ import entities.Mensagem;
 import entities.payloads.NotificacaoVC;
 import entities.payloads.NotificacaoVS;
 import enums.TipoMsg;
-import utils.structs.notification.ConcurrentBuffer;
-import utils.structs.notification.NotificationVCCounter;
-import utils.structs.notification.NotificationVSCounter;
-import utils.structs.server.SafeMap;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import utils.structs.notification.BoundedBuffer;
+import utils.structs.notification.NotificationVCCounter;
+import utils.structs.notification.NotificationVSCounter;
+import utils.structs.server.SafeMap;
 
 public class ServerNotifier implements Runnable {
      private List<NotificationVSCounter> listavs;
      private List<NotificationVCCounter> listavc;
-     private final ConcurrentBuffer<String> buffer;
+     private final BoundedBuffer<String> buffer;
      private final ReentrantLock lock1 = new ReentrantLock();
      private final ReentrantLock lock2 = new ReentrantLock();
-     private final SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers;
+     private final SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers;
 
-     public ServerNotifier(SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers) {
+     public ServerNotifier(SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers) {
           this.listavc = new ArrayList<>();
           this.listavs = new ArrayList<>();
-          this.buffer = new ConcurrentBuffer<>();
+          this.buffer = new BoundedBuffer<>();
           this.clientBuffers = clientBuffers;
      }
 

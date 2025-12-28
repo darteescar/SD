@@ -2,7 +2,7 @@ package utils.structs.server;
 
 import entities.Mensagem;
 import entities.ServerData;
-import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.notification.BoundedBuffer;
 import utils.workers.server.ServerReader;
 import utils.workers.server.ServerWriter;
 
@@ -24,7 +24,7 @@ public class ClientSession {
     private final boolean closed = false;
 
     public ClientSession(Socket socket, int clienteId,
-                         ConcurrentBuffer<ServerData> taskBuffer)
+                         BoundedBuffer<ServerData> taskBuffer)
             throws IOException {
 
         this.socket = socket;
@@ -36,7 +36,7 @@ public class ClientSession {
             DataOutputStream output = new DataOutputStream( new BufferedOutputStream(socket.getOutputStream()));
 
             this.reader = new ServerReader(this,taskBuffer, clienteId, input);
-            this.writer = new ServerWriter(this,new ConcurrentBuffer<>(), clienteId, output);
+            this.writer = new ServerWriter(this,new BoundedBuffer<>(), clienteId, output);
             ok = true;
         } finally {
             if (!ok) {
@@ -65,7 +65,7 @@ public class ClientSession {
         }
     }
 
-    public ConcurrentBuffer<Mensagem> getOutBuffer() {
+    public BoundedBuffer<Mensagem> getOutBuffer() {
         return writer.getOutBuffer();
     }
 

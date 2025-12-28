@@ -2,21 +2,20 @@ package utils.workers.server;
 
 import entities.Mensagem;
 import entities.ServerData;
-import utils.structs.notification.ConcurrentBuffer;
-import utils.structs.server.ClientSession;
-
 import java.io.*;
 import java.net.ProtocolException;
 import java.net.SocketException;
+import utils.structs.notification.BoundedBuffer;
+import utils.structs.server.ClientSession;
 
 public class ServerReader implements Runnable {
      private final ClientSession session;
      private final DataInputStream input;
-     private final ConcurrentBuffer<ServerData> taskBuffer;
+     private final BoundedBuffer<ServerData> taskBuffer;
      private final int cliente;
 
      public ServerReader(ClientSession session,
-                         ConcurrentBuffer<ServerData> taskBuffer,
+                         BoundedBuffer<ServerData> taskBuffer,
                          int cliente, 
                          DataInputStream input) throws IOException {
           this.session = session;

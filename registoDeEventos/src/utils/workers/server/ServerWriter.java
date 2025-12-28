@@ -2,24 +2,23 @@ package utils.workers.server;
 
 import entities.Mensagem;
 import enums.TipoMsg;
-import utils.structs.notification.ConcurrentBuffer;
-import utils.structs.server.ClientSession;
-
 import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketException;
+import utils.structs.notification.BoundedBuffer;
+import utils.structs.server.ClientSession;
 
 public class ServerWriter implements Runnable {
     private final ClientSession session;
     private final DataOutputStream output;
-    private final ConcurrentBuffer<Mensagem> taskBuffer;
+    private final BoundedBuffer<Mensagem> taskBuffer;
     private final int cliente;
 
     public static final Mensagem POISON_PILL = new Mensagem(0, TipoMsg.POISON_PILL, null);
 
     public ServerWriter(ClientSession session,
-                        ConcurrentBuffer<Mensagem> taskBuffer,
+                        BoundedBuffer<Mensagem> taskBuffer,
                         int cliente,
                         DataOutputStream output) {
         this.session = session;
@@ -74,7 +73,7 @@ public class ServerWriter implements Runnable {
         }
     }
 
-    public ConcurrentBuffer<Mensagem> getOutBuffer() {
+    public BoundedBuffer<Mensagem> getOutBuffer() {
         return taskBuffer;
     }
 }

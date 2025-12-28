@@ -5,13 +5,13 @@ import java.util.Queue;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ConcurrentBuffer<T> {
+public class BoundedBuffer<T> {
 
     private final Queue<T> queue;
     private final ReentrantLock lock;
     private final Condition condition;
 
-    public ConcurrentBuffer() {
+    public BoundedBuffer() {
         this.queue = new ArrayDeque<>();
         this.lock = new ReentrantLock();
         this.condition = this.lock.newCondition();

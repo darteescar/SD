@@ -12,7 +12,7 @@ import enums.TipoMsg;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.List;
-import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorSeries;
 import utils.structs.server.SafeMap;
@@ -22,14 +22,14 @@ public class ServerWorker implements Runnable {
     private final GestorLogins logins;
     private final GestorSeries gestorSeries;
     private final ServerNotifier notifier;
-    private final ConcurrentBuffer<ServerData> taskBuffer;
-    private final SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers;
+    private final BoundedBuffer<ServerData> taskBuffer;
+    private final SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers;
 
     public ServerWorker(GestorLogins logins, 
         GestorSeries gestorSeries, 
         ServerNotifier notifier, 
-        ConcurrentBuffer<ServerData> taskBuffer,
-        SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers,
+        BoundedBuffer<ServerData> taskBuffer,
+        SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers,
         int d) throws IOException{
         this.logins = logins;
         this.gestorSeries = gestorSeries;
@@ -73,7 +73,7 @@ public class ServerWorker implements Runnable {
                 }
                 Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
 
-                ConcurrentBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
+                BoundedBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
                 bufferCliente.add(reply);
             }
         } finally {

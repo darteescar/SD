@@ -10,7 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.util.Scanner;
-import utils.structs.notification.ConcurrentBuffer;
+import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.ClientSession;
 import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorSeries;
@@ -33,8 +33,8 @@ public class Server implements AutoCloseable{
     private final ServerWorker[] workers;
     private final SafeMap<Integer, ServerReader> readers;
     private final SafeMap<Integer, ServerWriter> writers;
-    private final SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers;
-    private final ConcurrentBuffer<ServerData> taskBuffer;
+    private final SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers;
+    private final BoundedBuffer<ServerData> taskBuffer;
 
     public Server(int d, int s, int w) throws IOException {
         this.ss = new ServerSocket(12345);
@@ -53,7 +53,7 @@ public class Server implements AutoCloseable{
         this.simulator = new ServerSimulator(this);
         this.notifier = new ServerNotifier(this.clientBuffers);
 
-        this.taskBuffer = new ConcurrentBuffer<>();
+        this.taskBuffer = new BoundedBuffer<>();
         this.workers = new ServerWorker[d];
         startWorkers(w);
     }
