@@ -26,7 +26,7 @@ public class ParallelQueryTest {
         Thread[] threads = new Thread[NUM_CLIENTES];
 
         BufferedWriter logFile = new BufferedWriter(
-                new FileWriter("resultados_test_query.txt"));
+                new FileWriter("src/scripts/results/resultados_test_query.txt"));
         logFile.write("CLIENTE;RESPOSTA\n");
 
         for (int i = 0; i < NUM_CLIENTES; i++) {

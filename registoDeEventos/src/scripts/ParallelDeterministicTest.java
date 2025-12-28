@@ -26,7 +26,7 @@ public class ParallelDeterministicTest {
         Stud[] studs = new Stud[NUM_CLIENTES];
         Thread[] threads = new Thread[NUM_CLIENTES];
 
-        BufferedWriter logFile = new BufferedWriter(new FileWriter("resultados_deterministicos.txt"));
+        BufferedWriter logFile = new BufferedWriter(new FileWriter("src/scripts/results/resultados_deterministicos.txt"));
         logFile.write("CLIENTE;TIPO;PRODUTO;RESPOSTA\n");
 
         // Produtos determinísticos

@@ -3,3 +3,4 @@
 
 # Ignorar a pasta bin/
 bin/
+src/scripts/results/
