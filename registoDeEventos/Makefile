@@ -63,6 +63,10 @@ stress-notification:
 	@echo ">> A executar Stress Test de Notificações..."
 	java -cp "$(CLASSPATH)" scripts.ParallelNotificationTest
 
+stress-mixed:
+	@echo ">> A executar Stress Test Misto..."
+	java -cp "$(CLASSPATH)" scripts.ParallelMixedTest
+
 # Clean
 clean:
 	@echo ">> A limpar ficheiros compilados..."
