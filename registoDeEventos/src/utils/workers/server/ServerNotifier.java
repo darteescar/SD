@@ -150,7 +150,7 @@ public class ServerNotifier implements Runnable {
                lock2.unlock();
           }
 
-          // Thread separada para envio (ou mesmo a thread atual)
+          // Thread separada para envio
           new Thread(() -> {
                for (NotificationVCCounter nvc : tmpVCCounters)
                     envia_notificacao(nvc, "null");
