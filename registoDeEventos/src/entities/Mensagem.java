@@ -27,8 +27,8 @@ public class Mensagem {
 
     // Construtor usado no ServerReader para criar mensagens de erro (caso a mensagem recebida seja inválida)
     // envia uma mensagem com tipo ERRO e o texto do erro como dados
-    public Mensagem(String errorMsg) {
-        this.id = -1;
+    public Mensagem(int id, String errorMsg) {
+        this.id = id;
         this.tipo = TipoMsg.ERRO;
         this.data = errorMsg.getBytes();
     }
@@ -52,6 +52,37 @@ public class Mensagem {
         dos.write(this.data);
     }
 
+    // Desserialização da mensagem a partir do DataInputStream
+    // altera o id passado por referência para, caso lance exceção, sabermos o id da mensagem inválida
+    // e podermos enviar uma mensagem de erro com esse id
+    public static Mensagem deserialize(DataInputStream dis, int id)
+        throws IOException, ProtocolException {
+
+        int id2;
+        try {
+            id2 = dis.readInt();
+        } catch (EOFException e) {
+            // Cliente fechou a ligação
+            throw e;
+        }
+        id = id2;
+
+        int tipoOrdinal = dis.readInt();
+        if (tipoOrdinal < 0 || tipoOrdinal >= TipoMsg.values().length) {
+            throw new ProtocolException("Tipo de mensagem inválido: " + tipoOrdinal);
+        }
+        TipoMsg tipo = TipoMsg.values()[tipoOrdinal];
+
+        int length = dis.readInt();
+        if (length < 0 || length > MAX_MSG_SIZE) {
+            throw new ProtocolException("Tamanho inválido da mensagem: " + length);
+        }
+
+        byte[] data = new byte[length];
+        dis.readFully(data);
+
+        return new Mensagem(id, tipo, data);
+    }
 
     public static Mensagem deserialize(DataInputStream dis)
         throws IOException, ProtocolException {
