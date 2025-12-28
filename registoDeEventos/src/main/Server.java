@@ -15,10 +15,10 @@ import utils.structs.server.ClientSession;
 import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorSeries;
 import utils.structs.server.SafeMap;
-import utils.structs.server.ThreadPool;
 import utils.workers.server.ServerNotifier;
 import utils.workers.server.ServerReader;
 import utils.workers.server.ServerSimulator;
+import utils.workers.server.ServerWorker;
 import utils.workers.server.ServerWriter;
 
 public class Server implements AutoCloseable{
@@ -30,13 +30,13 @@ public class Server implements AutoCloseable{
     private final ServerSimulator simulator;
     private final ServerNotifier notifier;
 
-    private final ThreadPool threadPool;
+    private final ServerWorker[] workers;
     private final SafeMap<Integer, ServerReader> readers;
     private final SafeMap<Integer, ServerWriter> writers;
     private final SafeMap<Integer, ConcurrentBuffer<Mensagem>> clientBuffers;
     private final ConcurrentBuffer<ServerData> taskBuffer;
 
-    public Server(int d, int s) throws IOException {
+    public Server(int d, int s, int w) throws IOException {
         this.ss = new ServerSocket(12345);
         this.logins = new GestorLogins(s + 1);
         this.cliente = 0;
@@ -54,7 +54,19 @@ public class Server implements AutoCloseable{
         this.notifier = new ServerNotifier(this.clientBuffers);
 
         this.taskBuffer = new ConcurrentBuffer<>();
-        this.threadPool = new ThreadPool(8, this.taskBuffer, d, this.logins, this.series, this.notifier, this.clientBuffers);
+        this.workers = new ServerWorker[d];
+        startWorkers(w);
+    }
+
+    private void startWorkers(int numWorkers) throws IOException {
+        for (int i = 0; i < numWorkers; i++) {
+            workers[i] = new ServerWorker(logins, series, notifier, taskBuffer, clientBuffers, d);
+            System.out.println("[THREAD-POOL]: Worker-" + i + " criado.");
+        }
+        for (int i = 0; i < numWorkers; i++) {
+            new Thread(workers[i], "Worker-" + i).start();
+            System.out.println("[THREAD-POOL]: Worker-" + i + " começou.");
+        }
     }
 
     private Data carregarDataAtual() {
@@ -120,15 +132,16 @@ public class Server implements AutoCloseable{
     }
 
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("Uso: make server <D> <S> <RESET>");
+        if (args.length < 3) {
+            System.out.println("Uso: make server <D> <S> <W> <RESET>");
             return;
         }
 
         int d = Integer.parseInt(args[0]);
         int s = Integer.parseInt(args[1]);
+        int w = Integer.parseInt(args[2]);
 
-        boolean reset = args.length == 3 && args[2].equals("1");
+        boolean reset = args.length == 4 && args[3].equals("1");
 
         if (s >= d) {
             System.out.println("Erro: S deve ser menor que D.");
@@ -150,7 +163,7 @@ public class Server implements AutoCloseable{
             }
         }
 
-        try (Server server = new Server(d, s)) {
+        try (Server server = new Server(d, s, w)) {
             server.start();
         } catch (Exception e) {
             e.printStackTrace();

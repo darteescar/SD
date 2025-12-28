@@ -10,9 +10,10 @@ CLASSPATH = $(BIN_DIR):$(LIB_DIR)/*
 SERVER_MAIN = main.Server
 SERVER_CLIENTE = main.ClienteUI
 
-# Argumentos para o servidor (passados com make server D=.. S=.. RESET=..)
+# Argumentos para o servidor (passados com make server D=.. S=.. W=.. RESET=..)
 D ?= 0
 S ?= 0
+W ?= 0
 RESET ?= 0
 
 # .java
@@ -29,15 +30,15 @@ compile:
 
 # Executar servidor
 server:
-	@if [ "$(D)" = "0" ] || [ "$(S)" = "0" ]; then \
-		echo "Uso: make server D=<valor> S=<valor> [RESET=1]"; \
+	@if [ "$(D)" = "0" ] || [ "$(S)" = "0" ] || [ "$(W)" = "0" ]; then \
+		echo "Uso: make server D=<valor> S=<valor> W=<valor> [RESET=1]"; \
 		exit 1; \
 	fi
-	@echo ">> Iniciando o servidor com D=$(D) S=$(S) RESET=$(RESET)..."
+	@echo ">> Iniciando o servidor com D=$(D) S=$(S) W=$(W) RESET=$(RESET)..."
 	@if [ "$(RESET)" = "1" ]; then \
-		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S) $(RESET) < $(shell tty); \
+		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S) $(W) $(RESET) < $(shell tty); \
 	else \
-		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S); \
+		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S) $(W); \
 	fi
 
 # Executar cliente
