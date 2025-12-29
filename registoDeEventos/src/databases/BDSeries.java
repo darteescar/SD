@@ -7,11 +7,9 @@ import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class BDSeries implements Map<String, Serie> {
-
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     private final ReentrantReadWriteLock.WriteLock writelock =  lock.writeLock();
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
-
     private static BDSeries singleton = null;
 
     public static BDSeries getInstance() {

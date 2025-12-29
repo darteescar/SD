@@ -9,12 +9,13 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.ClientSession;
 import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorSeries;
-import utils.structs.server.SafeMap;
 import utils.workers.server.ServerNotifier;
 import utils.workers.server.ServerReader;
 import utils.workers.server.ServerSimulator;
@@ -31,9 +32,9 @@ public class Server implements AutoCloseable{
     private final ServerNotifier notifier;
 
     private final ServerWorker[] workers;
-    private final SafeMap<Integer, ServerReader> readers;
-    private final SafeMap<Integer, ServerWriter> writers;
-    private final SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers;
+    private final Map<Integer, ServerReader> readers;
+    private final Map<Integer, ServerWriter> writers;
+    private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
     private final BoundedBuffer<ServerData> taskBuffer;
 
     public Server(int d, int s, int w) throws IOException {
@@ -46,9 +47,9 @@ public class Server implements AutoCloseable{
         Serie serie_inicial = new Serie(dataAtual.getData());
         this.series = new GestorSeries(s, dataAtual, serie_inicial);
 
-        this.readers = new SafeMap<>();
-        this.writers = new SafeMap<>();
-        this.clientBuffers = new SafeMap<>();
+        this.readers = new HashMap<>();
+        this.writers = new HashMap<>();
+        this.clientBuffers = new HashMap<>();
 
         this.simulator = new ServerSimulator(this);
         this.notifier = new ServerNotifier(this.clientBuffers);
