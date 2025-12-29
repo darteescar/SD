@@ -42,17 +42,13 @@ public class ServerNotifier implements Runnable {
 
      private void processar(String produto){
           this.lock1.lock();
-          try {
-              processarNotificacoesVC(produto);
-          } finally {
-               this.lock1.unlock();
-          }
-          
           this.lock2.lock();
           try {
-               processarNotificacoesVS(produto);
+              processarNotificacoesVC(produto);
+              processarNotificacoesVS(produto);
           } finally {
                this.lock2.unlock();
+               this.lock1.unlock();
           }
      }
 
@@ -138,19 +134,15 @@ public class ServerNotifier implements Runnable {
 
                // Locks feitos dentro da thread
                lock1.lock();
+               lock2.lock();
                try {
                     tmpVCCounters = new ArrayList<>(listavc);
                     listavc.clear();
-               } finally {
-                    lock1.unlock();
-               }
-
-               lock2.lock();
-               try {
                     tmpVSCounters = new ArrayList<>(listavs);
                     listavs.clear();
                } finally {
                     lock2.unlock();
+                    lock1.unlock();
                }
 
                // Envio das notificações

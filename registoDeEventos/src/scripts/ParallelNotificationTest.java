@@ -11,7 +11,7 @@ import utils.structs.client.Stud;
 public class ParallelNotificationTest {
 
      private static final int NUM_CLIENTES = 10;
-     private static final int NUM_PRODUTOS = 10;
+     private static final int NUM_PRODUTOS = 100;
 
      private static final ReentrantLock lock = new ReentrantLock();
      private static final Condition startCondition  = lock.newCondition();
