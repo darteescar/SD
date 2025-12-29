@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.GestorLogins;
+import utils.structs.server.GestorNotificacoes;
 import utils.structs.server.GestorSeries;
 
 public class ServerWorker implements Runnable {
@@ -22,6 +23,7 @@ public class ServerWorker implements Runnable {
     private final GestorLogins logins;
     private final GestorSeries gestorSeries;
     private final ServerNotifier notifier;
+    private final GestorNotificacoes gestornotificacoes;
     private final BoundedBuffer<ServerData> taskBuffer;
     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
 
@@ -30,13 +32,15 @@ public class ServerWorker implements Runnable {
         ServerNotifier notifier, 
         BoundedBuffer<ServerData> taskBuffer,
         Map<Integer, BoundedBuffer<Mensagem>> clientBuffers,
-        int d) throws IOException{
+        int d,
+        GestorNotificacoes gestornotificacoes) throws IOException{
         this.logins = logins;
         this.gestorSeries = gestorSeries;
         this.notifier = notifier;
         this.taskBuffer = taskBuffer;
         this.clientBuffers = clientBuffers;
         this.d = d;
+        this.gestornotificacoes = gestornotificacoes;
     }
 
     @Override
@@ -305,7 +309,7 @@ public class ServerWorker implements Runnable {
         try {
             NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
 
-            this.notifier.add(id,noti,clienteID);
+            this.gestornotificacoes.addVC(id,noti,clienteID);
             return true;
         } catch (ProtocolException e) {
             //System.out.println("[ERRO] Notificação VC inválida ou incompleta recebida, ignorando.");
@@ -322,7 +326,7 @@ public class ServerWorker implements Runnable {
         try {
             NotificacaoVS noti = NotificacaoVS.deserialize(bytes);
 
-            this.notifier.add(id,noti,clienteID);
+            this.gestornotificacoes.addVS(id,noti,clienteID);
             return true;
         } catch (ProtocolException e) {
             //System.out.println("[ERRO] Notificação VS inválida ou incompleta recebida, ignorando.");

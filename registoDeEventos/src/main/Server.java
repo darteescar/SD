@@ -15,6 +15,7 @@ import java.util.Scanner;
 import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.ClientSession;
 import utils.structs.server.GestorLogins;
+import utils.structs.server.GestorNotificacoes;
 import utils.structs.server.GestorSeries;
 import utils.workers.server.ServerNotifier;
 import utils.workers.server.ServerReader;
@@ -30,6 +31,7 @@ public class Server implements AutoCloseable{
     private final int d;
     private final ServerSimulator simulator;
     private final ServerNotifier notifier;
+    private final GestorNotificacoes gestornotificacoes;
 
     private final ServerWorker[] workers;
     private final Map<Integer, ServerReader> readers;
@@ -46,13 +48,14 @@ public class Server implements AutoCloseable{
         Data dataAtual = carregarDataAtual();
         Serie serie_inicial = new Serie(dataAtual.getData());
         this.series = new GestorSeries(s, dataAtual, serie_inicial);
+        this.gestornotificacoes = new GestorNotificacoes();
 
         this.readers = new HashMap<>();
         this.writers = new HashMap<>();
         this.clientBuffers = new HashMap<>();
 
         this.simulator = new ServerSimulator(this);
-        this.notifier = new ServerNotifier(this.clientBuffers);
+        this.notifier = new ServerNotifier(this.gestornotificacoes,this.clientBuffers);
 
         this.taskBuffer = new BoundedBuffer<>();
         this.workers = new ServerWorker[d];
@@ -61,7 +64,7 @@ public class Server implements AutoCloseable{
 
     private void startWorkers(int numWorkers) throws IOException {
         for (int i = 0; i < numWorkers; i++) {
-            workers[i] = new ServerWorker(logins, series, notifier, taskBuffer, clientBuffers, d);
+            workers[i] = new ServerWorker(logins, series, notifier, taskBuffer, clientBuffers, d, gestornotificacoes);
             System.out.println("[THREAD-POOL]: Worker-" + i + " criado.");
         }
         for (int i = 0; i < numWorkers; i++) {
