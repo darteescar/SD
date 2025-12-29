@@ -39,7 +39,7 @@ public class Server implements AutoCloseable{
 
     public Server(int d, int s, int w) throws IOException {
         this.ss = new ServerSocket(12345);
-        this.logins = new GestorLogins(s + 1);
+        this.logins = new GestorLogins();
         this.cliente = 0;
         this.d = d;
 

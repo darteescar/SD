@@ -12,10 +12,10 @@ import enums.TipoMsg;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.List;
+import java.util.Map;
 import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorSeries;
-import utils.structs.server.SafeMap;
 
 public class ServerWorker implements Runnable {
     private final int d;
@@ -23,13 +23,13 @@ public class ServerWorker implements Runnable {
     private final GestorSeries gestorSeries;
     private final ServerNotifier notifier;
     private final BoundedBuffer<ServerData> taskBuffer;
-    private final SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers;
+    private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
 
     public ServerWorker(GestorLogins logins, 
         GestorSeries gestorSeries, 
         ServerNotifier notifier, 
         BoundedBuffer<ServerData> taskBuffer,
-        SafeMap<Integer, BoundedBuffer<Mensagem>> clientBuffers,
+        Map<Integer, BoundedBuffer<Mensagem>> clientBuffers,
         int d) throws IOException{
         this.logins = logins;
         this.gestorSeries = gestorSeries;
