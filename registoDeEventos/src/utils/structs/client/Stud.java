@@ -57,9 +57,10 @@ public class Stud implements AutoCloseable {
         this.demu.start();
     }
 
-    /** Fecha o socket de comunicação com o servidor */
+    /** Fecha o socket de comunicação com o servidor e a thread do Demultiplexer */
     @Override
     public void close() throws IOException {
+        this.demu.close();
         this.socket.close();
     }
 

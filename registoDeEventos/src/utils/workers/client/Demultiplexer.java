@@ -109,6 +109,5 @@ public class Demultiplexer implements AutoCloseable{
     public void close() throws IOException{
         this.in.close();
         this.out.close();
-        this.socket.close();
     }
 }

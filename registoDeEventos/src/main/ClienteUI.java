@@ -1,6 +1,7 @@
 package main;
 
 import enums.TipoMsg;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,6 +53,11 @@ public class ClienteUI {
     public void start(){
         Menu menuPrincipal = criaMenuPrincipal();
         menuPrincipal.run();
+        try {
+            this.cliente.close();   
+        } catch (IOException e) {
+            System.out.println("[ERRO AO FECHAR STUD] " + e.getMessage());
+        }
         System.exit(0);
     }
 
