@@ -1,25 +1,19 @@
 package utils.workers.client;
 
 import entities.Mensagem;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class Demultiplexer implements AutoCloseable{
-    class Entry{
+public class Demultiplexer implements AutoCloseable {
+
+    class Entry {
         public Queue<String> queue;
         public Condition cond;
 
-        public Entry(ReentrantLock lock){
+        public Entry(ReentrantLock lock) {
             this.queue = new ArrayDeque<>();
             this.cond = lock.newCondition();
         }
@@ -29,10 +23,12 @@ public class Demultiplexer implements AutoCloseable{
     private final DataOutputStream out;
     private final DataInputStream in;
     private final ReentrantLock lock;
-    private Map<Integer, Entry> mapEntries;
-    private Exception ex; // Isto vai servir para acordar todas as threads caso ocorra alguma Exception
+    private final Map<Integer, Entry> mapEntries;
+    private Exception ex;
+    private boolean closed = false; // protegido pelo lock
+    private Thread backgroundThread;
 
-    public Demultiplexer(Socket socket) throws IOException{
+    public Demultiplexer(Socket socket) throws IOException {
         this.socket = socket;
         this.out = new DataOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
         this.in = new DataInputStream(new BufferedInputStream(this.socket.getInputStream()));
@@ -41,73 +37,84 @@ public class Demultiplexer implements AutoCloseable{
         this.ex = null;
     }
 
-    public Entry getEntry(int id){
-        if(!this.mapEntries.containsKey(id)){
-            this.mapEntries.put(id, new Entry(this.lock));
-        }
-        return this.mapEntries.get(id);
+    public Entry getEntry(int id) {
+        return mapEntries.computeIfAbsent(id, k -> new Entry(lock));
     }
 
-    // Começar Thread de background que vai orientar as replies para a thread correta
-    public void start(){
-        Thread background = new Thread(() -> {
-            //System.out.println("[DEMULTIPLEXER INICIADO]");
-            try{
-                while(true){
+    public void start() {
+        backgroundThread = new Thread(() -> {
+            try {
+                while (true) {
+                    lock.lock();
+                    try {
+                        if (closed) break; // sai do loop se fechado
+                    } finally {
+                        lock.unlock();
+                    }
+
                     Mensagem m = Mensagem.deserialize(in);
                     int id = m.getID();
                     String result = new String(m.getData());
 
-                    this.lock.lock();
-                    try{
-                        Entry entry = this.getEntry(id);
+                    lock.lock();
+                    try {
+                        Entry entry = getEntry(id);
                         entry.queue.add(result);
                         entry.cond.signalAll();
-
-                    }finally{
-                        this.lock.unlock();
+                    } finally {
+                        lock.unlock();
                     }
                 }
-            }catch(Exception e){    
-                // Tratamos do caso da Exception, acordando todas as Threads e nada fica bloqueado
-                this.lock.lock();
-                try{
+            } catch (Exception e) {
+                // sinaliza exceção e acorda threads
+                lock.lock();
+                try {
                     this.ex = e;
-                    for(Entry entry : this.mapEntries.values()){
+                    for (Entry entry : mapEntries.values()) {
                         entry.cond.signalAll();
                     }
-                }finally{
-                    this.lock.unlock();
+                } finally {
+                    lock.unlock();
                 }
             }
-        });
-        background.start();
-    }        
+        }, "Demultiplexer-Thread");
 
-    public void send(Mensagem mensagem) throws IOException{
+        backgroundThread.start();
+    }
+
+    public void send(Mensagem mensagem) throws IOException {
         mensagem.serialize(out);
         out.flush();
     }
 
-    public String receive(int id) throws InterruptedException{
-        this.lock.lock();
-        try{
-            Entry entry = this.getEntry(id);
-            while(entry.queue.isEmpty()){
+    public String receive(int id) throws InterruptedException {
+        lock.lock();
+        try {
+            Entry entry = getEntry(id);
+            while (entry.queue.isEmpty()) {
+                if (closed || ex != null) return null; // termina se fechado ou exceção
                 entry.cond.await();
-                if(this.ex != null){
-                    return null;
-                }
+                if (closed || ex != null) return null;
             }
-            String reply = entry.queue.poll();
-            return reply;
-        }finally{
-            this.lock.unlock();
+            return entry.queue.poll();
+        } finally {
+            lock.unlock();
         }
     }
 
-    public void close() throws IOException{
-        this.in.close();
-        this.out.close();
+    @Override
+    public void close() throws IOException {
+        lock.lock();
+        try {
+            closed = true;
+            for (Entry entry : mapEntries.values()) {
+                entry.cond.signalAll(); // acorda threads bloqueadas
+            }
+        } finally {
+            lock.unlock();
+        }
+
+        in.close();
+        out.close();
     }
 }

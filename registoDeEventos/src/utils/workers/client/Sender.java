@@ -30,6 +30,11 @@ public class Sender implements Runnable {
             demu.send(mToSend);
             String reply = demu.receive(id);
 
+            if (reply == null) { // Demultiplexer fechado
+                //System.out.println("Sender thread " + id + " terminou porque Demultiplexer foi fechado.");
+                return;
+            }
+
             if(tipo != TipoMsg.REGISTA_LOGIN && tipo != TipoMsg.LOGIN){
                 lock.lock();
                 try {
