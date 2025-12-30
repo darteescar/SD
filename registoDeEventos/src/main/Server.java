@@ -38,7 +38,7 @@ public class Server implements AutoCloseable{
     private final Map<Integer, ServerReader> readers;
     private final Map<Integer, ServerWriter> writers;
     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
-    private final BoundedBuffer<ServerData> taskBuffer;
+    private final BoundedBuffer<ServerData> mensagensPendentes;
 
     public Server(int d, int s, int w) throws IOException {
         this.ss = new ServerSocket(12345);
@@ -58,14 +58,14 @@ public class Server implements AutoCloseable{
         this.simulator = new ServerSimulator(this);
         this.notifier = new ServerNotifier(this.gestornotificacoes,this.clientBuffers);
 
-        this.taskBuffer = new BoundedBuffer<>();
+        this.mensagensPendentes = new BoundedBuffer<>();
         this.workers = new ServerWorker[d];
         startWorkers(w);
     }
 
     private void startWorkers(int numWorkers) throws IOException {
         for (int i = 0; i < numWorkers; i++) {
-            workers[i] = new ServerWorker(logins, series, notifier, taskBuffer, clientBuffers, d, gestornotificacoes);
+            workers[i] = new ServerWorker(logins, series, notifier, mensagensPendentes, clientBuffers, d, gestornotificacoes);
             System.out.println("[THREAD-POOL]: Worker-" + i + " criado.");
         }
         for (int i = 0; i < numWorkers; i++) {
@@ -97,7 +97,7 @@ public class Server implements AutoCloseable{
             int id = cliente++;
 
             try {
-                ClientSession session = new ClientSession(socket, id, taskBuffer);
+                ClientSession session = new ClientSession(socket, id, mensagensPendentes);
                 clientBuffers.put(id, session.getOutBuffer());
                 session.start();
                 //System.out.println("[NOVO CLIENTE " + id + " LIGADO]");

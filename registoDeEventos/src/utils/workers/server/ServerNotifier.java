@@ -26,7 +26,6 @@ public class ServerNotifier implements Runnable {
      public void run() {
           while (true) {
                String produto = buffer.poll();
-               if (produto == null) continue;
 
                List<ServerData> notificacoes =
                          gestor.processarProdutoVendido(produto);

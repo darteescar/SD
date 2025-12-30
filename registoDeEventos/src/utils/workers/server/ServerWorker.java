@@ -24,20 +24,20 @@ public class ServerWorker implements Runnable {
     private final GestorSeries gestorSeries;
     private final ServerNotifier notifier;
     private final GestorNotificacoes gestornotificacoes;
-    private final BoundedBuffer<ServerData> taskBuffer;
+    private final BoundedBuffer<ServerData> mensagensPendentes;
     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
 
     public ServerWorker(GestorLogins logins, 
         GestorSeries gestorSeries, 
         ServerNotifier notifier, 
-        BoundedBuffer<ServerData> taskBuffer,
+        BoundedBuffer<ServerData> mensagensPendentes,
         Map<Integer, BoundedBuffer<Mensagem>> clientBuffers,
         int d,
         GestorNotificacoes gestornotificacoes) throws IOException{
         this.logins = logins;
         this.gestorSeries = gestorSeries;
         this.notifier = notifier;
-        this.taskBuffer = taskBuffer;
+        this.mensagensPendentes = mensagensPendentes;
         this.clientBuffers = clientBuffers;
         this.d = d;
         this.gestornotificacoes = gestornotificacoes;
@@ -47,7 +47,7 @@ public class ServerWorker implements Runnable {
     public void run() {
         try {
             while (true) {
-                ServerData serverData = this.taskBuffer.poll();
+                ServerData serverData = this.mensagensPendentes.poll();
                 int clienteID = serverData.getClienteID();
 
                 Mensagem mensagem = serverData.getMensagem();

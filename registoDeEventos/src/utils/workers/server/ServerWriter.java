@@ -9,17 +9,17 @@ import utils.structs.server.ClientSession;
 public class ServerWriter implements Runnable {
     private final ClientSession session;
     private final DataOutputStream output;
-    private final BoundedBuffer<Mensagem> taskBuffer;
+    private final BoundedBuffer<Mensagem> mensagensResposta;
     private final int cliente;
 
     public static final Mensagem POISON_PILL = new Mensagem(0, TipoMsg.POISON_PILL, null);
 
     public ServerWriter(ClientSession session,
-                        BoundedBuffer<Mensagem> taskBuffer,
+                        BoundedBuffer<Mensagem> mensagensResposta,
                         int cliente,
                         DataOutputStream output) {
         this.session = session;
-        this.taskBuffer = taskBuffer;
+        this.mensagensResposta = mensagensResposta;
         this.cliente = cliente;
         this.output = output;
     }
@@ -28,7 +28,7 @@ public class ServerWriter implements Runnable {
     public void run() {
         try {
             while (true) {
-                Mensagem msg = taskBuffer.poll();
+                Mensagem msg = mensagensResposta.poll();
 
                 if (msg.getTipo() == TipoMsg.POISON_PILL) {
                     // Poison pill recebido - termina a thread
@@ -52,11 +52,11 @@ public class ServerWriter implements Runnable {
 
     public void send(Mensagem data) {
         if (data != null) {
-            taskBuffer.add(data);
+            mensagensResposta.add(data);
         }
     }
 
     public BoundedBuffer<Mensagem> getOutBuffer() {
-        return taskBuffer;
+        return mensagensResposta;
     }
 }

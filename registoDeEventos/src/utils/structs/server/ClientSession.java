@@ -2,10 +2,6 @@ package utils.structs.server;
 
 import entities.Mensagem;
 import entities.ServerData;
-import utils.structs.notification.BoundedBuffer;
-import utils.workers.server.ServerReader;
-import utils.workers.server.ServerWriter;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -13,6 +9,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.locks.ReentrantLock;
+import utils.structs.notification.BoundedBuffer;
+import utils.workers.server.ServerReader;
+import utils.workers.server.ServerWriter;
 
 public class ClientSession {
 
@@ -24,7 +23,7 @@ public class ClientSession {
     private final boolean closed = false;
 
     public ClientSession(Socket socket, int clienteId,
-                         BoundedBuffer<ServerData> taskBuffer)
+                         BoundedBuffer<ServerData> mensagensPendentes)
             throws IOException {
 
         this.socket = socket;
@@ -35,7 +34,7 @@ public class ClientSession {
             DataInputStream input = new DataInputStream( new BufferedInputStream(socket.getInputStream()));
             DataOutputStream output = new DataOutputStream( new BufferedOutputStream(socket.getOutputStream()));
 
-            this.reader = new ServerReader(this,taskBuffer, clienteId, input);
+            this.reader = new ServerReader(this,mensagensPendentes, clienteId, input);
             this.writer = new ServerWriter(this,new BoundedBuffer<>(), clienteId, output);
             ok = true;
         } finally {
