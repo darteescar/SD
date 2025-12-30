@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import utils.structs.notification.BoundedBuffer;
@@ -120,7 +121,11 @@ public class Server implements AutoCloseable{
             LocalDate.of(d.getAno(), d.getMes(), d.getDia())
         );
 
-        this.notifier.clear();
+        new Thread(() -> {
+        List<ServerData> notificacoes = gestornotificacoes.clear();
+            for (ServerData m : notificacoes)
+                clientBuffers.get(m.getClienteID()).add(m.getMensagem());
+        }).start();
     }
 
     public void printGS(){

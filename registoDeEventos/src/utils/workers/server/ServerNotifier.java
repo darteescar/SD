@@ -39,14 +39,8 @@ public class ServerNotifier implements Runnable {
           }
      }
 
+     // usado pelos ServerWorkers para notificar o ServerNotifier
      public void signall(String produto){
           buffer.add(produto);
-     }
-
-     /* Chamado pelo simulador */
-     public void clear() {
-          List<ServerData> notificacoes = gestor.clear();
-          for (ServerData m : notificacoes)
-               clientBuffers.get(m.getClienteID()).add(m.getMensagem());
      }
 }

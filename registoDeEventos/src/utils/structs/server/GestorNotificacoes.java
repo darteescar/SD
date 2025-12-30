@@ -10,20 +10,30 @@ import java.util.concurrent.locks.ReentrantLock;
 import utils.structs.notification.NotificationVCCounter;
 import utils.structs.notification.NotificationVSCounter;
 
+/** Classe responsável por gerir notificações */
 public class GestorNotificacoes {
 
+     /** Lista de notificações do tipo Vendas Consecutivas */
      private final List<NotificationVCCounter> listavc = new ArrayList<>();
+
+     /** Lista de notificações do tipo Vendas Simultâneas */
      private final List<NotificationVSCounter> listavs = new ArrayList<>();
 
+     /** Lock para a lista de notificações do tipo Vendas Consecutivas */
      private final ReentrantLock lockVC = new ReentrantLock();
+
+     /** Lock para a lista de notificações do tipo Vendas Simultâneas */
      private final ReentrantLock lockVS = new ReentrantLock();
 
+     /** Último produto vendido */
      private String produtoAtualVC = null;
 
-     /* ======================
-          Registo de notificações
-          ====================== */
-
+     /** Adiciona uma notificação do tipo Vendas Consecutivas 
+      * 
+      * @param id ID da notificação
+      * @param noti Notificação a adicionar
+      * @param clienteID ID do cliente que pediu a notificação
+     */
      public void addVC(int id, NotificacaoVC noti, int clienteID) {
           lockVC.lock();
           try {
@@ -33,6 +43,12 @@ public class GestorNotificacoes {
           }
      }
 
+     /** Adiciona uma notificação do tipo Vendas Simultâneas 
+      * 
+      * @param id ID da notificação
+      * @param noti Notificação a adicionar
+      * @param clienteID ID do cliente que pediu a notificação
+     */
      public void addVS(int id, NotificacaoVS noti, int clienteID) {
           lockVS.lock();
           try {
@@ -45,10 +61,11 @@ public class GestorNotificacoes {
           }
      }
 
-     /* ======================
-          Evento: produto vendido
-          ====================== */
-
+     /** Processa a venda de um produto 
+      * 
+      * @param produto Produto vendido
+      * @return Lista de notificações a enviar
+     */
      public List<ServerData> processarProdutoVendido(String produto) {
           List<ServerData> out = new ArrayList<>();
 
@@ -65,6 +82,11 @@ public class GestorNotificacoes {
           return out;
      }
 
+     /** Processa as notificações do tipo Vendas Consecutivas
+      * 
+      * @param produto Produto vendido
+      * @param out Lista de notificações a enviar
+      */
      private void processarVC(String produto, List<ServerData> out) {
           if (produto.equals(produtoAtualVC)) {
                Iterator<NotificationVCCounter> it = listavc.iterator();
@@ -88,6 +110,11 @@ public class GestorNotificacoes {
           }
      }
 
+     /** Processa as notificações do tipo Vendas Simultâneas
+      * 
+      * @param produto Produto vendido
+      * @param out Lista de notificações a enviar
+      */
      private void processarVS(String produto, List<ServerData> out) {
           Iterator<NotificationVSCounter> it = listavs.iterator();
           while (it.hasNext()) {
@@ -108,10 +135,10 @@ public class GestorNotificacoes {
           }
      }
 
-     /* ======================
-          Clear (simulador / shutdown)
-          ====================== */
-
+     /** Obtem todas as notificações pendentes e limpa as listas
+      * 
+      * @return Lista de notificações a enviar
+      */
      public List<ServerData> clear() {
           List<ServerData> out = new ArrayList<>();
 
