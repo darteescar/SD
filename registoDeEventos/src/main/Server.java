@@ -34,7 +34,7 @@ public class Server implements AutoCloseable{
     private final ServerNotifier notifier;
     private final GestorNotificacoes gestornotificacoes;
 
-    private final ServerWorker[] workers;
+    private final ServerWorker[] threadpool;
     private final Map<Integer, ServerReader> readers;
     private final Map<Integer, ServerWriter> writers;
     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
@@ -59,17 +59,17 @@ public class Server implements AutoCloseable{
         this.notifier = new ServerNotifier(this.gestornotificacoes,this.clientBuffers);
 
         this.mensagensPendentes = new BoundedBuffer<>();
-        this.workers = new ServerWorker[d];
-        startWorkers(w);
+        this.threadpool = new ServerWorker[d];
+        startthreadpool(w);
     }
 
-    private void startWorkers(int numWorkers) throws IOException {
-        for (int i = 0; i < numWorkers; i++) {
-            workers[i] = new ServerWorker(logins, series, notifier, mensagensPendentes, clientBuffers, d, gestornotificacoes);
+    private void startthreadpool(int numthreadpool) throws IOException {
+        for (int i = 0; i < numthreadpool; i++) {
+            threadpool[i] = new ServerWorker(logins, series, notifier, mensagensPendentes, clientBuffers, d, gestornotificacoes);
             System.out.println("[THREAD-POOL]: Worker-" + i + " criado.");
         }
-        for (int i = 0; i < numWorkers; i++) {
-            new Thread(workers[i], "Worker-" + i).start();
+        for (int i = 0; i < numthreadpool; i++) {
+            new Thread(threadpool[i], "Worker-" + i).start();
             System.out.println("[THREAD-POOL]: Worker-" + i + " começou.");
         }
     }
