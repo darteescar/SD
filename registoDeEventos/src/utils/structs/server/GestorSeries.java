@@ -72,7 +72,6 @@ public class GestorSeries {
 
      public Serie get(String dia) {
           if (cache.containsKey(dia)){ // HIT - se está na cache
-               System.out.println("[GS]: Cache HIT para o dia " + dia);
                return cache.get(dia);
           } else if (bd.containsKey(dia)){ // MISS - se está na BD
                Serie s = bd.get(dia);
