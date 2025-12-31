@@ -71,6 +71,10 @@ stress-all:
 	@echo ">> A executar Stress Test Completo..."
 	java -cp "$(CLASSPATH)" scripts.ParallelDeterministicTest
 
+stress-final:
+	@echo ">> A executar Stress Test Final..."
+	java -cp "$(CLASSPATH)" scripts.RobustScalabilityTestFinal
+
 # Clean
 clean:
 	@echo ">> A limpar ficheiros compilados..."
