@@ -323,16 +323,13 @@ public class RobustScalabilityTestFinal {
 
         for (int i = 1 ; i <= 4; i++) {
             test.enviar_Eventos(num_clientes, num_produtos, logFilePath);
-            Thread.sleep(35000); // Pausa de 40 segundos entre rondas (40)
+            Thread.sleep(40000); // Pausa de 40 segundos entre rondas (40)
             num_clientes *= 2; // Dobra o número de clientes para a próxima ronda
         }
         // 1ª ronda: 5 clientes x 1000 produtos = 5.000 eventos
         // 2ª ronda: 10 clientes x 1000 produtos = 10.000
         // 3ª ronda: 20 clientes x 1000 produtos = 20.000 eventos
         // 4ª ronda: 40 clientes x 1000 produtos = 40.000 eventos
-        
-        // esperar alguns dias
-        //Thread.sleep()
 
         // ao usar enviar querys, garantir que o numero é multiplo de 5
 
