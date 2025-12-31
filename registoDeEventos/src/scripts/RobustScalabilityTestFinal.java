@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -306,8 +307,14 @@ public class RobustScalabilityTestFinal {
             logFile.write("\n");
             logFile.write("\n");
         }
+
         // Fecha os studs
-        for (Stud2 stud : studs) stud.close();
+        for (Stud2 stud : studs) {
+            List <String> replies = stud.getRepliesList();
+            System.out.println("[INFO] Cliente recebeu " + replies );
+
+            stud.close();
+        }
 
         System.out.println("[INFO] Rodada concluída e log gravado em " + logFilePath);
 
@@ -318,25 +325,41 @@ public class RobustScalabilityTestFinal {
         String logFilePath = "src/scripts/results/robust_scalability_test_final_log.txt";
         new FileWriter(logFilePath, false).close(); // Limpa o ficheiro de log antes de começar
 
-        int num_clientes = 5;
-        int num_produtos = 1000;
+        Scanner scanner = new Scanner(System.in);
 
-        for (int i = 1 ; i <= 4; i++) {
+        System.out.print("Insira o número de clientes: ");
+        int num_clientes = scanner.nextInt();
+
+        System.out.print("Insira o número de produtos: ");
+        int num_produtos = scanner.nextInt();
+
+        System.out.print("Insira o intervalo entre rodadas de eventos (ms): ");
+        int pausa_evento_ms = scanner.nextInt();
+
+        System.out.print("Insira o número de rodadas: ");
+        int num_rodadas = scanner.nextInt();
+
+        for (int i = 1 ; i <= num_rodadas; i++) {
+            System.out.println("Iniciando ronda " + i + " de " + num_rodadas);
             test.enviar_Eventos(num_clientes, num_produtos, logFilePath);
-            Thread.sleep(40000); // Pausa de 40 segundos entre rondas (40)
-            num_clientes *= 2; // Dobra o número de clientes para a próxima ronda
+            num_clientes *= 2;
+            Thread.sleep(pausa_evento_ms);
         }
-        // 1ª ronda: 5 clientes x 1000 produtos = 5.000 eventos
-        // 2ª ronda: 10 clientes x 1000 produtos = 10.000
-        // 3ª ronda: 20 clientes x 1000 produtos = 20.000 eventos
-        // 4ª ronda: 40 clientes x 1000 produtos = 40.000 eventos
 
-        // ao usar enviar querys, garantir que o numero é multiplo de 5
+        System.out.println("Ronda concluída. Deseja enviar queries? (s/n)");
+        String resposta = scanner.next();
+        if (resposta.equalsIgnoreCase("s")) {
+            System.out.print("Insira o número de clientes para queries: ");
+            int num_clientes_query = scanner.nextInt();
 
-        test.enviar_Querys(10, 10, logFilePath);
+            System.out.print("Insira o número de produtos para queries: ");
+            int num_produtos_query = scanner.nextInt();
 
+            test.enviar_Querys(num_clientes_query, num_produtos_query, logFilePath);
+        }
 
-
-
+        scanner.close();
+        System.out.println("Teste concluído. Log gravado em: " + logFilePath);
     }
+
 }
