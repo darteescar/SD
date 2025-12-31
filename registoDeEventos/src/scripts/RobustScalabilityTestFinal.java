@@ -310,8 +310,8 @@ public class RobustScalabilityTestFinal {
 
         // Fecha os studs
         for (Stud2 stud : studs) {
-            List <String> replies = stud.getRepliesList();
-            System.out.println("[INFO] Cliente recebeu " + replies );
+            /*List <String> replies = stud.getRepliesList();
+            System.out.println("[INFO] Cliente recebeu " + replies );*/
 
             stud.close();
         }
