@@ -152,8 +152,6 @@ public class BDSeries implements Map<String, Serie> {
     public Serie put(String key, Serie value) {
         writelock.lock();
         try {
-            System.out.println("[BDS]: Adicionando série do dia " + key + " à base de dados.");
-            System.out.println("[BDS]: Eventos na série: " + value.getEventos().size());
             // cria nova série com data=key e adiciona eventos
             try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
                 PreparedStatement stmtSerie = conn.prepareStatement(
@@ -181,7 +179,6 @@ public class BDSeries implements Map<String, Serie> {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
-            System.out.println("[BDS]: Série do dia " + key + " adicionada com sucesso à base de dados.");
             return value;   
         } finally {
             writelock.unlock();

@@ -59,7 +59,7 @@ public class Server implements AutoCloseable{
         this.notifier = new ServerNotifier(this.gestornotificacoes,this.clientBuffers);
 
         this.mensagensPendentes = new BoundedBuffer<>();
-        this.threadpool = new ServerWorker[d];
+        this.threadpool = new ServerWorker[w];
         startthreadpool(w);
     }
 
@@ -164,9 +164,9 @@ public class Server implements AutoCloseable{
 
             if (resposta.equals("sim") || resposta.equals("s")) {
                 databases.BDReset.resetAll();
-                System.out.println("Base de dados apagada.");
+                System.out.println("[SERVER]: Base de dados apagada.");
             } else {
-                System.out.println("Reset cancelado.");
+                System.out.println("[SERVER]: Reset cancelado.");
             }
         }
 

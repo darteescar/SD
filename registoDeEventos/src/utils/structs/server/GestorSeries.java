@@ -42,8 +42,13 @@ public class GestorSeries {
           }
           if (!bd.containsKey(serie.getData())){ // se não está na BD, insere na BD e na Cache
                System.out.println("[GS]: Adicionando série do dia " + serie.getData() + " à BD e Cache");
-               bd.put(serie.getData(), serie);
+               System.out.println("[GS]: Série de tamanho " + serie.size());
+               System.out.println("[GS]: Adicionando à cache");
                cache.put(serie.getData(), serie);
+               System.out.println("[GS]: Série do dia " + serie.getData() + " adicionada à Cache");
+               System.out.println("[GS]: Adicionando à BD ...");
+               bd.put(serie.getData(), serie);
+               System.out.println("[GS]: Série do dia " + serie.getData() + " adicionada à BD");
                return true;
           }
           return false; // série existe
@@ -67,12 +72,13 @@ public class GestorSeries {
 
      public Serie get(String dia) {
           if (cache.containsKey(dia)){ // HIT - se está na cache
+               System.out.println("[GS]: Cache HIT para o dia " + dia);
                return cache.get(dia);
           } else if (bd.containsKey(dia)){ // MISS - se está na BD
                Serie s = bd.get(dia);
                cache.put(dia, s);
                return s;
-          } 
+          }
           return null; // série não existe
      }
 
@@ -86,6 +92,7 @@ public class GestorSeries {
                serieParaGuardar = this.serie_atual; // guarda a série atual
                this.data_atual.incrementData();
                this.serie_atual = new Serie(data_atual.getData());
+               this.cache.print();
           } finally {
                lock.unlock();
           }

@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class RobustScalabilityTestFinal {
 
-    private static final int PAUSA_EVENTO_MS = 1;
+    private static final int PAUSA_EVENTO_MS = 5;
 
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition startCondition = lock.newCondition();
@@ -21,7 +21,9 @@ public class RobustScalabilityTestFinal {
     private boolean ready = false;
     private int finished = 0;
 
-    public void enviar_Eventos(int num_clientes, int num_produtos, String logFilePath) throws Exception {
+    private void enviar_Eventos(int num_clientes, int num_produtos, String logFilePath) throws Exception {
+
+        System.out.println("[INFO] Iniciando ronda com " + num_clientes + " clientes e " + num_produtos + " produtos por cliente.");
 
         // Reset de contadores
         ready = false;
@@ -39,6 +41,10 @@ public class RobustScalabilityTestFinal {
                 try {
                     // Login
                     studs[clienteId].sendLOGIN(TipoMsg.LOGIN, "tiago", "tiago");
+
+                    studs[clienteId].sendNotificacaoVC(TipoMsg.NOTIFICACAO_VC, 5 );
+
+                    studs[clienteId].sendNotificacaoVS(TipoMsg.NOTIFICACAO_VS, "produto1", "produto5" );
 
                     // Espera pelo sinal de arranque
                     lock.lock();
@@ -93,7 +99,11 @@ public class RobustScalabilityTestFinal {
             lock.unlock();
         }
 
-        Thread.sleep(5000); // Espera adicional para garantir que todas as respostas foram recebidas
+        System.out.println("[INFO] Todos os clientes terminaram de enviar eventos. Aguardando processamento final...");
+
+        Thread.sleep(1000); // espera 1 segundo
+
+        System.out.println("[INFO] Gravando estatísticas da ronda no log...");
 
         // Grava no log em modo append a média da ronda
         try (BufferedWriter logFile = new BufferedWriter(new FileWriter(logFilePath, true))) {
@@ -144,13 +154,15 @@ public class RobustScalabilityTestFinal {
         // Fecha os studs
         for (Stud2 stud : studs) stud.close();
 
-        System.out.println("[INFO] Rodada concluída e log gravado em " + logFilePath);
+        System.out.println("[INFO] Rodada concluída e log gravado");
     }
 
     private void enviar_Querys(int num_clientes, int num_produtos, String logFilePath) throws Exception {
         // Reset de contadores
         ready = false;
         finished = 0;
+
+        System.out.println("[INFO] Iniciando ronda de querys com " + num_clientes + " clientes e " + num_produtos + " produtos por cliente.");
 
         Stud2[] studs = new Stud2[num_clientes];
         Thread[] threads = new Thread[num_clientes];
@@ -181,31 +193,31 @@ public class RobustScalabilityTestFinal {
                                 studs[clienteId].sendAGREGACAO(
                                         TipoMsg.PRECO_MAXIMO,
                                         "produto" + j,
-                                        5
+                                        3
                                 );  break;
                             case 1:
                                 studs[clienteId].sendAGREGACAO(
                                         TipoMsg.PRECO_MEDIO,
                                         "produto" + j,
-                                        5
+                                        3
                                 );  break;
                             case 2:
                                 studs[clienteId].sendAGREGACAO(
                                         TipoMsg.VOLUME_VENDAS,
                                         "produto" + j,
-                                        5
+                                        3
                                 );  break;
                             case 3:
                                 studs[clienteId].sendAGREGACAO(
                                         TipoMsg.QUANTIDADE_VENDAS,
                                         "produto" + j,
-                                        5
+                                        3
                                 );  break;
                             default:
                                 studs[clienteId].sendFILTRAR(
                                         TipoMsg.LISTA,
                                         new ArrayList<String>(List.of("produto" + j, "produto" + (j+1), "produto" + (j+2))),
-                                        5
+                                        3
                                 );  break;
                         }
                     }
@@ -244,7 +256,9 @@ public class RobustScalabilityTestFinal {
             lock.unlock();
         }
 
-        Thread.sleep(5000); // Espera adicional para garantir que todas as respostas foram recebidas
+        System.out.println("[INFO] Todos os clientes terminaram de enviar queries. Aguardando processamento final...");
+
+        Thread.sleep(1000); // Espera adicional para garantir que todas as respostas foram recebidas
 
         // Grava no log em modo append a média da ronda
         try (BufferedWriter logFile = new BufferedWriter(new FileWriter(logFilePath, true))) {
@@ -299,51 +313,33 @@ public class RobustScalabilityTestFinal {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         RobustScalabilityTestFinal test = new RobustScalabilityTestFinal();
         String logFilePath = "src/scripts/results/robust_scalability_test_final_log.txt";
+        new FileWriter(logFilePath, false).close(); // Limpa o ficheiro de log antes de começar
 
-        int num_clientes = 10;
+        int num_clientes = 5;
         int num_produtos = 1000;
 
-        try {
-            for (int i = 0 ; i < 5; i++) {
-                test.enviar_Eventos(num_clientes, num_produtos, logFilePath);
-                Thread.sleep(30000); // Pausa de 35 segundos entre rondas (30 + 5 segundos de espera em enviar_Eventos)
-                num_clientes *= 2; // Dobra o número de clientes para a próxima ronda
-            }
-            // 1ª ronda: 10 clientes x 1000 produtos = 10.000 eventos
-            // 2ª ronda: 20 clientes x 1000 produtos = 20.000
-            // 3ª ronda: 40 clientes x 1000 produtos = 40.000 eventos
-            // 4ª ronda: 80 clientes x 1000 produtos = 80.000 eventos
-            // 5ª ronda: 160 clientes x 1000 produtos = 160.000 eventos
-            
-            // esperar alguns dias
-            //Thread.sleep()
-
-            // ao usar enviar querys, garantir que o numero é multiplo de 5
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        for (int i = 1 ; i <= 4; i++) {
+            test.enviar_Eventos(num_clientes, num_produtos, logFilePath);
+            Thread.sleep(35000); // Pausa de 40 segundos entre rondas (40)
+            num_clientes *= 2; // Dobra o número de clientes para a próxima ronda
         }
+        // 1ª ronda: 5 clientes x 1000 produtos = 5.000 eventos
+        // 2ª ronda: 10 clientes x 1000 produtos = 10.000
+        // 3ª ronda: 20 clientes x 1000 produtos = 20.000 eventos
+        // 4ª ronda: 40 clientes x 1000 produtos = 40.000 eventos
+        
+        // esperar alguns dias
+        //Thread.sleep()
 
+        // ao usar enviar querys, garantir que o numero é multiplo de 5
+
+        test.enviar_Querys(10, 10, logFilePath);
 
 
 
 
     }
-
-    
-    //////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////
-    /// //////////////////////////////////////////////////
-    /// 
-    /// nao esquecer que como as threads apenas enviam e avisam que acabram de enviar, dependendo do numero de server workers
-    /// /// pode ser que o servidor ainda esteja a processar 1 ou outro evento quando o teste acabar e por isso
-    /// ao inves de ter todos os eventos processados, pode faltar 1 ou outro
 }

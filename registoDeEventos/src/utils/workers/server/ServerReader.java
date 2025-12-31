@@ -34,11 +34,10 @@ public class ServerReader implements Runnable {
                mensagensPendentes.add(new ServerData(cliente, new Mensagem(e.getId(), "Erro: Mensagem inválida ou corrompida.")));
 
           } catch (Exception e) {
+               // Erro ao ler a mensagem - termina a thread
                break;
           }
      }
-
      session.close();
      }
-
 }

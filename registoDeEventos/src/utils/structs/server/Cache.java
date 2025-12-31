@@ -100,4 +100,14 @@ public class Cache<K,V>{
           }
      }
 
+     public void print() {
+          readLock.lock();
+          try {
+               // imprime as chaves na cache
+               System.out.println("[CACHE]: Estado atual da cache: " + map.keySet());
+          } finally {
+               readLock.unlock();
+          }
+     }
+
 }
