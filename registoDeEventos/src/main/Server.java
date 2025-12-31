@@ -40,7 +40,7 @@ public class Server implements AutoCloseable{
     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
     private final BoundedBuffer<ServerData> mensagensPendentes;
 
-    public Server(int d, int s, int w) throws IOException {
+    public Server(int d, int s, int w, long intervalo) throws IOException {
         this.ss = new ServerSocket(12345);
         this.logins = new GestorLogins();
         this.cliente = 0;
@@ -55,7 +55,7 @@ public class Server implements AutoCloseable{
         this.writers = new HashMap<>();
         this.clientBuffers = new HashMap<>();
 
-        this.simulator = new ServerSimulator(this);
+        this.simulator = new ServerSimulator(this, intervalo);
         this.notifier = new ServerNotifier(this.gestornotificacoes,this.clientBuffers);
 
         this.mensagensPendentes = new BoundedBuffer<>();
@@ -139,16 +139,17 @@ public class Server implements AutoCloseable{
     }
 
     public static void main(String[] args) {
-        if (args.length < 3) {
-            System.out.println("Uso: make server <D> <S> <W> <RESET>");
+        if (args.length < 4) {
+            System.out.println("Uso: make server <D> <S> <W> <I> <RESET>");
             return;
         }
 
         int d = Integer.parseInt(args[0]);
         int s = Integer.parseInt(args[1]);
         int w = Integer.parseInt(args[2]);
+        long intervalo = Long.parseLong(args[3]);
 
-        boolean reset = args.length == 4 && args[3].equals("1");
+        boolean reset = args.length >= 5 && args[4].equals("1");
 
         if (s >= d) {
             System.out.println("Erro: S deve ser menor que D.");
@@ -170,11 +171,12 @@ public class Server implements AutoCloseable{
             }
         }
 
-        try (Server server = new Server(d, s, w)) {
+        try (Server server = new Server(d, s, w, intervalo)) {
             server.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
 }

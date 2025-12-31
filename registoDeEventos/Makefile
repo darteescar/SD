@@ -14,6 +14,7 @@ SERVER_CLIENTE = main.ClienteUI
 D ?= 0
 S ?= 0
 W ?= 0
+I ?= 60000   # Default 60 segundos
 RESET ?= 0
 
 # .java
@@ -31,14 +32,14 @@ compile:
 # Executar servidor
 server:
 	@if [ "$(D)" = "0" ] || [ "$(S)" = "0" ] || [ "$(W)" = "0" ]; then \
-		echo "Uso: make server D=<valor> S=<valor> W=<valor> [RESET=1]"; \
+		echo "Uso: make server D=<valor> S=<valor> W=<valor> I=<intervalo_ms> [RESET=1]"; \
 		exit 1; \
 	fi
-	@echo ">> Iniciando o servidor com D=$(D) S=$(S) W=$(W) RESET=$(RESET)..."
+	@echo ">> Iniciando o servidor com D=$(D) S=$(S) W=$(W) I=$(I) RESET=$(RESET)..."
 	@if [ "$(RESET)" = "1" ]; then \
-		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S) $(W) $(RESET) < $(shell tty); \
+		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S) $(W) $(I) $(RESET) < $(shell tty); \
 	else \
-		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S) $(W); \
+		java -cp "$(CLASSPATH)" $(SERVER_MAIN) $(D) $(S) $(W) $(I); \
 	fi
 
 # Executar cliente
@@ -54,22 +55,6 @@ stress-test:
 stress-test-invalid:
 	@echo ">> A executar Stress Test de Inserções Inválidas..."
 	java -cp "$(CLASSPATH)" scripts.ParallelInsertCorruptedTest
-
-stress-query:
-	@echo ">> A executar Stress Test de Consultas..."
-	java -cp "$(CLASSPATH)" scripts.ParallelQueryTest
-
-stress-notification:
-	@echo ">> A executar Stress Test de Notificações..."
-	java -cp "$(CLASSPATH)" scripts.ParallelNotificationTest
-
-stress-mixed:
-	@echo ">> A executar Stress Test Misto..."
-	java -cp "$(CLASSPATH)" scripts.ParallelMixedTest
-
-stress-all:
-	@echo ">> A executar Stress Test Completo..."
-	java -cp "$(CLASSPATH)" scripts.ParallelDeterministicTest
 
 stress-final:
 	@echo ">> A executar Stress Test Final..."
