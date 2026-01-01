@@ -13,7 +13,7 @@ public class Cache<K,V>{
 
      public Cache(int capacidade){
           this.capacidade = capacidade;
-          this.map = new LinkedHashMap<>(capacidade, 1.0f, false){
+          this.map = new LinkedHashMap<>(capacidade, 1.0f, true){
                @Override
                protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
                     // Remove o elemento mais antigo quando exceder a capacidade
@@ -23,14 +23,11 @@ public class Cache<K,V>{
      }
 
      public V get(K key){
-          readLock.lock();
+          writelock.lock();
           try{
-               if (this.map.containsKey(key)){
-                    return this.map.get(key);
-               }
-               return null;
+               return this.map.get(key);
           }finally{
-               readLock.unlock();
+               writelock.unlock();
           }
      }
 
