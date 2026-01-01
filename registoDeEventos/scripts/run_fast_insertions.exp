@@ -1,8 +1,0 @@
-NUM_CLIENTES=100
-
-for i in $(seq 1 $NUM_CLIENTES); do
-    ./fast_insertions.exp &
-done
-
-wait
-
