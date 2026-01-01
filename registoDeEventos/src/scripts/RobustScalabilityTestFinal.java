@@ -259,7 +259,7 @@ public class RobustScalabilityTestFinal {
 
         System.out.println("[INFO] Todos os clientes terminaram de enviar queries. Aguardando processamento final...");
 
-        Thread.sleep(1000); // Espera adicional para garantir que todas as respostas foram recebidas
+        Thread.sleep(10000); // Espera adicional para garantir que todas as respostas foram recebidas
 
         // Grava no log em modo append a média da ronda
         try (BufferedWriter logFile = new BufferedWriter(new FileWriter(logFilePath, true))) {
@@ -310,8 +310,8 @@ public class RobustScalabilityTestFinal {
 
         // Fecha os studs
         for (Stud2 stud : studs) {
-            /*List <String> replies = stud.getRepliesList();
-            System.out.println("[INFO] Cliente recebeu " + replies );*/
+            List <String> replies = stud.getRepliesList();
+            System.out.println("[INFO] Cliente recebeu " + replies );
 
             stud.close();
         }
