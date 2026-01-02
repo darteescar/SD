@@ -60,6 +60,11 @@ insert-test-final:
 	@echo ">> A executar teste de várias operações..."
 	java -cp "$(CLASSPATH)" scripts.RobustScalabilityTestFinal
 
+doc: 
+	@echo ">> A gerar documentação..."
+	javadoc -Xdoclint:none -d docs -sourcepath src -subpackages scripts:utils:main:databases:menu:entities:enums
+	@echo ">> Documentação gerada na pasta 'docs'!"
+
 # Clean
 clean:
 	@echo ">> A limpar ficheiros compilados..."

@@ -54,6 +54,22 @@ $ make insert-test-final
 
 O primeiro comando executa um teste de inserções de eventos, o segundo um teste de inserções de eventos inválidos e o terceiro, um teste que envolve várias operações. No fim de cada teste, são apresentados alguns resultados estatísticos na pasta `scripts/results`.
 
+### Documentação
+
+Para gerar a documentação do projeto, basta fazer:
+
+```bash
+$ cd registoDeEventos
+$ make doc
+```
+
+Irá ser criada uma pasta `docs` com a documentação gerada. Para aceder à documentação, basta abrir o ficheiro `index.html` que se encontra dentro da pasta `docs`. Por exemplo:
+
+```bash
+$ cd registoDeEventos/docs
+$ xdg-open index.html
+```
+
 ### Limpar ficheiros compilados
 
 Para apagar os ficheiros compilados, basta fazer:
