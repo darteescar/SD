@@ -48,16 +48,16 @@ cliente:
 	java -cp "$(CLASSPATH)" $(SERVER_CLIENTE)
 
 # Executar Stress Test de Inserções Corretas
-stress-test:
-	@echo ">> A executar Stress Test de Inserções..."
+insert-test:
+	@echo ">> A executar teste de inserções..."
 	java -cp "$(CLASSPATH)" scripts.ParallelInsertTest
 
-stress-test-invalid:
-	@echo ">> A executar Stress Test de Inserções Inválidas..."
+insert-test-invalid:
+	@echo ">> A executar teste de inserções inválidas..."
 	java -cp "$(CLASSPATH)" scripts.ParallelInsertCorruptedTest
 
-stress-final:
-	@echo ">> A executar Stress Test Final..."
+insert-test-final:
+	@echo ">> A executar teste de várias operações..."
 	java -cp "$(CLASSPATH)" scripts.RobustScalabilityTestFinal
 
 # Clean
