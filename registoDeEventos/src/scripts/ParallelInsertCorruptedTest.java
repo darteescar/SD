@@ -4,14 +4,12 @@ import enums.TipoMsg;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import utils.structs.client.Stud;
 
 public class ParallelInsertCorruptedTest {
-
-    private static final int NUM_CLIENTES = 1000;
-    private static final int NUM_PRODUTOS = 10;
 
     private static final ReentrantLock lock = new ReentrantLock();
     private static final Condition startCondition  = lock.newCondition();
@@ -22,24 +20,39 @@ public class ParallelInsertCorruptedTest {
 
     public static void main(String[] args) throws Exception {
 
-        Stud[] studs = new Stud[NUM_CLIENTES];
-        Thread[] threads = new Thread[NUM_CLIENTES];
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Insira o número de clientes: ");
+        int numClientes = scanner.nextInt();
+
+        System.out.print("Insira o número de eventos inválidos por cliente: ");
+        int numProdutos = scanner.nextInt();
+
+        scanner.close();
+
+        Stud[] studs = new Stud[numClientes];
+        Thread[] threads = new Thread[numClientes];
 
         BufferedWriter logFile = new BufferedWriter(
-                new FileWriter("src/scripts/results/resultados_test_invalid.txt"));
+                new FileWriter("src/scripts/results/resultados_test_invalid.txt", false));
         logFile.write("CLIENTE;RESPOSTA\n");
 
-        for (int i = 0; i < NUM_CLIENTES; i++) {
+        // Reset de controlo
+        ready = false;
+        finished = 0;
+
+        for (int i = 0; i < numClientes; i++) {
             final int clienteId = i;
             studs[i] = new Stud();
             studs[i].start();
 
             threads[i] = new Thread(() -> {
                 try {
+                    // Login
                     studs[clienteId].sendLOGIN(
                             TipoMsg.LOGIN,
                             "tiago",
-                            "tiago" 
+                            "tiago"
                     );
 
                     // Espera pelo sinal de arranque
@@ -52,9 +65,8 @@ public class ParallelInsertCorruptedTest {
                         lock.unlock();
                     }
 
-                    // Bombardeamento de eventos
-                    for (int j = 0; j < NUM_PRODUTOS; j++) {
-                        //Thread.sleep(5); // Pequena pausa para evitar sobrecarga total
+                    // Envio de eventos inválidos
+                    for (int j = 0; j < numProdutos; j++) {
                         studs[clienteId].sendEVENTO_INVALIDO(TipoMsg.REGISTO);
                     }
 
@@ -62,7 +74,7 @@ public class ParallelInsertCorruptedTest {
                     lock.lock();
                     try {
                         finished++;
-                        if (finished == NUM_CLIENTES) {
+                        if (finished == numClientes) {
                             finishCondition.signal();
                         }
                     } finally {
@@ -90,22 +102,23 @@ public class ParallelInsertCorruptedTest {
         // Espera até todos terminarem
         lock.lock();
         try {
-            while (finished < NUM_CLIENTES) {
+            while (finished < numClientes) {
                 finishCondition.await();
             }
         } finally {
             lock.unlock();
         }
 
-        Thread.sleep(5000); // Espera para garantir que todas as respostas foram recebidas
+        Thread.sleep(5000); // garante receção de todas as respostas
 
         // Recolhe respostas
-        for (int i = 0; i < NUM_CLIENTES; i++) {
+        for (int i = 0; i < numClientes; i++) {
             List<String> replies = studs[i].getRepliesList();
             for (String r : replies) {
                 logFile.write(i + ";" + r + "\n");
             }
         }
+
         logFile.flush();
 
         // Cleanup
@@ -117,4 +130,3 @@ public class ParallelInsertCorruptedTest {
         System.out.println("Teste concluído com sucesso!");
     }
 }
-

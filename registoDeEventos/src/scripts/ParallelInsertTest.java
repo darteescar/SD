@@ -4,14 +4,12 @@ import enums.TipoMsg;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import utils.structs.client.Stud;
 
 public class ParallelInsertTest {
-
-    private static final int NUM_CLIENTES = 20;
-    private static final int NUM_PRODUTOS = 1000;
 
     private static final ReentrantLock lock = new ReentrantLock();
     private static final Condition startCondition  = lock.newCondition();
@@ -22,24 +20,39 @@ public class ParallelInsertTest {
 
     public static void main(String[] args) throws Exception {
 
-        Stud[] studs = new Stud[NUM_CLIENTES];
-        Thread[] threads = new Thread[NUM_CLIENTES];
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Insira o número de clientes: ");
+        int numClientes = scanner.nextInt();
+
+        System.out.print("Insira o número de produtos por cliente: ");
+        int numProdutos = scanner.nextInt();
+
+        scanner.close();
+
+        Stud[] studs = new Stud[numClientes];
+        Thread[] threads = new Thread[numClientes];
 
         BufferedWriter logFile = new BufferedWriter(
-                new FileWriter("src/scripts/results/resultados_test.txt"));
+                new FileWriter("src/scripts/results/resultados_test_inserts.txt", false));
         logFile.write("CLIENTE;RESPOSTA\n");
 
-        for (int i = 0; i < NUM_CLIENTES; i++) {
+        // Reset de controlo
+        ready = false;
+        finished = 0;
+
+        for (int i = 0; i < numClientes; i++) {
             final int clienteId = i;
             studs[i] = new Stud();
             studs[i].start();
 
             threads[i] = new Thread(() -> {
                 try {
+                    // Login
                     studs[clienteId].sendLOGIN(
                             TipoMsg.LOGIN,
                             "tiago",
-                            "tiago" 
+                            "tiago"
                     );
 
                     // Espera pelo sinal de arranque
@@ -52,9 +65,9 @@ public class ParallelInsertTest {
                         lock.unlock();
                     }
 
-                    // Bombardeamento de eventos
-                    for (int j = 0; j < NUM_PRODUTOS; j++) {
-                        Thread.sleep(5); // Pequena pausa para evitar sobrecarga total
+                    // Envio de eventos
+                    for (int j = 0; j < numProdutos; j++) {
+                        Thread.sleep(5); // pequena pausa
                         studs[clienteId].sendEVENTO(
                                 TipoMsg.REGISTO,
                                 "banana",
@@ -67,7 +80,7 @@ public class ParallelInsertTest {
                     lock.lock();
                     try {
                         finished++;
-                        if (finished == NUM_CLIENTES) {
+                        if (finished == numClientes) {
                             finishCondition.signal();
                         }
                     } finally {
@@ -95,7 +108,7 @@ public class ParallelInsertTest {
         // Espera até todos terminarem
         lock.lock();
         try {
-            while (finished < NUM_CLIENTES) {
+            while (finished < numClientes) {
                 finishCondition.await();
             }
         } finally {
@@ -103,12 +116,13 @@ public class ParallelInsertTest {
         }
 
         // Recolhe respostas
-        for (int i = 0; i < NUM_CLIENTES; i++) {
+        for (int i = 0; i < numClientes; i++) {
             List<String> replies = studs[i].getRepliesList();
             for (String r : replies) {
                 logFile.write(i + ";" + r + "\n");
             }
         }
+
         logFile.flush();
 
         // Cleanup
