@@ -1,5 +1,5 @@
 # SD (Sistemas Distribuídos)
-Implementação de um serviço de registo de eventos em séries temporais e de agregação de informação, acessível remotamente através de um servidor. É possível consultar o respetivo [enunciado](enunciado.pdf) e [relatório](relatorio.pdf).
+Implementação de um serviço de registo de eventos em séries temporais e de agregação de informação, acessível remotamente através de um servidor. É possível consultar o respetivo [enunciado](registoDeEventos/enunciado.pdf) e [relatório](registoDeEventos/relatorio.pdf).
 
 ## Membros do grupo:
 
@@ -40,7 +40,7 @@ Para executar o cliente, basta:
 $ make cliente
 ```
 
-E a partir daqui poderá interagir com o servidor através do menu apresentado. Para mais informações, pode consultar o [relatório](relatorio.pdf).
+E a partir daqui poderá interagir com o servidor através do menu apresentado. Para mais informações, pode consultar o [relatorio](registoDeEventos/relatorio.pdf).
 
 ### Scripts de teste
 
