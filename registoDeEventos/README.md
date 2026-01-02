@@ -1,21 +1,66 @@
-## Getting Started
+# SD (Sistemas Distribuídos)
+Implementação de um serviço de registo de eventos em séries temporais e de agregação de informação, acessível remotamente através de um servidor. É possível consultar o respetivo [enunciado](enunciado.pdf) e [relatório](relatorio.pdf).
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+## Membros do grupo:
 
-## Folder Structure
+* [darteescar](https://github.com/darteescar)
+* [luis7788](https://github.com/luis7788)
+* [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
+* [inesferribeiro](https://github.com/inesferribeiro)
 
-The workspace contains two folders by default, where:
+## Executável
+Para compilar os ficheiros executáveis do servidor, do cliente e de testes, basta fazer:
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+```bash
+$ cd registoDeEventos
+$ make
+```
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+### Programa principal
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
+Para executar o servidor, basta fazer:
 
-## Dependency Management
+```console
+$ make server <D> <S> <W> <I> [RESET]
+```   
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+- `<D>` – número de séries que o servidor deve contabilizar para as suas operações
 
+- `<S>` - número de séries que o servidor deve manter em memória
 
-javadoc -Xdoclint:none -d docs -sourcepath src -subpackages scripts:utils:main:databases:menu:entities:enums
+- `<W>` - número de _threads_ responsáveis pela execução de tarefas (tamanho da ThreadPool)
+
+- `<I>` - tempo de intervalo entre a passagem de dias
+
+- `[RESET]` - flag opcional que apaga todas as entradas das bases de dados (com exceção da dos utilizadores).
+
+Para executar o cliente, basta:
+
+```console
+$ make cliente
+```
+
+E a partir daqui poderá interagir com o servidor através do menu apresentado. Para mais informações, pode consultar o [relatório](relatorio.pdf).
+
+### Scripts de teste
+
+Foram desenvolvidos alguns scripts para testar o funcionamento do servidor e do cliente. Para os executar, basta ter o servidor a correr e escolher um dos seguintes comandos:
+
+```bash
+$ make insert-test
+$ make insert-test-invalid
+$ make insert-test-final
+```
+
+O primeiro comando executa um teste de inserções de eventos, o segundo um teste de inserções de eventos inválidos e o terceiro, um teste que envolve várias operações. No fim de cada teste, são apresentados alguns resultados estatísticos na pasta `scripts/results`.
+
+### Limpar ficheiros compilados
+
+Para apagar os ficheiros compilados, basta fazer:
+
+```bash
+$ cd registoDeEventos
+$ make clean
+```
+
+É de notar que os ficheiros de resultado da execução de scripts não são apagados com este comando.
