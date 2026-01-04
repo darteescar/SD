@@ -9,15 +9,30 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import utils.structs.client.Stud;
 
+/** Teste de inserção de eventos de forma paralela (imita vários clientes a enviar mensagens)*/
 public class ParallelInsertTest {
 
+    /** Lock para sincronização das threads */
     private static final ReentrantLock lock = new ReentrantLock();
+
+    /** Condição para sinalizar o início do envio de eventos */
     private static final Condition startCondition  = lock.newCondition();
+
+    /** Condição para sinalizar o término do envio de eventos */
     private static final Condition finishCondition = lock.newCondition();
 
+    /** Variável de controlo para iniciar o envio de eventos */
     private static boolean ready = false;
+
+    /** Contador de threads que finalizaram o envio de eventos */
     private static int finished = 0;
 
+    /**
+     * Ponto de entrada do teste. Solicita ao utilizador o número de clientes e eventos a enviar, cria os clientes, sincroniza o início do envio e regista as respostas num ficheiro.
+     * 
+     * @param args Argumentos da linha de comando
+     * @throws Exception caso ocorra algum erro durante o teste (não é necessário tratar especificamente)
+     */
     public static void main(String[] args) throws Exception {
 
         Scanner scanner = new Scanner(System.in);
