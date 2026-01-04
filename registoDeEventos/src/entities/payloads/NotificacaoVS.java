@@ -7,39 +7,82 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
 
+/** Guarda as informações de uma notificação vendas simultâneas */
 public class NotificacaoVS {
-     private String produto_1;
-     private String produto_2;
-     private static final int MAX_PRODUTO_LENGTH = 1_000; // limite arbitrário
 
+     /** Produto 1 */
+     private String produto_1;
+
+     /** Produto 2 */
+     private String produto_2;
+
+     /** Limite máximo para o comprimento do nome do produto */
+     private static final int MAX_PRODUTO_LENGTH = 1_000;
+
+     /** Construtor parametrizado
+      * 
+      * @param prod1 Produto 1
+      * @param prod2 Produto 2
+      * @return Uma nova instância de NotificacaoVS
+      */
      public NotificacaoVS(String prod1, String prod2){
           this.produto_1 = prod1;
           this.produto_2 = prod2;
      }
 
+     /** Construtor de cópia
+      * 
+      * @param notificacaoVS Notificação a ser copiada
+      * @return Uma nova instância de NotificacaoVS
+      */
      public NotificacaoVS(NotificacaoVS notificacaoVS){
           this.produto_1 = notificacaoVS.getProduto_1();
           this.produto_2 = notificacaoVS.getProduto_2();
      }
 
+     /** 
+      * Devolve o produto 1
+      * 
+      * @return Produto 1
+      */
      public String getProduto_1(){
           return this.produto_1;
      }
 
+     /** 
+      * Devolve o produto 2
+      * 
+      * @return Produto 2
+      */
      public String getProduto_2(){
           return this.produto_2;
      }
 
+     /** 
+     * Representação em String da notificação
+     * @return String representando a notificação
+     */
      @Override
      public String toString(){
           return "Produto 1: " + this.produto_1 + " , Produto 2: " + this.getProduto_2();
      }
 
+     /** 
+      * Cria uma cópia da notificação
+      * 
+      * @return Cópia da notificação
+      */
      @Override
      public NotificacaoVS clone(){
           return new NotificacaoVS(this);
      }
 
+     /** 
+      * Serializa a notificação em um array de bytes
+      * 
+      * @return Array de bytes representando a notificação
+      * @throws IOException Se ocorrer um erro de I/O durante a serialização
+      */
      public byte[] serialize() throws IOException {
           ByteArrayOutputStream baos = new ByteArrayOutputStream();
           DataOutputStream dos = new DataOutputStream(baos);
@@ -51,6 +94,14 @@ public class NotificacaoVS {
           return baos.toByteArray();
      }
 
+     /** 
+      * Desserializa um array de bytes numa notificação
+      * 
+      * @param bytes Array de bytes a ser desserializado
+      * @return Notificação desserializada
+      * @throws IOException Se ocorrer um erro de I/O durante a desserialização
+      * @throws ProtocolException Se os dados estiverem num formato inválido
+      */
      public static NotificacaoVS deserialize(byte[] bytes) throws IOException, ProtocolException{
 
           DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
