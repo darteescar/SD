@@ -24,22 +24,58 @@ import utils.workers.server.ServerSimulator;
 import utils.workers.server.ServerWorker;
 import utils.workers.server.ServerWriter;
 
+/** Classe do Servidor com todas as suas funcionalidades */
 public class Server implements AutoCloseable{
+
+    /** Socket do Servidor onde os clientes se ligam */
     private final ServerSocket ss;
+
+    /** Gestor de logins dos clientes */
     private final GestorLogins logins;
+
+    /** Gestor das séries de eventos */
     private final GestorSeries series;
-    private int cliente;
-    private final int d;
-    private final ServerSimulator simulator;
-    private final ServerNotifier notifier;
+
+    /** Gestor das notificações dos clientes */
     private final GestorNotificacoes gestornotificacoes;
 
+    /** Contador de clientes conectados */
+    private int cliente;
+
+    /** Intervalo de número de dias para considerar nos cálculos */
+    private final int d;
+
+    /** Thread que simula a passagem do tempo */
+    private final ServerSimulator simulator;
+
+    /** Thread que notifica os clientes e guarda as estruturas onde as notificações são armazenadas */
+    private final ServerNotifier notifier;
+
+    /** Thread pool para processamento das mensagens dos clientes */
     private final ServerWorker[] threadpool;
+
+    /** Mapa para gerir os leitores */
     private final Map<Integer, ServerReader> readers;
+
+    /** Mapa para gerir os escritores */
     private final Map<Integer, ServerWriter> writers;
+
+    /** Mapa para gerir os buffers de mensagens dos ServerWriters */
     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
+
+    /** Buffer de mensagens pendentes para processamento pelos ServerWorkers */
     private final BoundedBuffer<ServerData> mensagensPendentes;
 
+    /**
+     * Construtor da classe Server. Inicializa todas as estruturas de dados e threads necessárias.
+     * 
+     * @param d Intervalo de número de dias para considerar nos cálculos
+     * @param s Intervalo de número de dias para ter em memória
+     * @param w Número de threads na thread pool
+     * @param intervalo Intervalo de tempo (em milissegundos) para simular a passagem de um dia
+     * @throws IOException
+     * @return Uma nova instância de Server
+     */
     public Server(int d, int s, int w, long intervalo) throws IOException {
         this.ss = new ServerSocket(12345);
         this.logins = new GestorLogins();
@@ -63,6 +99,12 @@ public class Server implements AutoCloseable{
         startthreadpool(w);
     }
 
+    /** 
+     * Inicia a thread pool com o número especificado de threads.
+     * 
+     * @param numthreadpool Número de threads na thread pool
+     * @throws IOException caso ocorra um erro ao criar os workers
+     */
     private void startthreadpool(int numthreadpool) throws IOException {
         for (int i = 0; i < numthreadpool; i++) {
             threadpool[i] = new ServerWorker(logins, series, notifier, mensagensPendentes, clientBuffers, d, gestornotificacoes);
@@ -74,6 +116,11 @@ public class Server implements AutoCloseable{
         }
     }
 
+    /** 
+     * Carrega a data atual do servidor a partir da base de dados (BDServerDay) e incrementa-a em um dia. Assim, o servidor inicia sempre um dia após a última data registrada.
+     * 
+     * @return A data atual do servidor
+     */
     private Data carregarDataAtual() {
         LocalDate ultimaData = BDServerDay.getCurrentDate();
         LocalDate dataArranque = ultimaData.plusDays(1);
@@ -88,6 +135,11 @@ public class Server implements AutoCloseable{
         return dataAtual;
     }
 
+    /** 
+     * Inicia o ciclo do servidor, aceitando conexões de clientes e criando sessões para cada um deles.
+     * 
+     * @throws IOException caso ocorra um erro ao aceitar conexões ou criar sessões
+     */
     public void start() throws IOException {
         new Thread(simulator).start();
         new Thread(notifier).start();
@@ -113,6 +165,9 @@ public class Server implements AutoCloseable{
         }
     }
 
+    /** 
+     * Simula a passagem de um dia no servidor, guarda a série do dia, atualiza a data atual e notifica os clientes.
+     */
     public void passarDia() {
         this.series.passarDia();
 
@@ -128,16 +183,27 @@ public class Server implements AutoCloseable{
         }).start();
     }
 
+    /** 
+     * Imprime a série de eventos do dia corrente do servidor.
+     */
     public void printGS(){
         this.series.print();
     }
 
+    /** 
+     * Fecha o servidor, liberando todos os recursos associados.
+     */
     @Override
     public void close() throws IOException{
         this.ss.close();
         this.series.close();
     }
 
+    /**
+     * Ponto de entrada do programa. Inicializa o servidor com os parâmetros fornecidos.
+     * 
+     * @param args Os argumentos da linha de comando (D, S, W, I, RESET)
+     */
     public static void main(String[] args) {
         if (args.length < 4) {
             System.out.println("Uso: make server <D> <S> <W> <I> <RESET>");
