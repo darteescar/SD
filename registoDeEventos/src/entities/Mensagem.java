@@ -13,12 +13,29 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.net.ProtocolException;
 
+/** A Mensagem que é usada entre os clientes e o servidor */
 public class Mensagem {
+
+    /** ID da mensagem */
     private int id;
+
+    /** Tipo da mensagem */
     private TipoMsg tipo;
+
+    /** Dados da mensagem */
     private byte[] data;
+
+    /** Tamanho máximo da mensagem */
     private static final int MAX_MSG_SIZE = 10_000_000;
 
+    /** 
+     * Construtor de Mensagem
+     * 
+     * @param id ID da mensagem
+     * @param tipo Tipo da mensagem
+     * @param data Dados da mensagem
+     * @return A nova Mensagem
+     */
     public Mensagem(int id, TipoMsg tipo, byte[] data){
         this.id = id;
         this.tipo = tipo;
@@ -27,24 +44,53 @@ public class Mensagem {
 
     // Construtor usado no ServerReader para criar mensagens de erro (caso a mensagem recebida seja inválida)
     // envia uma mensagem com tipo ERRO e o texto do erro como dados
+
+    /** 
+     * Construtor de Mensagem de Erro
+     * 
+     * @param id ID da mensagem
+     * @param errorMsg Mensagem de erro
+     * @return A nova Mensagem de Erro
+     */
     public Mensagem(int id, String errorMsg) {
         this.id = id;
         this.tipo = TipoMsg.ERRO;
         this.data = errorMsg.getBytes();
     }
     
+    /** 
+     * Devolve o ID da mensagem
+     * 
+     * @return ID da mensagem
+     */
     public int getID(){
         return this.id;
     }
 
+    /** 
+     * Devolve o Tipo da mensagem
+     * 
+     * @return Tipo da mensagem
+     */
     public TipoMsg getTipo(){
         return this.tipo;
     }
 
+    /** 
+     * Devolve os Dados da mensagem
+     * 
+     * @return Dados da mensagem
+     */
     public byte[] getData(){
         return this.data;
     }
 
+    /** 
+     * Serialização da mensagem para o DataOutputStream
+     * 
+     * @param dos DataOutputStream onde a mensagem será escrita
+     * @throws IOException Se ocorrer um erro de I/O durante a escrita
+     */
     public void serialize(DataOutputStream dos) throws IOException {
         dos.writeInt(id);
         dos.writeInt(this.tipo.ordinal());
@@ -52,9 +98,16 @@ public class Mensagem {
         dos.write(this.data);
     }
 
-    // Desserialização da mensagem a partir do DataInputStream
-    // altera o id passado por referência para, caso lance exceção, sabermos o id da mensagem inválida
-    // e podermos enviar uma mensagem de erro com esse id
+    /** 
+     * Desserialização da mensagem a partir do DataInputStream
+     * altera o id passado por referência para, caso lance exceção, sabermos o id da mensagem inválida
+     * e podermos enviar uma mensagem de erro com esse id
+     * 
+     * @param dis DataInputStream de onde a mensagem será lida
+     * @return A Mensagem desserializada
+     * @throws IOException Se ocorrer um erro de I/O durante a leitura
+     * @throws MensagemCorrompidaException Se a mensagem estiver corrompida
+     */
     public static Mensagem deserializeWithId(DataInputStream dis) 
         throws IOException, MensagemCorrompidaException {
 
@@ -84,6 +137,14 @@ public class Mensagem {
     }
 
 
+    /** 
+     * Desserialização da mensagem a partir do DataInputStream
+     * 
+     * @param dis DataInputStream de onde a mensagem será lida
+     * @return A Mensagem desserializada
+     * @throws IOException Se ocorrer um erro de I/O durante a leitura
+     * @throws ProtocolException Se a mensagem estiver corrompida
+     */
     public static Mensagem deserialize(DataInputStream dis)
         throws IOException, ProtocolException {
 
@@ -112,6 +173,11 @@ public class Mensagem {
         return new Mensagem(id, tipo, data);
     }
 
+    /** 
+     * Representação da Mensagem como uma String, desserializando os dados conforme o tipo
+     * 
+     * @return String representando a Mensagem
+     */
     @Override
     public String toString() {
         if (data == null) {
