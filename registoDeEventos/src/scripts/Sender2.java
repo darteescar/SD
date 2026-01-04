@@ -8,14 +8,37 @@ import java.util.concurrent.locks.ReentrantLock;
 import utils.structs.client.NotificacaoListener;
 import utils.workers.client.Demultiplexer;
 
+/** Thread responsável por enviar mensagens ao servidor e processar respostas, adicionando o timestamp ao mapa do Stud2 */
 public class Sender2 implements Runnable {
+
+    /** Thread Demultiplexer */
     private final Demultiplexer demu;
+
+    /** Mensagem a ser enviada */
     private final Mensagem mToSend;
+
+    /** Lista para armazenar respostas recebidas */
     private final List<String> replies;
+
+    /** Listener para notificações recebidas */
     private final NotificacaoListener listener;
+
+    /** Lock para sincronização de acesso a recursos compartilhados (lista de respostas e mapa de timestamps) */
     private final ReentrantLock lock;
+
+    /** Mapa para armazenar timestamps de mensagens enviadas */
     private final Map<TipoMsg, List<Long>> messageTimestamps;
 
+    /** Construtor da classe Sender2
+     * 
+     * @param demu Thread Demultiplexer
+     * @param mToSend Mensagem a ser enviada
+     * @param replies Lista para armazenar respostas recebidas
+     * @param listener Listener para notificações recebidas
+     * @param lock Lock para sincronização de acesso a recursos compartilhados (lista de respostas e mapa de timestamps)
+     * @param messageTimestamps Mapa para armazenar timestamps de mensagens enviadas
+     * @return Uma nova instância de Sender2
+     */
     public Sender2(Demultiplexer demu, Mensagem mToSend, List<String> replies, NotificacaoListener listener, ReentrantLock lock, Map<TipoMsg, List<Long>> messageTimestamps){
         this.demu = demu;
         this.mToSend = mToSend;
@@ -25,6 +48,9 @@ public class Sender2 implements Runnable {
         this.messageTimestamps = messageTimestamps;
     }
 
+    /** 
+     * Executa a thread para enviar a mensagem e processar a resposta. Regista os timestamps de envio e receção da mensagem
+     */
     @Override
     public void run(){
         try {
