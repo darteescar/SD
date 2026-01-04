@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import utils.workers.client.Demultiplexer;
 import utils.workers.client.Sender;
 
+/** Classe que realiza a comunicação com o servidor e gere o envio e receção de mensagens */
 public class Stud implements AutoCloseable {
 
     /** Socket de comunicação com o servidor */
