@@ -11,17 +11,35 @@ import java.util.Scanner;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
+/** Teste de escalabilidade robusto */
 public class RobustScalabilityTestFinal {
 
-    private static final int PAUSA_EVENTO_MS = 5;
-
+    /** Lock para sincronização das threads */
     private final ReentrantLock lock = new ReentrantLock();
+
+    /** Condição para sinalizar o início do envio de mensagens */
     private final Condition startCondition = lock.newCondition();
+    
+    /** Condição para sinalizar o término do envio de mensagens */
     private final Condition finishCondition = lock.newCondition();
 
+    /** Pausa entre envio de mensagens em milissegundos */
+    private static final int PAUSA_EVENTO_MS = 5;
+
+    /** Variável de controlo para iniciar o envio de mensagens */
     private boolean ready = false;
+
+    /** Contador de threads que terminaram o envio */
     private int finished = 0;
 
+    /** 
+     * Envia eventos de múltiplos clientes em paralelo e regista estatísticas num ficheiro de log
+     * 
+     * @param num_clientes Número de clientes a simular
+     * @param num_produtos Número de produtos por cliente
+     * @param logFilePath Caminho do ficheiro de log onde as estatísticas serão gravadas
+     * @throws Exception Em caso de erro durante o envio ou gravação do log
+     */
     private void enviar_Eventos(int num_clientes, int num_produtos, String logFilePath) throws Exception {
 
         System.out.println("[INFO] Iniciando ronda com " + num_clientes + " clientes e " + num_produtos + " produtos por cliente.");
@@ -158,6 +176,13 @@ public class RobustScalabilityTestFinal {
         System.out.println("[INFO] Rodada concluída e log gravado");
     }
 
+    /** 
+     * Envia queries de múltiplos clientes em paralelo e regista estatísticas num ficheiro de log
+     * 
+     * @param num_clientes Número de clientes a simular
+     * @param num_produtos Número de produtos por cliente
+     * @param logFilePath Caminho do ficheiro de log onde as estatísticas serão gravadas
+     */
     private void enviar_Querys(int num_clientes, int num_produtos, String logFilePath) throws Exception {
         // Reset de contadores
         ready = false;
@@ -320,6 +345,12 @@ public class RobustScalabilityTestFinal {
 
     }
 
+    /** 
+     * Ponto de entrada do teste de escalabilidade robusto. Pede ao utilizador os parâmetros do teste e executa múltiplas rondas de envio de eventos e queries.
+     * 
+     * @param args Argumentos da linha de comando (não utilizados)
+     * @throws Exception Em caso de erro durante o teste
+     */
     public static void main(String[] args) throws Exception {
         RobustScalabilityTestFinal test = new RobustScalabilityTestFinal();
         String logFilePath = "src/scripts/results/robust_scalability_test_final_log.txt";
