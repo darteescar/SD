@@ -7,39 +7,85 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
 
+/** Guarda as informações de login */
 public class Login {
-    private String username;
-    private String password;
-    private static final int MAX_USERNAME_LENGTH = 1_000; // limite arbitrário
 
+    /** Username do user */
+    private String username;
+
+    /** Password do user */
+    private String password;
+
+    /** Limite máximo para o comprimento do username e password */
+    private static final int MAX_USERNAME_LENGTH = 1_000;
+
+    /** 
+     * Construtor parametrizado
+     * 
+     * @param username Username do user
+     * @param password Password do user
+     * @return Uma nova instância de Login
+     */
     public Login(String username, String password){
         this.username = username;
         this.password = password;
     }
 
+    /** 
+     * Construtor de cópia
+     * 
+     * @param login Login a ser copiado
+     * @return Uma nova instância de Login
+     */
     public Login(Login login){
         this.username = login.getUsername();
         this.password = login.getPassword();
     }
 
+    /** 
+     * Devolve o username
+     * 
+     * @return Username
+     */
     public String getUsername(){
         return this.username;
     }
 
+    /** 
+     * Devolve a password
+     * 
+     * @return Password
+     */
     public String getPassword(){
         return this.password;
     }
 
+    /** 
+     * Representação em String do login
+     * 
+     * @return String representando o login
+     */
     @Override
     public String toString(){
         return "Username: " + this.username + " , Password: " + this.getPassword();
     }
 
+    /** 
+     * Cria uma cópia do login
+     * 
+     * @return Cópia do login
+     */
     @Override
     public Login clone(){
         return new Login(this);
     }
 
+    /** 
+     * Serializa o login em um array de bytes
+     * 
+     * @return Array de bytes representando o login
+     * @throws IOException Se ocorrer um erro de I/O durante a serialização
+     */
     public byte[] serialize() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(baos);
@@ -51,6 +97,14 @@ public class Login {
         return baos.toByteArray();  
     }
 
+    /** 
+     * Desserializa um array de bytes num login
+     * 
+     * @param bytes Array de bytes a ser desserializado
+     * @return Login desserializado
+     * @throws IOException Se ocorrer um erro de I/O durante a desserialização
+     * @throws ProtocolException Se os dados estiverem num formato inválido
+     */
     public static Login deserialize(byte[] bytes) throws IOException, ProtocolException{
             if (bytes == null) {
                 throw new ProtocolException("Bytes nulos recebidos");
