@@ -11,21 +11,34 @@ import menu.MenuOpcao;
 import utils.structs.client.NotificacaoListener;
 import utils.structs.client.Stud;
 
+/** Interface do Cliente */
 public class ClienteUI {
 
+    /** Stud que o cliente usa para comunicação */
     private final Stud cliente;
+
+    /** Scanner para leitura de input do utilizador */
     private final Scanner scanner;
 
+    /** Estado de autenticação do cliente */
     private boolean autenticado = false;
+
+    /** Estado das notificações de vendas simultâneas do cliente */
     private boolean notificacao1 = true;
+
+    /** Estado das notificações de vendas consecutivas do cliente */
     private boolean notificacao2 = true;
 
+
+    /** 
+     * Construtor
+     * 
+     * Inicializa o Stud e o Scanner, e regista os listeners para as notificações
+     */
     public ClienteUI(){
         this.cliente = new Stud();
         cliente.start();
         this.scanner = new Scanner(System.in);
-
-
         // Regista listener para atualizar notificações
         this.cliente.setNotificacaoListener(new NotificacaoListener() {
             @Override
@@ -39,17 +52,41 @@ public class ClienteUI {
     // --------------------------
     // Métodos de estado
     // --------------------------
+    /** 
+     * Muda o estado de autenticação do cliente para true
+     */
     private void switchAutenticacao() { this.autenticado = true; }
+
+    /** Muda o estado das notificações de vendas simultâneas */
     private void switchNotificacao1() { this.notificacao1 = !this.notificacao1; }
+
+    /** Muda o estado das notificações de vendas consecutivas */
     private void switchNotificacao2() { this.notificacao2 = !this.notificacao2; }
 
+    /** 
+     * Verifica se o cliente está autenticado
+     * 
+     * @return true se o cliente estiver autenticado, false caso contrário
+     */
     private boolean isAutenticado() { return this.autenticado; }
+
+    /** 
+     * Verifica se o cliente pode enviar a notificação de vendas simultâneas
+     * 
+     * @return true se a notificação estiver disponível, false caso contrário
+     */
     private boolean noti1IsAvailable() { return this.notificacao1; }
+
+    /**
+     * Verifica se o cliente pode enviar a notificação de vendas consecutivas
+     * 
+     * @return true se a notificação estiver disponível, false caso contrário
+     */
     private boolean noti2IsAvailable() { return this.notificacao2; }
 
-    // --------------------------
-    // Inicialização
-    // --------------------------
+    /** 
+     * Inicia a interface do cliente. Executa o menu principal e fecha o stud ao terminar.
+     */
     public void start(){
         Menu menuPrincipal = criaMenuPrincipal();
         menuPrincipal.run();
@@ -61,9 +98,11 @@ public class ClienteUI {
         System.exit(0);
     }
 
-    // --------------------------
-    // Menus
-    // --------------------------
+    /** 
+     * Cria o menu principal do cliente
+     * 
+     * @return Menu principal do cliente
+     */
     private Menu criaMenuPrincipal(){
         List<MenuOpcao> menuPrincipal = new ArrayList<>();
         menuPrincipal.add(new MenuOpcao("Fazer login", this::fazerLogin));
@@ -73,6 +112,11 @@ public class ClienteUI {
         return new Menu(menuPrincipal);
     }
 
+    /** 
+     * Cria o menu de mensagens do cliente
+     * 
+     * @return Menu de mensagens do cliente
+     */
     private Menu criaMenuMensagens(){
         List<MenuOpcao> menuMensagens = new ArrayList<>();
         menuMensagens.add(new MenuOpcao("Registar evento", this::enviarEvento));
@@ -88,9 +132,9 @@ public class ClienteUI {
         return new Menu(menuMensagens);
     }
 
-    // --------------------------
-    // Ações de Login / Registo
-    // --------------------------
+    /** 
+     * Faz o login do cliente. Se o login falhar, pede ao utilizador para se registar
+     */
     private void fazerLogin(){
         try {
             System.out.print("Introduza o username > ");
@@ -112,6 +156,9 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Regista o cliente. Se o registo falhar, pede ao utilizador para tentar novamente
+     */
     private void fazerRegisto(){
         try {
             System.out.print("Introduza o username > ");
@@ -133,11 +180,17 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Vai para o menu de mensagens do cliente
+     */
     private void irParaMenuMensagens(){
         Menu menuMensagens = criaMenuMensagens();
         menuMensagens.run();
     }
 
+    /** 
+     * Mostra as respostas recebidas do servidor
+     */
     private void verRespostas(){
         List<String> replies = cliente.getRepliesList();
         System.out.println("---- Respostas do Servidor ----");
@@ -146,9 +199,9 @@ public class ClienteUI {
         }
     }
 
-    // --------------------------
-    // Envio de mensagens
-    // --------------------------
+    /** 
+     * Envia uma mensagem de inserção de um evento para o servidor. Pede ao utilizador o nome, quantidade e preço do evento
+     */
     private void enviarEvento(){
         try {
             System.out.print("Nome do produto > ");
@@ -164,6 +217,9 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Envia uma mensagem de agregação de quantidade de vendas para o servidor. Pede ao utilizador o nome do produto e o número de dias
+     */
     private void enviarQuantidade(){
         try {
             System.out.print("Nome do produto > ");
@@ -177,6 +233,9 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Envia uma mensagem de agregação de volume de vendas para o servidor. Pede ao utilizador o nome do produto e o número de dias
+     */
     private void enviarVolume(){
         try {
             System.out.print("Nome do produto > ");
@@ -190,6 +249,9 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Envia uma mensagem de agregação de preço médio para o servidor. Pede ao utilizador o nome do produto e o número de dias
+     */
     private void enviarPrecoMedio(){
         try {
             System.out.print("Nome do produto > ");
@@ -203,6 +265,9 @@ public class ClienteUI {
         }
     }
 
+    /**
+     * Envia uma mensagem de agregação de preço máximo para o servidor. Pede ao utilizador o nome do produto e o número de dias
+     */
     private void enviarPrecoMaximo(){
         try {
             System.out.print("Nome do produto > ");
@@ -216,6 +281,9 @@ public class ClienteUI {
         }
     }
 
+    /**
+     * Envia uma mensagem de filtro de eventos para o servidor. Pede ao utilizador a lista de produtos e o número de dias
+     */
     private void enviarLista(){
         try {
             System.out.print("Produtos (separados por ; ) > ");
@@ -230,6 +298,9 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Envia uma notificação de vendas simultâneas para o servidor. Pede ao utilizador os dois produtos a comparar
+     */
     private void enviarNotificacaoVS(){
         try {
             System.out.print("Produto 1 > ");
@@ -243,6 +314,9 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Envia uma notificação de vendas consecutivas para o servidor. Pede ao utilizador o número de vendas consecutivas
+     */
     private void enviarNotificacaoVC(){
         try {
             System.out.print("Número de vendas consecutivas > ");
@@ -254,6 +328,11 @@ public class ClienteUI {
         }
     }
 
+    /** 
+     * Método main do ClienteUI
+     * 
+     * @param args Argumentos da linha de comandos
+     */
     public static void main(String[] args) {
         ClienteUI clienteUI = new ClienteUI();
         clienteUI.start();
