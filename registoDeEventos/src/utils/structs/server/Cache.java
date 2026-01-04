@@ -3,14 +3,30 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-
+/** Cache genérica thread-safe com capacidade limitada */
 public class Cache<K,V>{
+
+     /** Capacidade máxima da cache */
      private final int capacidade;
+
+     /** Mapa que armazena os pares chave-valor da cache */
      private final Map<K,V> map;
+
+     /** Lock para sincronização de acesso à cache */
      private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+     /** Lock para escrita na cache */
      private final ReentrantReadWriteLock.WriteLock writelock =  lock.writeLock();
+
+     /** Lock para leitura na cache */
      private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
 
+     /** 
+      * Construtor da cache com capacidade especificada
+      * 
+      * @param capacidade Capacidade máxima da cache
+      * @return Uma nova instância de Cache
+      */
      public Cache(int capacidade){
           this.capacidade = capacidade;
           this.map = new LinkedHashMap<>(capacidade, 1.0f, true){
@@ -22,6 +38,12 @@ public class Cache<K,V>{
           };
      }
 
+     /** 
+      * Obtém o valor associado à chave especificada
+      * 
+      * @param key Chave cujo valor deve ser obtido
+      * @return Valor associado à chave, ou null se a chave não existir
+      */
      public V get(K key){
           writelock.lock();
           try{
@@ -31,6 +53,12 @@ public class Cache<K,V>{
           }
      }
 
+     /** 
+      * Adiciona um par chave-valor à cache
+      * 
+      * @param key Chave do valor a ser adicionado
+      * @param value Valor a ser adicionado
+      */
      public void put(K key, V value){
           writelock.lock();
           try{
@@ -40,6 +68,11 @@ public class Cache<K,V>{
           }
      }
 
+     /** 
+      * Obtém o tamanho atual da cache
+      * 
+      * @return Número de elementos na cache
+      */
      public int size(){
           readLock.lock();
           try{
@@ -49,6 +82,12 @@ public class Cache<K,V>{
           }
      }
 
+     /** 
+      * Verifica se a cache contém a chave especificada
+      * 
+      * @param key Chave a ser verificada
+      * @return true se a chave existir na cache, false caso contrário
+      */
      public boolean containsKey(K key){
           readLock.lock();
           try{
@@ -58,6 +97,13 @@ public class Cache<K,V>{
           }
      }
 
+     /** 
+      * Remove o par chave-valor especificado da cache
+      * 
+      * @param key Chave do valor a ser removido
+      * @param value Valor a ser removido
+      * @return true se o par chave-valor foi removido, false caso contrário
+      */
      public boolean remove(K key,V value){
           writelock.lock();
           try {
@@ -67,6 +113,12 @@ public class Cache<K,V>{
           }
      }
 
+     /** 
+      * Remove o valor associado à chave especificada da cache
+      * 
+      * @param key Chave do valor a ser removido
+      * @return true se o valor foi removido, false caso contrário
+      */
      public boolean remove(K key){
           writelock.lock();
           try {
@@ -77,6 +129,12 @@ public class Cache<K,V>{
           }
      }
 
+     /** 
+      * Adiciona um par chave-valor à cache se a chave não existir
+      * 
+      * @param key Chave do valor a ser adicionado
+      * @param value Valor a ser adicionado
+      */
      public void putIfAbsent(K key, V value){
           writelock.lock();
           try {
@@ -86,7 +144,11 @@ public class Cache<K,V>{
           }
      }
 
-     // Para depuração: mostra o estado da cache
+     /** 
+      * Retorna uma representação em string da cache
+      * 
+      * @return Representação em string da cache
+      */
      @Override
      public String toString() {
           readLock.lock();
@@ -97,6 +159,9 @@ public class Cache<K,V>{
           }
      }
 
+     /** 
+      * Imprime o estado atual da cache
+      */
      public void print() {
           readLock.lock();
           try {
