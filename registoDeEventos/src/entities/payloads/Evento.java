@@ -7,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
 
-/** Guarda as informações de um evento */
+/** Guarda as informações de um Evento */
 public class Evento{
 
     /** Nome do produto */
@@ -19,7 +19,7 @@ public class Evento{
     /** Preço do produto */
     private double preco;
 
-    /** Limite máximo para o comprimento do nome do produto */
+    /** Limite máximo para o comprimento do nome de um produto */
     private static final int MAX_PRODUTO_LENGTH = 1_000;
 
     /** 
@@ -34,18 +34,6 @@ public class Evento{
         this.produto = produto;
         this.quantidade = quantidade;
         this.preco = preco;
-    }
-
-    /** 
-     * Construtor de cópia
-     * 
-     * @param evento Evento a ser copiado
-     * @return Uma nova instância de Evento
-     */
-    public Evento(Evento evento){
-        this.produto = evento.getProduto();
-        this.quantidade = evento.getQuantidade();
-        this.preco = evento.getPreco();
     }
 
     /** 
@@ -86,9 +74,9 @@ public class Evento{
     }
   
     /** 
-     * Serializa o evento em um array de bytes
+     * Serializa o evento num array de bytes
      * 
-     * @return Array de bytes representando o evento
+     * @return Array de bytes que representa o evento
      * @throws IOException Se ocorrer um erro de I/O durante a serialização
      */
     public byte[] serialize() throws IOException {

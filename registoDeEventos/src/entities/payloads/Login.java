@@ -7,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
 
-/** Guarda as informações de login */
+/** Guarda as informações de um Login */
 public class Login {
 
     /** Username do user */
@@ -16,7 +16,7 @@ public class Login {
     /** Password do user */
     private String password;
 
-    /** Limite máximo para o comprimento do username e password */
+    /** Limite máximo para o comprimento do username e da password */
     private static final int MAX_USERNAME_LENGTH = 1_000;
 
     /** 
@@ -29,17 +29,6 @@ public class Login {
     public Login(String username, String password){
         this.username = username;
         this.password = password;
-    }
-
-    /** 
-     * Construtor de cópia
-     * 
-     * @param login Login a ser copiado
-     * @return Uma nova instância de Login
-     */
-    public Login(Login login){
-        this.username = login.getUsername();
-        this.password = login.getPassword();
     }
 
     /** 
@@ -71,7 +60,7 @@ public class Login {
     }
     
     /** 
-     * Serializa o login em um array de bytes
+     * Serializa o login num array de bytes
      * 
      * @return Array de bytes representando o login
      * @throws IOException Se ocorrer um erro de I/O durante a serialização

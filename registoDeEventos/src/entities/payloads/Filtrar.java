@@ -9,39 +9,28 @@ import java.net.ProtocolException;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Guarda as informações para filtrar eventos */
+/** Guarda as informações de um Filtro de eventos de uma Série */
 public class Filtrar {
 
     /** Lista de produtos para filtrar */
     private List<String> produtos;
 
-    /** Número de dias para o filtro */
-    private int dias;
+    /** Dia da Série a filtrar */
+    private int dia;
 
-    /** Limite máximo para o comprimento do nome do produto */
+    /** Limite máximo para o comprimento do nome de um produto */
     private static final int MAX_PRODUTO_LENGTH = 1_000;
 
     /** 
      * Construtor parametrizado
      * 
      * @param produtos Lista de produtos para filtrar
-     * @param dias Número de dias para o filtro
+     * @param dia Dia da Série a filtrar
      * @return Uma nova instância de Filtrar
      */
-    public Filtrar(List<String> produtos, int dias){
+    public Filtrar(List<String> produtos, int dia){
         this.produtos = new ArrayList<>(produtos);
-        this.dias = dias;
-    }
-
-    /** 
-     * Construtor de cópia
-     * 
-     * @param filtrar Filtrar a ser copiado
-     * @return Uma nova instância de Filtrar
-     */
-    public Filtrar(Filtrar filtrar){
-        this.produtos = filtrar.getProdutos();
-        this.dias = filtrar.getDias();
+        this.dia = dia;
     }
 
     /** 
@@ -54,12 +43,12 @@ public class Filtrar {
     }
 
     /** 
-     * Devolve o número de dias
+     * Devolve o dia
      * 
-     * @return Número de dias
+     * @return Dia
      */
-    public int getDias(){
-        return this.dias;
+    public int getDia(){
+        return this.dia;
     }
 
     /** 
@@ -74,12 +63,12 @@ public class Filtrar {
         for(String produto : this.produtos){
             sb.append(produto).append(", ");
         }
-        sb.append("Dias: ").append(this.dias);
+        sb.append("Dias: ").append(this.dia);
         return sb.toString();
     }
 
     /** 
-     * Serializa o filtro em um array de bytes
+     * Serializa o filtro num array de bytes
      * 
      * @return Array de bytes representando o filtro
      * @throws IOException Se ocorrer um erro de I/O durante a serialização
@@ -91,7 +80,7 @@ public class Filtrar {
             for(String produto : produtos){
                 dos.writeUTF(produto);
             }
-            dos.writeInt(dias);
+            dos.writeInt(dia);
             dos.flush();
 
             return baos.toByteArray();

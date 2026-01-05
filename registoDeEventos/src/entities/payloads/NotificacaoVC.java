@@ -10,27 +10,17 @@ import java.net.ProtocolException;
 /** Guarda as informações de uma notificação de vendas consecutivas */
 public class NotificacaoVC {
 
-    /** Número de entradas na notificação */
+    /** Número de vendas consecutivas da notificação */
     private int n;
 
     /** 
      * Construtor parametrizado
      * 
-     * @param n Número de entradas na notificação
+     * @param n Número de vendas consecutivas da notificação
      * @return Uma nova instância de NotificaçãoVC
      */
     public NotificacaoVC(int n){
         this.n = n;
-    }
-
-    /** 
-     * Construtor de cópia
-     * 
-     * @param notificacaoVC NotificaçãoVC a ser copiada
-     * @return Uma nova instância de NotificaçãoVC
-     */
-    public NotificacaoVC(NotificacaoVC notificacaoVC){
-        this.n = notificacaoVC.getN();
     }
 
     /** 
@@ -53,7 +43,7 @@ public class NotificacaoVC {
     }
 
     /** 
-     * Serializa a notificação em um array de bytes
+     * Serializa a notificação num array de bytes
      * 
      * @return Array de bytes representando a notificação
      * @throws IOException Se ocorrer um erro de I/O durante a serialização

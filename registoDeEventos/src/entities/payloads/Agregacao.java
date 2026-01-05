@@ -32,17 +32,6 @@ public class Agregacao {
     }
 
     /** 
-     * Construtor de cópia
-     * 
-     * @param agregacao Agregação a ser copiada
-     * @return Uma nova instância de Agregação
-     */
-    public Agregacao(Agregacao agregacao){
-        this.produto = agregacao.getProduto();
-        this.dias = agregacao.getDias();
-    }
-
-    /** 
      * Devolve o nome do produto
      * 
      * @return Nome do produto

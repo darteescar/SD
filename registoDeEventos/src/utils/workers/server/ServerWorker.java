@@ -373,7 +373,7 @@ public class ServerWorker implements Runnable {
             Filtrar filtrar = Filtrar.deserialize(bytes);
 
             List<String> produto = filtrar.getProdutos();
-            int dia = filtrar.getDias();
+            int dia = filtrar.getDia();
 
             if (dIsInvalid(dia)) {
                 return "Insira num valor entre 1 e " + this.d + ".";

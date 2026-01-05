@@ -7,7 +7,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
 
-/** Guarda as informações de uma notificação vendas simultâneas */
+/** Guarda as informações de uma notificação de vendas simultâneas */
 public class NotificacaoVS {
 
      /** Produto 1 */
@@ -16,7 +16,7 @@ public class NotificacaoVS {
      /** Produto 2 */
      private String produto_2;
 
-     /** Limite máximo para o comprimento do nome do produto */
+     /** Limite máximo para o comprimento do nome de um produto */
      private static final int MAX_PRODUTO_LENGTH = 1_000;
 
      /** Construtor parametrizado
@@ -28,16 +28,6 @@ public class NotificacaoVS {
      public NotificacaoVS(String prod1, String prod2){
           this.produto_1 = prod1;
           this.produto_2 = prod2;
-     }
-
-     /** Construtor de cópia
-      * 
-      * @param notificacaoVS Notificação a ser copiada
-      * @return Uma nova instância de NotificacaoVS
-      */
-     public NotificacaoVS(NotificacaoVS notificacaoVS){
-          this.produto_1 = notificacaoVS.getProduto_1();
-          this.produto_2 = notificacaoVS.getProduto_2();
      }
 
      /** 
@@ -68,7 +58,7 @@ public class NotificacaoVS {
      }
 
      /** 
-      * Serializa a notificação em um array de bytes
+      * Serializa a notificação num array de bytes
       * 
       * @return Array de bytes representando a notificação
       * @throws IOException Se ocorrer um erro de I/O durante a serialização
