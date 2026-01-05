@@ -18,15 +18,43 @@ import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorNotificacoes;
 import utils.structs.server.GestorSeries;
 
+/** Thread responsável por processar mensagens pendentes dos clientes no servidor */
 public class ServerWorker implements Runnable {
+
+    /** Intervalo de dias a considerar nos cálculos */
     private final int d;
+
+    /** Gestor de logins */
     private final GestorLogins logins;
+
+    /** Gestor de séries */
     private final GestorSeries gestorSeries;
+
+    /** Notificador do servidor */
     private final ServerNotifier notifier;
+
+    /** Gestor de notificações */
     private final GestorNotificacoes gestornotificacoes;
+
+    /** Buffer de mensagens pendentes */
     private final BoundedBuffer<ServerData> mensagensPendentes;
+
+    /** Map de buffers de mensagens dos ServerWriters dos cliente */
     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
 
+    /** 
+     * Construtor da classe ServerWorker
+     * 
+     * @param logins Gestor de logins
+     * @param gestorSeries Gestor de séries
+     * @param notifier Notificador do servidor
+     * @param mensagensPendentes Buffer de mensagens pendentes
+     * @param clientBuffers Map de buffers de mensagens dos ServerWriters dos cliente
+     * @param d Intervalo de dias a considerar nos cálculos
+     * @param gestornotificacoes Gestor de notificações
+     * @throws IOException Se ocorrer um erro de I/O
+     * @return Uma nova instância de ServerWorker
+     */
     public ServerWorker(GestorLogins logins, 
         GestorSeries gestorSeries, 
         ServerNotifier notifier, 
@@ -34,6 +62,7 @@ public class ServerWorker implements Runnable {
         Map<Integer, BoundedBuffer<Mensagem>> clientBuffers,
         int d,
         GestorNotificacoes gestornotificacoes) throws IOException{
+
         this.logins = logins;
         this.gestorSeries = gestorSeries;
         this.notifier = notifier;
@@ -43,6 +72,9 @@ public class ServerWorker implements Runnable {
         this.gestornotificacoes = gestornotificacoes;
     }
 
+    /** 
+     * Método run da thread que processa mensagens pendentes dos clientes no servidor (quando existirem ou quando forem sinalizados)
+     */
     @Override
     public void run() {
         try {
@@ -85,7 +117,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
-
+    /** 
+     * Executa a ação correspondente ao tipo de mensagem recebida
+     * 
+     * @param mensagem Mensagem recebida
+     * @return String de resposta ao cliente
+     */
     private String execute(Mensagem mensagem) {
         String result = null;
         TipoMsg tipo = mensagem.getTipo();
@@ -111,6 +148,12 @@ public class ServerWorker implements Runnable {
         return result;
     }
 
+    /** 
+     * Processa o login do cliente
+     * 
+     * @param bytes Dados do login
+     * @return String "true" se o login for bem-sucedido, "false" caso contrário
+     */
     private String processLOGIN(byte[] bytes){
         try {
             Login login = Login.deserialize(bytes);
@@ -131,6 +174,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Processa o registo de um novo cliente
+     * 
+     * @param bytes Dados do login
+     * @return String "true" se o registo for bem-sucedido, "false" caso contrário
+     */
     private String processREGISTA_LOGIN(byte[] bytes){
         try {
             Login login = Login.deserialize(bytes);
@@ -151,6 +200,12 @@ public class ServerWorker implements Runnable {
         }
     }
     
+    /** 
+     * Processa o registo de um evento
+     * 
+     * @param bytes Dados do evento
+     * @return String de resposta ao cliente
+     */
     private String processREGISTO(byte[] bytes) {
         String resposta;
         try {
@@ -170,6 +225,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Processa a agregação de consulta de quantidade de vendas
+     * 
+     * @param bytes Dados da agregação
+     * @return String de resposta ao cliente
+     */
     private String processQUANTIDADE_VENDAS(byte[] bytes) {
         String resposta;
         try {
@@ -198,6 +259,12 @@ public class ServerWorker implements Runnable {
 
     }
 
+    /** 
+     * Processa a agregação de consulta de volume de vendas
+     * 
+     * @param bytes Dados da agregação
+     * @return String de resposta ao cliente
+     */
     private String processVOLUME_VENDAS(byte[] bytes) {
         String resposta;
         try {
@@ -224,6 +291,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Processa a agregação de consulta de preço médio
+     * 
+     * @param bytes Dados da agregação
+     * @return String de resposta ao cliente
+     */
     private String processPRECO_MEDIO(byte[] bytes) {
         String resposta;
         try {
@@ -250,6 +323,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Processa a agregação de consulta de preço máximo
+     * 
+     * @param bytes Dados da agregação
+     * @return String de resposta ao cliente
+     */
     private String processPRECO_MAXIMO(byte[] bytes) {
         String resposta;
         try {
@@ -278,6 +357,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Processa o filtro de consulta de lista de eventos
+     * 
+     * @param bytes Dados do filtro
+     * @return String de resposta ao cliente
+     */
     private String processLISTA(byte[] bytes) {
 
         String resposta;
@@ -305,6 +390,14 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Processa a notificação de vendas consecutivas
+     * 
+     * @param id Identificador da mensagem
+     * @param bytes Dados da notificação
+     * @param clienteID Identificador do cliente
+     * @return true se a notificação for processada com sucesso, false caso contrário
+     */
     private boolean processNOTIFICACAOVC(int id, byte[] bytes, int clienteID) {
         try {
             NotificacaoVC noti = NotificacaoVC.deserialize(bytes);
@@ -321,6 +414,14 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Processa a notificação de vendas simultâneas
+     * 
+     * @param id Identificador da mensagem
+     * @param bytes Dados da notificação
+     * @param clienteID Identificador do cliente
+     * @return true se a notificação for processada com sucesso, false caso contrário
+     */
     private boolean processNOTIFICACAOVS(int id, byte[] bytes, int clienteID) {
 
         try {
@@ -338,6 +439,12 @@ public class ServerWorker implements Runnable {
         }
     }
 
+    /** 
+     * Verifica se o número de dias passado na mensagem é inválido
+     * 
+     * @param dias Número de dias
+     * @return true se o número de dias for inválido, false caso contrário
+     */
     private boolean dIsInvalid(int dias) {
        return (dias < 1 || dias > this.d);
     }
