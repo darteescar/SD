@@ -2,8 +2,10 @@ package databases;
 
 import java.sql.*;
 
+/** Classe responsável por reiniciar a base de dados */
 public class BDReset {
 
+    /** Reinicia todas as tabelas da base de dados (com exceção da dos users) */
     public static void resetAll() {
         try (Connection conn = DriverManager.getConnection(
                 BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
