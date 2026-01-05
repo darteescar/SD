@@ -34,7 +34,7 @@ public class Mensagem {
      * @param id ID da mensagem
      * @param tipo Tipo da mensagem
      * @param data Dados da mensagem
-     * @return A nova Mensagem
+     * @return Uma nova instância de Mensagem
      */
     public Mensagem(int id, TipoMsg tipo, byte[] data){
         this.id = id;
@@ -50,7 +50,7 @@ public class Mensagem {
      * 
      * @param id ID da mensagem
      * @param errorMsg Mensagem de erro
-     * @return A nova Mensagem de Erro
+     * @return Uma nova instância de Mensagem (de Erro)
      */
     public Mensagem(int id, String errorMsg) {
         this.id = id;
@@ -100,8 +100,7 @@ public class Mensagem {
 
     /** 
      * Desserialização da mensagem a partir do DataInputStream
-     * altera o id passado por referência para, caso lance exceção, sabermos o id da mensagem inválida
-     * e podermos enviar uma mensagem de erro com esse id
+     * altera o id passado por referência para, caso lance exceção, sabermos o id da mensagem inválida e podermos enviar uma mensagem de erro com esse id
      * 
      * @param dis DataInputStream de onde a mensagem será lida
      * @return A Mensagem desserializada

@@ -69,7 +69,7 @@ public class Serie {
     }
 
     /** 
-     * Serializa a série de eventos em um DataOutputStream
+     * Serializa a série de eventos num DataOutputStream
      * 
      * @param dos DataOutputStream onde a série será serializada
      */
@@ -149,7 +149,7 @@ public class Serie {
     }
 
     /** 
-     * Filtra os eventos da série com base em uma lista de produtos
+     * Filtra os eventos da série com base numa lista de produtos
      * 
      * @param produtos Lista de produtos para filtrar
      * @return Lista de eventos que correspondem aos produtos fornecidos

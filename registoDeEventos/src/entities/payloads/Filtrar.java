@@ -79,16 +79,6 @@ public class Filtrar {
     }
 
     /** 
-     * Cria uma cópia do filtro
-     * 
-     * @return Cópia do filtro
-     */
-    @Override
-    public Filtrar clone(){
-        return new Filtrar(this);
-    }
-
-    /** 
      * Serializa o filtro em um array de bytes
      * 
      * @return Array de bytes representando o filtro

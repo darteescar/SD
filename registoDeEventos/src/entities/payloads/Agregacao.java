@@ -7,23 +7,23 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ProtocolException;
 
-/** Guarda as informações de uma agregação */
+/** Guarda as informações de uma Agregação */
 public class Agregacao {
 
     /** Nome do produto */
     private String produto;
 
-    /** Número de dias para a agregação */
+    /** Número de dias da agregação */
     private int dias;
 
-    /** Limite máximo para o comprimento do nome do produto */
+    /** Limite máximo para o comprimento do nome de um produto */
     private static final int MAX_PRODUTO_LENGTH = 1_000;
 
     /** 
      * Construtor parametrizado
      * 
      * @param produto Nome do produto
-     * @param dias Número de dias para a agregação
+     * @param dias Número de dias da agregação
      * @return Uma nova instância de Agregação
      */
     public Agregacao(String produto, int dias){
@@ -68,16 +68,6 @@ public class Agregacao {
     @Override
     public String toString(){
         return "Produto: " + this.produto + " ,Dias: " + this.dias;
-    }
-
-    /** 
-     * Cria uma cópia da agregação
-     * 
-     * @return Cópia da agregação
-     */
-    @Override
-    public Agregacao clone(){
-        return new Agregacao(this);
     }
 
     /** 

@@ -69,17 +69,7 @@ public class Login {
     public String toString(){
         return "Username: " + this.username + " , Password: " + this.getPassword();
     }
-
-    /** 
-     * Cria uma cópia do login
-     * 
-     * @return Cópia do login
-     */
-    @Override
-    public Login clone(){
-        return new Login(this);
-    }
-
+    
     /** 
      * Serializa o login em um array de bytes
      * 

@@ -84,16 +84,6 @@ public class Evento{
     public String toString(){
         return "Produto: " + this.produto + ", Quantidade: " + this.quantidade + ", Preço: " + this.preco;
     }
-
-    /** 
-     * Cria uma cópia do evento
-     * 
-     * @return Cópia do evento
-     */
-    @Override
-    public Evento clone(){
-        return new Evento(this);
-    }
   
     /** 
      * Serializa o evento em um array de bytes

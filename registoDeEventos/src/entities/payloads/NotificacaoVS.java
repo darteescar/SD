@@ -68,16 +68,6 @@ public class NotificacaoVS {
      }
 
      /** 
-      * Cria uma cópia da notificação
-      * 
-      * @return Cópia da notificação
-      */
-     @Override
-     public NotificacaoVS clone(){
-          return new NotificacaoVS(this);
-     }
-
-     /** 
       * Serializa a notificação em um array de bytes
       * 
       * @return Array de bytes representando a notificação

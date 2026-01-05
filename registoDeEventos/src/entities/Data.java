@@ -1,6 +1,6 @@
 package entities;
 
-/** Data de uma Série */
+/** Data do programa*/
 public class Data {
 
     /** Dia */
@@ -18,7 +18,7 @@ public class Data {
      * @param dia Dia
      * @param mes Mês
      * @param ano Ano
-     * @return A nova Data
+     * @return Uma nova instância de Data
      */
     public Data(int dia, int mes, int ano){
         this.dia = dia;
@@ -64,6 +64,7 @@ public class Data {
 
     /** 
      * Incrementa a data em um dia
+     * 
      */
     public void incrementData(){
         if(ultimoDiaMes() && mes == 12){
@@ -80,6 +81,7 @@ public class Data {
 
     /** 
      * Decrementa a data em um dia
+     * 
      */
     public void decrementData(){
         if(this.dia == 1 && this.mes == 1){
@@ -124,7 +126,7 @@ public class Data {
      * Converte uma String em um objeto Data 
      * 
      * @param data Data em formato String
-     * @return Data
+     * @return Uma nova instância de Data
     */
     private Data stringToData(String data){
         String[] pedaco = data.split("/");
@@ -201,7 +203,6 @@ public class Data {
     public String toString(){
         return this.dia + "/" + this.mes + "/" + this.ano;
     }
-
     /** 
      * Clona o objeto Data
      * 
