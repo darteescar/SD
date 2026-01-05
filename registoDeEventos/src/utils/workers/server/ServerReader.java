@@ -7,12 +7,31 @@ import java.io.*;
 import utils.structs.notification.BoundedBuffer;
 import utils.structs.server.ClientSession;
 
+/** Thread responsável por ler mensagens dos clientes e adicioná-las ao buffer de mensagens pendentes */
 public class ServerReader implements Runnable {
+
+     /** Sessão do cliente associada a esta thread */
      private final ClientSession session;
+
+     /** Stream de entrada para ler dados do cliente */
      private final DataInputStream input;
+
+     /** Buffer de mensagens pendentes */
      private final BoundedBuffer<ServerData> mensagensPendentes;
+
+     /** Identificador do cliente associado a esta thread */
      private final int cliente;
 
+     /** 
+      * Construtor da classe ServerReader
+      * 
+      * @param session Sessão do cliente
+      * @param mensagensPendentes Buffer de mensagens pendentes
+      * @param cliente Identificador do cliente
+      * @param input Stream de entrada para ler dados do cliente
+      * @throws IOException Se ocorrer um erro de I/O
+      * @return Uma nova instância de ServerReader
+      */
      public ServerReader(ClientSession session,
                          BoundedBuffer<ServerData> mensagensPendentes,
                          int cliente, 
@@ -23,6 +42,9 @@ public class ServerReader implements Runnable {
           this.cliente = cliente;
      }
 
+     /** 
+      * Método run da thread que lê mensagens do socket do cliente e as adiciona-as ao buffer de mensagens pendentes
+      */
      @Override
      public void run() {
      while (true) {
