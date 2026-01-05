@@ -108,8 +108,10 @@ public class ServerWorker implements Runnable {
                 // Só envia resposta se houver resultado/erro
                 if (enviadoErro) {
                     BoundedBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
-                    Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
-                    bufferCliente.add(reply);
+                    if (bufferCliente != null) {
+                        Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
+                        bufferCliente.add(reply);
+                    }
                 }
             }
         } finally {
