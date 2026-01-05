@@ -13,7 +13,8 @@ import java.io.IOException;
 import java.net.ProtocolException;
 import java.util.List;
 import java.util.Map;
-import utils.structs.notification.BoundedBuffer;
+import utils.structs.server.BoundedBuffer;
+import utils.structs.server.ClientSession;
 import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorNotificacoes;
 import utils.structs.server.GestorSeries;
@@ -40,7 +41,7 @@ public class ServerWorker implements Runnable {
     private final BoundedBuffer<ServerData> mensagensPendentes;
 
     /** Map de buffers de mensagens dos ServerWriters dos cliente */
-    private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
+    private final Map<Integer, ClientSession> clientSessions;
 
     /** 
      * Construtor da classe ServerWorker
@@ -59,7 +60,7 @@ public class ServerWorker implements Runnable {
         GestorSeries gestorSeries, 
         ServerNotifier notifier, 
         BoundedBuffer<ServerData> mensagensPendentes,
-        Map<Integer, BoundedBuffer<Mensagem>> clientBuffers,
+        Map<Integer, ClientSession> clientSessions,
         int d,
         GestorNotificacoes gestornotificacoes) throws IOException{
 
@@ -67,7 +68,7 @@ public class ServerWorker implements Runnable {
         this.gestorSeries = gestorSeries;
         this.notifier = notifier;
         this.mensagensPendentes = mensagensPendentes;
-        this.clientBuffers = clientBuffers;
+        this.clientSessions = clientSessions;
         this.d = d;
         this.gestornotificacoes = gestornotificacoes;
     }
@@ -107,10 +108,10 @@ public class ServerWorker implements Runnable {
 
                 // Só envia resposta se houver resultado/erro
                 if (enviadoErro) {
-                    BoundedBuffer<Mensagem> bufferCliente = this.clientBuffers.get(clienteID);
-                    if (bufferCliente != null) {
+                    ClientSession session = this.clientSessions.get(clienteID);
+                    if (session != null) {
                         Mensagem reply = new Mensagem(id, TipoMsg.RESPOSTA, result == null ? new byte[0] : result.getBytes());
-                        bufferCliente.add(reply);
+                        session.addToBuffer(reply);
                     }
                 }
             }

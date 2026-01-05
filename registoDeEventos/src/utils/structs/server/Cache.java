@@ -39,7 +39,7 @@ public class Cache<K,V>{
      }
 
      /** 
-      * Obtém o valor associado à chave especificada
+      * Obtém o valor associado à chave especificada. Usa write lock porque a cache é LRU, logo, uma simples leitura poderá alterar o estado da cache.
       * 
       * @param key Chave cujo valor deve ser obtido
       * @return Valor associado à chave, ou null se a chave não existir
@@ -94,22 +94,6 @@ public class Cache<K,V>{
                return map.containsKey(key);
           }finally{
                readLock.unlock();
-          }
-     }
-
-     /** 
-      * Remove o par chave-valor especificado da cache
-      * 
-      * @param key Chave do valor a ser removido
-      * @param value Valor a ser removido
-      * @return true se o par chave-valor foi removido, false caso contrário
-      */
-     public boolean remove(K key,V value){
-          writelock.lock();
-          try {
-               return map.remove(key, value);
-          } finally {
-               writelock.unlock();
           }
      }
 

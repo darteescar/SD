@@ -3,7 +3,7 @@ package utils.workers.server;
 import entities.Mensagem;
 import enums.TipoMsg;
 import java.io.DataOutputStream;
-import utils.structs.notification.BoundedBuffer;
+import utils.structs.server.BoundedBuffer;
 import utils.structs.server.ClientSession;
 
 /** Thread responsável por enviar mensagens de resposta aos clientes através do socket */
@@ -76,18 +76,11 @@ public class ServerWriter implements Runnable {
      * 
      * @param data Mensagem a ser enviada ao cliente
      */
-    public void send(Mensagem data) {
+    public boolean send(Mensagem data) {
         if (data != null) {
             mensagensResposta.add(data);
+            return true;
         }
-    }
-
-    /** 
-     * Retorna o buffer de mensagens de resposta do cliente.
-     * 
-     * @return Buffer de mensagens de resposta do cliente
-     */
-    public BoundedBuffer<Mensagem> getOutBuffer() {
-        return mensagensResposta;
+        return false;
     }
 }

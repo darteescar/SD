@@ -2,7 +2,6 @@ package main;
 
 import databases.BDServerDay;
 import entities.Data;
-import entities.Mensagem;
 import entities.Serie;
 import entities.ServerData;
 import java.io.IOException;
@@ -13,16 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import utils.structs.notification.BoundedBuffer;
+import utils.structs.server.BoundedBuffer;
 import utils.structs.server.ClientSession;
 import utils.structs.server.GestorLogins;
 import utils.structs.server.GestorNotificacoes;
 import utils.structs.server.GestorSeries;
 import utils.workers.server.ServerNotifier;
-import utils.workers.server.ServerReader;
 import utils.workers.server.ServerSimulator;
 import utils.workers.server.ServerWorker;
-import utils.workers.server.ServerWriter;
 
 /** Classe do Servidor com todas as suas funcionalidades */
 public class Server implements AutoCloseable{
@@ -54,14 +51,8 @@ public class Server implements AutoCloseable{
     /** Thread pool para processamento das mensagens dos clientes */
     private final ServerWorker[] threadpool;
 
-    /** Mapa para gerir os leitores */
-    private final Map<Integer, ServerReader> readers;
-
-    /** Mapa para gerir os escritores */
-    private final Map<Integer, ServerWriter> writers;
-
-    /** Mapa para gerir os buffers de mensagens dos ServerWriters */
-    private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
+    /** Mapa para gerir as sessões dos clientes */
+    private final Map<Integer, ClientSession> clientSessions;
 
     /** Buffer de mensagens pendentes para processamento pelos ServerWorkers */
     private final BoundedBuffer<ServerData> mensagensPendentes;
@@ -87,12 +78,10 @@ public class Server implements AutoCloseable{
         this.series = new GestorSeries(s, dataAtual, serie_inicial);
         this.gestornotificacoes = new GestorNotificacoes();
 
-        this.readers = new HashMap<>();
-        this.writers = new HashMap<>();
-        this.clientBuffers = new HashMap<>();
+        this.clientSessions = new HashMap<>();
 
         this.simulator = new ServerSimulator(this, intervalo);
-        this.notifier = new ServerNotifier(this.gestornotificacoes,this.clientBuffers);
+        this.notifier = new ServerNotifier(this.gestornotificacoes,this.clientSessions);
 
         this.mensagensPendentes = new BoundedBuffer<>();
         this.threadpool = new ServerWorker[w];
@@ -107,7 +96,7 @@ public class Server implements AutoCloseable{
      */
     private void startthreadpool(int numthreadpool) throws IOException {
         for (int i = 0; i < numthreadpool; i++) {
-            threadpool[i] = new ServerWorker(logins, series, notifier, mensagensPendentes, clientBuffers, d, gestornotificacoes);
+            threadpool[i] = new ServerWorker(logins, series, notifier, mensagensPendentes, clientSessions, d, gestornotificacoes);
             System.out.println("[THREAD-POOL]: Worker-" + i + " criado.");
         }
         for (int i = 0; i < numthreadpool; i++) {
@@ -150,7 +139,7 @@ public class Server implements AutoCloseable{
 
             try {
                 ClientSession session = new ClientSession(socket, id, mensagensPendentes);
-                clientBuffers.put(id, session.getOutBuffer());
+                clientSessions.put(id, session);
                 session.start();
                 //System.out.println("[NOVO CLIENTE " + id + " LIGADO]");
             } catch (IOException e) {
@@ -178,8 +167,12 @@ public class Server implements AutoCloseable{
 
         new Thread(() -> {
         List<ServerData> notificacoes = gestornotificacoes.clear();
-            for (ServerData m : notificacoes)
-                clientBuffers.get(m.getClienteID()).add(m.getMensagem());
+            for (ServerData m : notificacoes) {
+                ClientSession session = clientSessions.get(m.getClienteID());
+                if (session != null) {
+                    session.addToBuffer(m.getMensagem());
+                }
+            }
         }).start();
     }
 

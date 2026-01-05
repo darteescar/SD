@@ -4,7 +4,7 @@ import entities.Mensagem;
 import entities.MensagemCorrompidaException;
 import entities.ServerData;
 import java.io.*;
-import utils.structs.notification.BoundedBuffer;
+import utils.structs.server.BoundedBuffer;
 import utils.structs.server.ClientSession;
 
 /** Thread responsável por ler mensagens dos clientes e adicioná-las ao buffer de mensagens pendentes */

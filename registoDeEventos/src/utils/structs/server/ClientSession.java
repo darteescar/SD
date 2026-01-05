@@ -9,7 +9,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.locks.ReentrantLock;
-import utils.structs.notification.BoundedBuffer;
 import utils.workers.server.ServerReader;
 import utils.workers.server.ServerWriter;
 
@@ -39,7 +38,7 @@ public class ClientSession {
 
     /** 
      * Construtor da sessão do cliente.
-     * Inicializa o socket, identificador do cliente, leitor e escritor.
+     * Inicializa o socket, identificador do cliente e as threads ServerReader e ServerWriter.
      * 
      * @param socket Socket de comunicação com o cliente
      * @param clienteId Identificador único do cliente
@@ -94,12 +93,14 @@ public class ClientSession {
     }
 
     /** 
-     * Obtém o buffer de saída do escritor para enviar mensagens ao cliente.
+     * Adiciona uma mensagem ao buffer de saída do escritor para ser enviada ao cliente.
      * 
-     * @return Buffer de mensagens de saída
+     * @param msg Mensagem a ser enviada ao cliente
      */
-    public BoundedBuffer<Mensagem> getOutBuffer() {
-        return writer.getOutBuffer();
+    public void addToBuffer(Mensagem msg) {
+        if (msg != null) {
+            writer.send(msg);
+        }
     }
 
 }

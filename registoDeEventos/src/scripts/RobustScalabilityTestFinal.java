@@ -1,6 +1,8 @@
 package scripts;
 
 import enums.TipoMsg;
+import utils.structs.client.Stud2;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -11,7 +13,7 @@ import java.util.Scanner;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
-/** Teste de escalabilidade robusto */
+/** Teste de escalabilidade robusto. Envia eventos, notificações, querys e logins*/
 public class RobustScalabilityTestFinal {
 
     /** Lock para sincronização das threads */

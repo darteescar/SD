@@ -30,7 +30,7 @@ public class ParallelInsertCorruptedTest {
     /**
      * Ponto de entrada do teste. Solicita ao utilizador o número de clientes e eventos inválidos a enviar, cria os clientes, sincroniza o início do envio e regista as respostas num ficheiro.
      * 
-     * @param args Argumentos da linha de comando
+     * @param args Argumentos da linha de comando (não utilizados)
      * @throws Exception caso ocorra algum erro durante o teste (não é necessário tratar especificamente)
      */
     public static void main(String[] args) throws Exception {

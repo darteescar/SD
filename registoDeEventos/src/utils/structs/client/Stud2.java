@@ -1,4 +1,4 @@
-package scripts;
+package utils.structs.client;
 
 import entities.Mensagem;
 import entities.payloads.*;
@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
-import utils.structs.client.NotificacaoListener;
 import utils.workers.client.Demultiplexer;
+import utils.workers.client.Sender2;
 
-/** Classe que realiza a comunicação com o servidor e gere o envio e receção de mensagens nos scripts */
+/** Classe que realiza a comunicação com o servidor e gere o envio e receção de mensagens nos scripts. Usada apenas em testes */
 public class Stud2 implements AutoCloseable {
 
     /** Socket para comunicação com o servidor */
@@ -28,7 +28,7 @@ public class Stud2 implements AutoCloseable {
     /** Lista para armazenar respostas recebidas */
     private final List<String> replies;
 
-    /** Mapa para armazenar timestamps de mensagens por tipo */
+    /** Mapa para armazenar timestamps de mensagens (por tipo) */
     private final Map<TipoMsg, List<Long>> messageTimestamps;
 
     /** Listener para notificações recebidas */

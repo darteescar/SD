@@ -1,4 +1,4 @@
-package scripts;
+package utils.workers.client;
 
 import entities.Mensagem;
 import enums.TipoMsg;
@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import utils.structs.client.NotificacaoListener;
-import utils.workers.client.Demultiplexer;
 
-/** Thread responsável por enviar mensagens ao servidor e processar respostas, adicionando o timestamp ao mapa do Stud2 */
+/** Thread responsável por enviar mensagens ao servidor e processar respostas, adicionando o timestamp ao mapa do Stud2. Usada apenas em testes */
 public class Sender2 implements Runnable {
 
     /** Thread Demultiplexer */

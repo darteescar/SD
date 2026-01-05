@@ -1,10 +1,10 @@
 package utils.workers.server;
 
-import entities.Mensagem;
 import entities.ServerData;
 import java.util.List;
 import java.util.Map;
-import utils.structs.notification.BoundedBuffer;
+import utils.structs.server.BoundedBuffer;
+import utils.structs.server.ClientSession;
 import utils.structs.server.GestorNotificacoes;
 
 /** Thread responsável por submeter notificações aos buffers dos ServerWriters dos clientes */
@@ -16,8 +16,8 @@ public class ServerNotifier implements Runnable {
      /** Gestor de notificações para processar produtos vendidos */
      private final GestorNotificacoes gestor;
 
-     /** Mapa de buffers dos ServerWriters, indexados por ID do cliente */
-     private final Map<Integer, BoundedBuffer<Mensagem>> clientBuffers;
+     /** Mapa de sessões dos clientes, indexados por ID do cliente */
+     private final Map<Integer, ClientSession> clientSessions;
 
      /** 
       * Construtor que inicializa o ServerNotifier com o gestor e os buffers dos clientes
@@ -28,11 +28,11 @@ public class ServerNotifier implements Runnable {
       */
      public ServerNotifier(
                GestorNotificacoes gestor,
-               Map<Integer, BoundedBuffer<Mensagem>> clientBuffers) {
+               Map<Integer, ClientSession> clientSessions) {
 
           this.buffer = new BoundedBuffer<>();
           this.gestor = gestor;
-          this.clientBuffers = clientBuffers;
+          this.clientSessions = clientSessions;
      }
 
      /** 
@@ -47,12 +47,14 @@ public class ServerNotifier implements Runnable {
                          gestor.processarProdutoVendido(produto);
 
                for (ServerData m : notificacoes) {
-                    clientBuffers
-                         .get(m.getClienteID())
-                         .add(m.getMensagem());
+                    ClientSession session = clientSessions.get(m.getClienteID());
+                     if (session != null) {
+                         session.addToBuffer(m.getMensagem());
+                    }
                }
           }
      }
+
      /**
       * Notifica o ServerNotifier sobre um novo produto vendido. Usado pelos ServerWorkers.
       * 
