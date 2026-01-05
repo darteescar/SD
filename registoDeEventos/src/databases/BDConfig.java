@@ -1,10 +1,21 @@
 package databases;
 
+// Devolve a password de um utilizador/** Configurações da base de dados */
 public class BDConfig {
+
+    /** Nome de utilizador da base de dados */
     static final String USERNAME = "me";
+
+    /** Password da base de dados */
     static final String PASSWORD = "mypass";
+
+    /** Nome da base de dados */
     private static final String DATABASE = "base_dados_sd";
+
+    /** Driver JDBC da base de dados */
     private static final String DRIVER = "jdbc:mariadb";
+
+    /** URL de ligação à base de dados */
     static final String URL = DRIVER + "://localhost:3306/" + DATABASE;
 }
 
