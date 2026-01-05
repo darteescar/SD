@@ -31,14 +31,16 @@ public class ClienteUI {
 
 
     /** 
-     * Construtor
+     * Construtor. Inicializa o Stud e o Scanner, e regista os listeners para as notificações
      * 
-     * Inicializa o Stud e o Scanner, e regista os listeners para as notificações
+     * @param host Endereço do servidor
+     * @param port Porta do servidor
+     * @return Uma nova instância de ClienteUI
      */
-    public ClienteUI(){
-        this.cliente = new Stud();
+    public ClienteUI(String host, int port){
+        this.cliente = new Stud(host, port);
         cliente.start();
-        this.scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in);  
         // Regista listener para atualizar notificações
         this.cliente.setNotificacaoListener(new NotificacaoListener() {
             @Override
@@ -334,7 +336,11 @@ public class ClienteUI {
      * @param args Argumentos da linha de comandos
      */
     public static void main(String[] args) {
-        ClienteUI clienteUI = new ClienteUI();
-        clienteUI.start();
-    }
+    String host = args.length > 0 ? args[0] : "localhost";
+    int port = args.length > 1 ? Integer.parseInt(args[1]) : 12345;
+
+    ClienteUI clienteUI = new ClienteUI(host, port);
+    clienteUI.start();
+}
+
 }

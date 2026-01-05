@@ -58,7 +58,7 @@ public class ParallelInsertTest {
 
         for (int i = 0; i < numClientes; i++) {
             final int clienteId = i;
-            studs[i] = new Stud();
+            studs[i] = new Stud("localhost", 12345);
             studs[i].start();
 
             threads[i] = new Thread(() -> {

@@ -33,17 +33,22 @@ public class Stud implements AutoCloseable {
     private ReentrantLock lock = new ReentrantLock();
 
     /** 
-     * Construtor vazio que inicializa o Stud, conectando ao servidor na porta 12345 e inicializando o demultiplexador.
+     * Construtor vazio que inicializa o Stud, conectando ao servidor na porta passada.
+     * 
+     * @param host Endereço do servidor
+     * @param port Porta do servidor
+     * @return Uma nova instância de Stud
      */
-    public Stud() {
+    public Stud(String host, int port) {
         try {
-            this.socket = new Socket("localhost", 12345);
+            this.socket = new Socket(host, port);
             this.demu = new Demultiplexer(socket);
             this.replies = new ArrayList<>();
         } catch (IOException e) {
             throw new RuntimeException("[ERRO CLIENTE] Nao foi possivel conectar ao servidor: " + e.getMessage());
         }
     }
+
 
     /** Define o listener para notificações recebidas
      * 

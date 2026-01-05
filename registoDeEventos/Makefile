@@ -17,6 +17,10 @@ W ?= 0
 I ?= 60000   # Default 60 segundos
 RESET ?= 0
 
+# Argumento para o cliente (passado com make cliente HOST=.. PORT=..)
+HOST ?= localhost
+PORT ?= 12345
+
 # .java
 SOURCES := $(shell find $(SRC_DIR) -name "*.java")
 
@@ -44,8 +48,8 @@ server:
 
 # Executar cliente
 cliente:
-	@echo ">> Iniciando o cliente..."
-	java -cp "$(CLASSPATH)" $(SERVER_CLIENTE)
+	@echo ">> Iniciando o cliente em $(HOST):$(PORT)..."
+	java -cp "$(CLASSPATH)" $(SERVER_CLIENTE) $(HOST) $(PORT)
 
 # Executar Stress Test de Inserções Corretas
 insert-test:
