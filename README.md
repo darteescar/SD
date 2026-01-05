@@ -16,6 +16,10 @@ Para executar este projeto é necessário ter instalado:
 - **GNU Make**
 - **MariaDB Server**
 
+ℹ️ O driver JDBC do MariaDB (`mariadb-java-client-2.7.1.jar`) já está incluído na pasta `lib/`, e o `Makefile` adiciona automaticamente todos os `.jar` desta pasta ao classpa na pasta lib/, e o Makefile adiciona automaticamente todos os .jar desta pasta ao classpath.
+
+th.
+
 ### Base de Dados
 
 O servidor utiliza a base de dados MariaDB para persistência de dados.
