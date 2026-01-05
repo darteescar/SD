@@ -315,7 +315,7 @@ public class RobustScalabilityTestFinal {
                 int totalCount = countPorTipo.get(tipo);
                 long average = totalCount > 0 ? totalSum / totalCount : 0;
 
-                logFile.write("TipoMensagem: " + tipo + "; TempoMedioRonda(ms): " + average + "\n");
+                logFile.write("Tipo Mensagem: " + tipo + "; Tempo Medio(ms): " + average + "\n");
             }
 
             logFile.write("----- Ronda com " + num_clientes + " clientes e " + num_produtos + " produtos por cliente -----\n");
@@ -335,8 +335,8 @@ public class RobustScalabilityTestFinal {
 
         // Fecha os studs
         for (Stud2 stud : studs) {
-            List <String> replies = stud.getRepliesList();
-            System.out.println("[INFO] Cliente recebeu " + replies );
+            //List <String> replies = stud.getRepliesList();
+            //System.out.println("[INFO] Cliente recebeu " + replies );
 
             stud.close();
         }
