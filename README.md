@@ -40,7 +40,7 @@ Para executar o cliente, basta:
 $ make cliente
 ```
 
-E a partir daqui poderá interagir com o servidor através do menu apresentado. Para mais informações, pode consultar o [relatorio](registoDeEventos/relatorio.pdf).
+E a partir daqui poderá interagir com o servidor através do menu apresentado. Para mais informações, pode consultar o [relatório](registoDeEventos/relatorio.pdf).
 
 ### Scripts de teste
 
