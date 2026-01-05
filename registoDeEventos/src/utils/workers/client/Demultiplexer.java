@@ -131,7 +131,7 @@ public class Demultiplexer implements AutoCloseable {
     }
 
     /** 
-     * Método usado pelas threads Receiver para receber mensagens do servidor
+     * Método usado pelas threads Sender para receber mensagens do servidor
      * 
      * @param id ID da entrada da qual receber a mensagem
      * @return A mensagem recebida ou null se o demultiplexador estiver fechado ou ocorrer uma exceção
