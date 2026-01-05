@@ -3,8 +3,10 @@ package databases;
 import java.sql.*;
 import java.time.LocalDate;
 
+/** Classe responsável por gerir a data do servidor na base de dados */
 public class BDServerDay {
 
+    /** Inicializa a tabela server_day na base de dados */
     static {
         // garante que a tabela existe
         try (Connection conn = DriverManager.getConnection(
@@ -29,6 +31,11 @@ public class BDServerDay {
         }
     }
 
+    /** 
+     * Obtém a data atual do servidor guardada na base de dados
+     * 
+     * @return A data atual do servidor
+     */
     public static LocalDate getCurrentDate() {
         try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
              Statement stm = conn.createStatement()) {
@@ -59,7 +66,11 @@ public class BDServerDay {
         }
     }
 
-
+    /** 
+     * Define a data atual do servidor na base de dados
+     * 
+     * @param date A nova data a definir
+     */
     public static void setCurrentDate(LocalDate date) {
         try (Connection conn = DriverManager.getConnection(
                 BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
