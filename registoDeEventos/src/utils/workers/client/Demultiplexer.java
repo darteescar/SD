@@ -153,7 +153,7 @@ public class Demultiplexer implements AutoCloseable {
     }
 
     /** 
-     * Fecha o demultiplexador, encerrando a thread de fundo e liberando os recursos
+     * Fecha o demultiplexador, encerrando a thread de fundo e libertando os recursos
      */
     @Override
     public void close() throws IOException {

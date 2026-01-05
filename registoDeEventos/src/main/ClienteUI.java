@@ -23,15 +23,15 @@ public class ClienteUI {
     /** Estado de autenticação do cliente */
     private boolean autenticado = false;
 
-    /** Estado das notificações de vendas simultâneas do cliente */
+    /** Estado das notificações de vendas simultâneas do cliente true = por enviar / false = enviadas */
     private boolean notificacao1 = true;
 
-    /** Estado das notificações de vendas consecutivas do cliente */
+    /** Estado das notificações de vendas consecutivas do cliente true = por enviar / false = enviadas */
     private boolean notificacao2 = true;
 
 
     /** 
-     * Construtor. Inicializa o Stud e o Scanner, e regista os listeners para as notificações
+     * Construtor. Inicializa o Stud e o Scanner e regista os listeners para as notificações
      * 
      * @param host Endereço do servidor
      * @param port Porta do servidor
@@ -51,19 +51,26 @@ public class ClienteUI {
         });
     }
 
-    // --------------------------
-    // Métodos de estado
-    // --------------------------
     /** 
      * Muda o estado de autenticação do cliente para true
      */
-    private void switchAutenticacao() { this.autenticado = true; }
+    private void switchAutenticacao() { 
+        this.autenticado = true; 
+    }
 
-    /** Muda o estado das notificações de vendas simultâneas */
-    private void switchNotificacao1() { this.notificacao1 = !this.notificacao1; }
+    /** 
+     * Muda o estado das notificações de vendas simultâneas 
+     */
+    private void switchNotificacao1() { 
+        this.notificacao1 = !this.notificacao1; 
+    }
 
-    /** Muda o estado das notificações de vendas consecutivas */
-    private void switchNotificacao2() { this.notificacao2 = !this.notificacao2; }
+    /** 
+     * Muda o estado das notificações de vendas consecutivas 
+     */
+    private void switchNotificacao2() { 
+        this.notificacao2 = !this.notificacao2; 
+    }
 
     /** 
      * Verifica se o cliente está autenticado
@@ -87,7 +94,7 @@ public class ClienteUI {
     private boolean noti2IsAvailable() { return this.notificacao2; }
 
     /** 
-     * Inicia a interface do cliente. Executa o menu principal e fecha o stud ao terminar.
+     * Inicia a interface do cliente. Executa o menu principal e fecha o Stud ao terminar.
      */
     public void start(){
         Menu menuPrincipal = criaMenuPrincipal();
@@ -284,7 +291,7 @@ public class ClienteUI {
     }
 
     /**
-     * Envia uma mensagem de filtro de eventos para o servidor. Pede ao utilizador a lista de produtos e o número de dias
+     * Envia uma mensagem de filtro de eventos para o servidor. Pede ao utilizador a lista de produtos e o dia
      */
     private void enviarLista(){
         try {
@@ -301,7 +308,7 @@ public class ClienteUI {
     }
 
     /** 
-     * Envia uma notificação de vendas simultâneas para o servidor. Pede ao utilizador os dois produtos a comparar
+     * Envia uma notificação de vendas simultâneas para o servidor. Pede ao utilizador os dois produtos
      */
     private void enviarNotificacaoVS(){
         try {

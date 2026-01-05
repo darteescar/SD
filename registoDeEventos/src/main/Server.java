@@ -48,7 +48,7 @@ public class Server implements AutoCloseable{
     /** Thread que simula a passagem do tempo */
     private final ServerSimulator simulator;
 
-    /** Thread que notifica os clientes e guarda as estruturas onde as notificações são armazenadas */
+    /** Thread que notifica os clientes e guarda as estruturas onde os pedidos de notificações são armazenados */
     private final ServerNotifier notifier;
 
     /** Thread pool para processamento das mensagens dos clientes */
@@ -136,7 +136,7 @@ public class Server implements AutoCloseable{
     }
 
     /** 
-     * Inicia o ciclo do servidor, aceitando conexões de clientes e criando sessões para cada um deles.
+     * Inicia o ciclo do servidor, aceitando conexões de clientes e criando sessões e threads para cada um deles.
      * 
      * @throws IOException caso ocorra um erro ao aceitar conexões ou criar sessões
      */
@@ -166,7 +166,7 @@ public class Server implements AutoCloseable{
     }
 
     /** 
-     * Simula a passagem de um dia no servidor, guarda a série do dia, atualiza a data atual e notifica os clientes.
+     * Simula a passagem de um dia no servidor, guarda a série do dia, atualiza a data atual e notifica os clientes necessários.
      */
     public void passarDia() {
         this.series.passarDia();
@@ -184,14 +184,7 @@ public class Server implements AutoCloseable{
     }
 
     /** 
-     * Imprime a série de eventos do dia corrente do servidor.
-     */
-    public void printGS(){
-        this.series.print();
-    }
-
-    /** 
-     * Fecha o servidor, liberando todos os recursos associados.
+     * Fecha o servidor, libertando todos os recursos associados.
      */
     @Override
     public void close() throws IOException{

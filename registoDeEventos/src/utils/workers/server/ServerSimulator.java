@@ -32,7 +32,6 @@ public class ServerSimulator implements Runnable{
             while (true) {
                 Thread.sleep(intervalo); // Simula a passagem de um dia a cada intervalo
                 server.passarDia();
-                //server.printGS();
             }
         } catch (Exception e){
             e.printStackTrace();
