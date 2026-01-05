@@ -40,20 +40,20 @@ public class Demultiplexer implements AutoCloseable {
     /** Lock para sincronização de acesso às estruturas internas */
     private final ReentrantLock lock;
 
-    /** Mapa de entradas do demultiplexador, indexadas por ID */
+    /** Mapa de entradas do Demultiplexer, indexadas por ID */
     private final Map<Integer, Entry> mapEntries;
 
     /** Exceção capturada durante a execução da thread de fundo */
     private Exception ex;
 
-    /** Indica se o demultiplexador foi fechado */
+    /** Indica se o Demultiplexer foi fechado */
     private boolean closed = false;
 
     /** Thread responsável por ler mensagens do servidor em segundo plano */
     private Thread backgroundThread;
 
     /** 
-     * Construtor que inicializa o demultiplexador com o socket fornecido
+     * Construtor que inicializa o Demultiplexer com o socket fornecido
      * 
      * @param socket Socket para comunicação com o servidor
      * @throws IOException Se ocorrer um erro ao obter os streams do socket
@@ -124,6 +124,9 @@ public class Demultiplexer implements AutoCloseable {
 
     /** 
      * Método usado pelas threads Sender para enviar mensagens ao servidor
+     * 
+     * @param mensagem Mensagem a ser enviada
+     * @throws IOException Se ocorrer um erro ao enviar a mensagem
      */
     public void send(Mensagem mensagem) throws IOException {
         mensagem.serialize(out);
@@ -134,7 +137,7 @@ public class Demultiplexer implements AutoCloseable {
      * Método usado pelas threads Sender para receber mensagens do servidor
      * 
      * @param id ID da entrada da qual receber a mensagem
-     * @return A mensagem recebida ou null se o demultiplexador estiver fechado ou ocorrer uma exceção
+     * @return A mensagem recebida ou null se o Demultiplexer estiver fechado ou ocorrer uma exceção
      * @throws InterruptedException Se a thread for interrompida enquanto aguarda
      */
     public String receive(int id) throws InterruptedException {
@@ -144,7 +147,7 @@ public class Demultiplexer implements AutoCloseable {
             while (entry.queue.isEmpty()) {
                 if (closed || ex != null) return null; // termina se fechado ou exceção
                 entry.cond.await();
-                if (closed || ex != null) return null;
+                if (closed || ex != null) return null; // termina se fechado ou exceção
             }
             return entry.queue.poll();
         } finally {
@@ -153,7 +156,7 @@ public class Demultiplexer implements AutoCloseable {
     }
 
     /** 
-     * Fecha o demultiplexador, encerrando a thread de fundo e libertando os recursos
+     * Fecha o Demultiplexer, encerrando a thread de fundo e libertando os recursos
      */
     @Override
     public void close() throws IOException {

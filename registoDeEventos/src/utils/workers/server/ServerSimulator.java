@@ -24,7 +24,7 @@ public class ServerSimulator implements Runnable{
     }
 
     /** 
-     * Método run da thread que simula a passagem do tempo no servidor
+     * Método que simula a passagem do tempo no servidor
      */
     @Override
     public void run(){

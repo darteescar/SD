@@ -40,7 +40,7 @@ public class ServerWorker implements Runnable {
     /** Buffer de mensagens pendentes */
     private final BoundedBuffer<ServerData> mensagensPendentes;
 
-    /** Map de buffers de mensagens dos ServerWriters dos cliente */
+    /** Map de sessões dos clientes */
     private final Map<Integer, ClientSession> clientSessions;
 
     /** 

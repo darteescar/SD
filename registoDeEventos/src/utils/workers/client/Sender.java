@@ -21,7 +21,7 @@ public class Sender implements Runnable {
     /** Listener para notificações enviadas */
     private final NotificacaoListener listener;
 
-    /** Lock para sincronizar o acesso à lista de respostas */
+    /** Lock para sincronizar o acesso à lista de respostas do Stud */
     private final ReentrantLock lock;
 
     /**

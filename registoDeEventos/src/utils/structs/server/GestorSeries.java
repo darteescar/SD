@@ -39,7 +39,7 @@ public class GestorSeries {
      }
 
      /** 
-      * Método a ser chamado quando o Gestor de Séries for encerrado. Garante que a série atual é guardada na base de dados
+      * Método a ser chamado quando o Gestor de Séries for encerrado. Garante que a série do dia atual é guardada na base de dados
      */
      public void close() {
           lock.lock();
@@ -74,7 +74,8 @@ public class GestorSeries {
           return false; // série existe
      }
 
-     /** Remove uma série de eventos da base de dados e da cache
+     /** 
+      * Remove uma série de eventos da base de dados e da cache
       * 
       * @param dia Data da série a ser removida
       * @return true se a série foi removida com sucesso, false caso contrário
@@ -181,6 +182,13 @@ public class GestorSeries {
           } finally {
                lock.unlock();
           }
+     }
+
+     /** 
+      * Imprime o conteúdo da base de dados de séries
+      */
+     public void print(){
+          this.bd.print();
      }
 
      // Métodos das Queries de Agregação
@@ -315,13 +323,6 @@ public class GestorSeries {
           } else {
                return List.of(); // Retorna uma lista vazia se a série não existir
           }
-     }
-
-     /** 
-      * Imprime o conteúdo da base de dados de séries
-      */
-     public void print(){
-          this.bd.print();
      }
 
      /** 

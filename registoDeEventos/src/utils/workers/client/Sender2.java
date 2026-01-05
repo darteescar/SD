@@ -22,10 +22,10 @@ public class Sender2 implements Runnable {
     /** Listener para notificações recebidas */
     private final NotificacaoListener listener;
 
-    /** Lock para sincronização de acesso a recursos compartilhados (lista de respostas e mapa de timestamps) */
+    /** Lock para sincronização de acesso a recursos compartilhados (lista de respostas e mapa de timestamps do Stud2) */
     private final ReentrantLock lock;
 
-    /** Mapa para armazenar timestamps de mensagens enviadas */
+    /** Mapa para armazenar timestamps de mensagens enviadas do Stud2 */
     private final Map<TipoMsg, List<Long>> messageTimestamps;
 
     /** Construtor da classe Sender2

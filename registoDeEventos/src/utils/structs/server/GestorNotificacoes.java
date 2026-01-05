@@ -13,10 +13,10 @@ import utils.structs.notification.NotificationVSCounter;
 /** Classe responsável por gerir notificações */
 public class GestorNotificacoes {
 
-     /** Lista de notificações do tipo Vendas Consecutivas */
+     /** Lista das estruturas que guardam o estado das notificações do tipo Vendas Consecutivas */
      private final List<NotificationVCCounter> listavc = new ArrayList<>();
 
-     /** Lista de notificações do tipo Vendas Simultâneas */
+     /** Lista das estruturas que guardam o estado das notificações do tipo Vendas Simultâneas */
      private final List<NotificationVSCounter> listavs = new ArrayList<>();
 
      /** Lock para a lista de notificações do tipo Vendas Consecutivas */
@@ -28,7 +28,7 @@ public class GestorNotificacoes {
      /** Último produto vendido */
      private String produtoAtualVC = null;
 
-     /** Adiciona uma notificação do tipo Vendas Consecutivas 
+     /** Adiciona uma notificação do tipo Vendas Consecutivas. Usada pelo ServerWorker quando recebe uma notificação deste tipo.
       * 
       * @param id ID da notificação
       * @param noti Notificação a adicionar
@@ -43,7 +43,7 @@ public class GestorNotificacoes {
           }
      }
 
-     /** Adiciona uma notificação do tipo Vendas Simultâneas 
+     /** Adiciona uma notificação do tipo Vendas Simultâneas. Usada pelo ServerWorker quando recebe uma notificação deste tipo.
       * 
       * @param id ID da notificação
       * @param noti Notificação a adicionar
@@ -61,7 +61,7 @@ public class GestorNotificacoes {
           }
      }
 
-     /** Processa a venda de um produto 
+     /** Processa a venda de um produto. Usada pelo ServerNotifier sempre que algum ServerWorker notifica uma venda.
       * 
       * @param produto Produto vendido
       * @return Lista de notificações a enviar
@@ -110,7 +110,8 @@ public class GestorNotificacoes {
           }
      }
 
-     /** Processa as notificações do tipo Vendas Simultâneas
+     /** 
+      * Processa as notificações do tipo Vendas Simultâneas
       * 
       * @param produto Produto vendido
       * @param out Lista de notificações a enviar
@@ -135,7 +136,8 @@ public class GestorNotificacoes {
           }
      }
 
-     /** Obtem todas as notificações pendentes e limpa as listas
+     /** 
+      * Obtém todas as notificações pendentes e limpa as listas. usado pelo ServerSimulator ao passar o dia.
       * 
       * @return Lista de notificações a enviar
       */
