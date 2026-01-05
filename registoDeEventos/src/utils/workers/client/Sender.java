@@ -6,13 +6,34 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import utils.structs.client.NotificacaoListener;
 
+/** Thread responsável por enviar 1 mensagem e esperar pela resposta */
 public class Sender implements Runnable {
+
+    /** Demultiplexer utilizado para enviar e receber mensagens */
     private final Demultiplexer demu;
+
+    /** Mensagem a ser enviada */
     private final Mensagem mToSend;
+
+    /** Lista do Stud onde serão guardadas as respostas recebidas */
     private final List<String> replies;
+
+    /** Listener para notificações enviadas */
     private final NotificacaoListener listener;
+
+    /** Lock para sincronizar o acesso à lista de respostas */
     private final ReentrantLock lock;
 
+    /**
+     * Construtor da classe Sender
+     * 
+     * @param demu Demultiplexer utilizado para enviar e receber mensagens
+     * @param mToSend Mensagem a enviar
+     * @param replies Lista onde serão guardadas as respostas recebidas
+     * @param listener Listener para notificações enviadas
+     * @param lock Lock para sincronizar o acesso à lista de respostas
+     * @return Uma nova instância de Sender
+     */
     public Sender(Demultiplexer demu, Mensagem mToSend, List<String> replies, NotificacaoListener listener, ReentrantLock lock){
         this.demu = demu;
         this.mToSend = mToSend;
@@ -21,6 +42,9 @@ public class Sender implements Runnable {
         this.lock = lock;
     }
 
+    /** 
+     * Método executado pela thread para enviar a mensagem e esperar pela resposta
+     */
     @Override
     public void run(){
         try {
