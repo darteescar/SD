@@ -145,21 +145,6 @@ public class Cache<K,V>{
      }
 
      /** 
-      * Retorna uma representação em string da cache
-      * 
-      * @return Representação em string da cache
-      */
-     @Override
-     public String toString() {
-          readLock.lock();
-          try {
-               return map.toString();
-          } finally {
-               readLock.unlock();
-          }
-     }
-
-     /** 
       * Imprime o estado atual da cache
       */
      public void print() {
