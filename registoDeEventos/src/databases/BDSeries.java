@@ -6,12 +6,26 @@ import java.sql.*;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/** Classe responsável por gerir as séries na base de dados */
 public class BDSeries implements Map<String, Serie> {
+
+    /** Lock para garantir a sincronização de acesso às séries */
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    /** Lock para escrita */
     private final ReentrantReadWriteLock.WriteLock writelock =  lock.writeLock();
+
+    /** Lock para leitura */
     private final ReentrantReadWriteLock.ReadLock readLock = lock.readLock();
+
+    /** Instância singleton da classe BDSeries */
     private static BDSeries singleton = null;
 
+    /**
+     * Obtém a instância singleton da classe BDSeries
+     *
+     * @return Instância singleton de BDSeries
+     */
     public static BDSeries getInstance() {
         if (singleton == null) {
             singleton = new BDSeries();
@@ -19,6 +33,11 @@ public class BDSeries implements Map<String, Serie> {
         return singleton;
     }
 
+    /** 
+     * Construtor privado que inicializa a base de dados de séries/eventos
+     * 
+     * @throws NullPointerException se ocorrer um erro ao criar as tabelas
+     */
     private BDSeries() {
         
         try (Connection conn = DriverManager.getConnection(BDConfig.URL, BDConfig.USERNAME, BDConfig.PASSWORD);
@@ -52,6 +71,11 @@ public class BDSeries implements Map<String, Serie> {
 
     // ----------------------- Map methods -----------------------
 
+    /** 
+     * Retorna o número de séries na base de dados
+     * 
+     * @return Número de séries na base de dados
+     */
     @Override
     public int size() {
         readLock.lock();
@@ -69,6 +93,11 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Verifica se a base de dados de séries está vazia
+     * 
+     * @return true se a base de dados estiver vazia, false caso contrário
+     */
     @Override
     public boolean isEmpty() {
         readLock.lock();
@@ -79,6 +108,12 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Verifica se existe uma série com a data especificada
+     * 
+     * @param key Data da série a verificar
+     * @return true se a série existir, false caso contrário
+     */
     @Override
     public boolean containsKey(Object key) {
         readLock.lock();
@@ -98,6 +133,12 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Verifica se existe uma série com o valor especificado
+     * 
+     * @param value Série a verificar
+     * @return true se a série existir, false caso contrário
+     */
     @Override
     public boolean containsValue(Object value) {
         readLock.lock();
@@ -111,6 +152,12 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Obtém a série correspondente à data especificada
+     * 
+     * @param key Data da série a obter
+     * @return Série correspondente à data, ou null se não existir
+     */
     @Override
     public Serie get(Object key) {
         readLock.lock();
@@ -148,6 +195,13 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Adiciona uma nova série à base de dados
+     * 
+     * @param key Data da série a adicionar
+     * @param value Série a adicionar
+     * @return Série adicionada
+     */
     @Override
     public Serie put(String key, Serie value) {
         writelock.lock();
@@ -185,6 +239,12 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Remove a série correspondente à data especificada
+     * 
+     * @param key Data da série a remover
+     * @return Série removida, ou null se não existir
+     */
     @Override
     public Serie remove(Object key) {
         writelock.lock();
@@ -206,6 +266,12 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Adiciona todas as séries do mapa especificado à base de dados
+     * 
+     * @param m Mapa de séries a adicionar
+     * @throws NullPointerException se ocorrer um erro ao adicionar as séries
+     */
     @Override
     public void putAll(Map<? extends String, ? extends Serie> m) {
         writelock.lock();
@@ -216,6 +282,9 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Remove todas as séries da base de dados
+     */
     @Override
     public void clear() {
         writelock.lock();
@@ -232,6 +301,11 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Devolve o conjunto de chaves (datas das séries) na base de dados
+     * 
+     * @return Conjunto de chaves (datas das séries) na base de dados
+     */
     @Override
     public Set<String> keySet() {
         readLock.lock();
@@ -252,6 +326,11 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Devolve a coleção de séries na base de dados
+     * 
+     * @return Coleção de séries na base de dados
+     */
     @Override
     public Collection<Serie> values() {
         readLock.lock();
@@ -264,6 +343,11 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Devolve o conjunto de entradas (data, série) na base de dados
+     * 
+     * @return Conjunto de entradas (data, série) na base de dados
+     */
     @Override
     public Set<Entry<String, Serie>> entrySet() {
         readLock.lock();
@@ -279,6 +363,9 @@ public class BDSeries implements Map<String, Serie> {
         }
     }
 
+    /** 
+     * Imprime o conteúdo completo da base de dados de séries/eventos
+     */
     public void print() {
         readLock.lock();
         try {
