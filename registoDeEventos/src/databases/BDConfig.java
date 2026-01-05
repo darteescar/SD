@@ -1,6 +1,6 @@
 package databases;
 
-// Devolve a password de um utilizador/** Configurações da base de dados */
+/** Configurações da base de dados */
 public class BDConfig {
 
     /** Nome de utilizador da base de dados */

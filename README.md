@@ -8,6 +8,30 @@ Implementação de um serviço de registo de eventos em séries temporais e de a
 * [tiagofigueiredo7](https://github.com/tiagofigueiredo7)
 * [inesferribeiro](https://github.com/inesferribeiro)
 
+## Dependências
+
+Para executar este projeto é necessário ter instalado:
+
+- **Java JDK 17** (ou superior)
+- **GNU Make**
+- **MariaDB Server**
+
+### Base de Dados
+
+O servidor utiliza a base de dados MariaDB para persistência de dados.
+
+Após instalar o MariaDB, é necessário executar os seguintes comandos:
+
+```sql
+CREATE DATABASE base_dados_sd;
+
+CREATE USER IF NOT EXISTS 'me'@'localhost' IDENTIFIED BY 'mypass';
+
+GRANT ALL PRIVILEGES ON base_dados_sd.* TO 'me'@'localhost';
+
+FLUSH PRIVILEGES;
+```
+
 ## Executável
 Para compilar os ficheiros executáveis do servidor, do cliente e de testes, basta fazer:
 
@@ -54,7 +78,7 @@ $ make insert-test-final
 
 O primeiro comando executa um teste de inserções de eventos, o segundo um teste de inserções de eventos inválidos e o terceiro, um teste que envolve várias operações. No fim de cada teste, são apresentados alguns resultados estatísticos na pasta `scripts/results`.
 
-### Documentação
+## Documentação
 
 Para gerar a documentação do projeto, basta fazer:
 
@@ -66,11 +90,11 @@ $ make doc
 Irá ser criada uma pasta `docs` com a documentação gerada. Para aceder à documentação, basta abrir o ficheiro `index.html` que se encontra dentro da pasta `docs`. Por exemplo:
 
 ```bash
-$ cd registoDeEventos/docs
+$ cd docs
 $ xdg-open index.html
 ```
 
-### Limpar ficheiros compilados
+## Limpeza
 
 Para apagar os ficheiros compilados, basta fazer:
 
