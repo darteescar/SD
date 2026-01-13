@@ -19,7 +19,7 @@ public class GestorSeries {
      private final BDSeries bd;
 
      /** Cache para armazenar resultados de agregações */
-     private final Cache<String, Map<TipoMsg, Map<String, Double>>> cacheQueries;
+     private final Cache<String, Map<TipoMsg, Map<String, Double>>> cacheQueries; // dia -> (tipo -> (produto -> valor))
 
      /** Data do dia atual */
      private Data data_atual;

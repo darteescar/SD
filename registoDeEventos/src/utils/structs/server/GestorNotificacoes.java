@@ -96,7 +96,7 @@ public class GestorNotificacoes {
 
                     if (nvc.getCounter() >= nvc.getN()) {
                          out.add(new ServerData(
-                              nvc.getClienteID(), 
+                              nvc.getClienteID(),
                               new Mensagem(
                                    nvc.getId(),
                                    TipoMsg.NOTIFICACAO_VC,
