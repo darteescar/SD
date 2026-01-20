@@ -130,13 +130,8 @@ public class Demultiplexer implements AutoCloseable {
      * @throws IOException Se ocorrer um erro ao enviar a mensagem
      */
     public void send(Mensagem mensagem) throws IOException {
-        lock.lock();
-        try {
-            mensagem.serialize(out);
-            out.flush();
-        } finally {
-            lock.unlock();
-        }
+        mensagem.serialize(out);
+        out.flush();
     }
 
     /** 

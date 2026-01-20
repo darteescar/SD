@@ -77,7 +77,6 @@ public class RobustScalabilityTestFinal {
 
                     // Bombardeamento de eventos
                     for (int j = 0; j < num_produtos; j++) {
-                        Thread.sleep(PAUSA_EVENTO_MS);
                         studs[clienteId].sendEVENTO(
                                 TipoMsg.REGISTO,
                                 "produto" + j,

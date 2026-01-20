@@ -82,7 +82,6 @@ public class ParallelInsertTest {
 
                     // Envio de eventos
                     for (int j = 0; j < numProdutos; j++) {
-                        Thread.sleep(5); // pequena pausa
                         studs[clienteId].sendEVENTO(
                                 TipoMsg.REGISTO,
                                 "banana",
