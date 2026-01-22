@@ -1,6 +1,8 @@
 # SD (Sistemas Distribuídos) (Português)
 Implementação de um serviço de registo de eventos em séries temporais e de agregação de informação, acessível remotamente através de um servidor. É possível consultar o respetivo [enunciado](registoDeEventos/enunciado.pdf) e [relatório](registoDeEventos/relatorio.pdf).
 
+### Nota Final: 13.9 / 20  😐
+
 ## Membros do grupo:
 
 * [darteescar](https://github.com/darteescar)
@@ -109,6 +111,8 @@ $ make clean
 
 # SD (Distributed Systems) (English)
 Implementation of a time series event logging and information aggregation service, remotely accessible through a server. You can check the respective [statement](registoDeEventos/enunciado.pdf) and [report](registoDeEventos/relatorio.pdf).
+
+### Final Grade: 13.9 / 20 😐
 
 ## Group Members:
 
